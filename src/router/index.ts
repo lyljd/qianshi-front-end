@@ -3,26 +3,30 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    component: import("../views/Index.vue")
-    //()=>import("")是懒加载，等点击到页面后才会加载
-    //一般网页都有个首页，首页是不需要懒加载的，直接import就行
+    component: () => import("../views/Index.vue")
   },
-  // {
-  //   path: "/a",
-  //   component: () => import("../components/A.vue")
-  //   //()=>import("")是懒加载，等点击到页面后才会加载
-  //   //一般网页都有个首页，首页是不需要懒加载的，直接import就行
-  // },
-  // {
-  //   path: "/b",
-  //   component: () => import("../components/B.vue"),
-  //   name: "b" //在路由跳转时可使用name来跳转
-  // }
+  {
+    path: "/:pathMatch(.*)",
+    component: () => import("../views/404.vue")
+  },
+  {
+    path: "/v/:vid",
+    component: () => import("../views/Video.vue")
+  },
+  {
+    path: "/live",
+    component: () => import("../views/LiveIndex.vue")
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  window.scrollTo(0, 0) //设置滚动条位置到顶部
+  next()
+});
 
 export default router

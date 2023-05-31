@@ -1,5 +1,5 @@
 <template>
-  <div class="video-card">
+  <div @click="ToVideo" class="video-card">
     <el-image class="cover" src="">
       <template #error>
         <div class="default">封面加载失败</div>
@@ -27,20 +27,22 @@
 </template>
 
 <script setup lang="ts">
-
+function ToVideo() {
+  window.open("/v/1", "_blank");
+}
 </script>
 
 <style scoped>
 .video-card {
   width: 270px;
   height: 200px;
+  cursor: pointer;
 }
 
 .video-card .cover {
   width: 270px;
   height: 151.875px;
   border-radius: 5px;
-  cursor: pointer;
 }
 
 .video-card .info {
@@ -55,7 +57,6 @@
   position: absolute;
   display: flex;
   justify-content: space-between;
-  cursor: default;
 }
 
 .video-card .info .icon {

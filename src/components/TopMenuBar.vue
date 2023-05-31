@@ -1,9 +1,9 @@
 <template>
-  <TopMenuImg></TopMenuImg>
+  <TopMenuImg id="top-menu-img"></TopMenuImg>
 
   <el-menu id="menu" class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
     <div class="logo">
-      <img class="icon" src="favicon.png">
+      <img class="icon" src="../../public/favicon.png">
       <span class="notice">浅时</span>
     </div>
 
@@ -22,7 +22,7 @@
     <div class="flex-grow" />
 
     <div>
-      <el-input v-model="searchKey" class="search" placeholder="搜索" clearable>
+      <el-input id="search" v-model="searchKey" class="search" placeholder="搜索" clearable>
         <template #prefix><el-icon style="cursor: pointer;">
             <search />
           </el-icon></template>
@@ -31,79 +31,142 @@
 
     <div class="flex-grow" />
 
-    <el-avatar class="avatar" size="40" src="" @error="true">
-      <img src="default-avatar.png" />
-    </el-avatar>
+    <el-popover ref="loginPop" :width="400" trigger="hover">
+      <template #reference>
+        <div @click="openLoginWindow()" v-show="!loginStatus" class="login-btn">登录</div>
+      </template>
+      <div class="before-login-pop">
+        <div class="info1">登录后你可以：</div>
+        <div class="good">免费看高清视频</div>
+        <div class="good">同步播放记录</div>
+        <div class="good">发表弹幕/评论</div>
+        <el-button @click="openLoginWindow()" class="pop-login-btn" type="primary">立即登录</el-button>
+        <div class="info2">首次使用？<span @click="openLoginWindow()" class="register-span">点我注册</span></div>
+      </div>
+    </el-popover>
 
-    <div class="ico-btn">
-      <el-button class="iconfont el-icon-vip ico" circle></el-button>
-      <div class="notice">会员</div>
+    <LoginWindow v-model="loginWindowStatus"></LoginWindow>
+
+    <div v-show="loginStatus" class="after-login-menu">
+      <el-avatar class="avatar" size="40" src="" @error="true">
+        <img src="../../public/default-avatar.png" />
+      </el-avatar>
+
+      <div class="ico-btn">
+        <el-button class="iconfont el-icon-vip ico" circle></el-button>
+        <div class="notice">会员</div>
+      </div>
+
+      <div class="ico-btn">
+        <el-button circle><el-icon class="ico">
+            <Message />
+          </el-icon></el-button>
+        <div class="notice">消息</div>
+      </div>
+
+      <div class="ico-btn">
+        <el-button class="iconfont el-icon-fengche ico" circle></el-button>
+        <div class="notice">动态</div>
+      </div>
+
+      <div class="ico-btn">
+        <el-button circle><el-icon class="ico">
+            <Star />
+          </el-icon></el-button>
+        <div class="notice">收藏</div>
+      </div>
+
+      <div class="ico-btn">
+        <el-button circle><el-icon class="ico">
+            <Clock />
+          </el-icon></el-button>
+        <div class="notice">历史</div>
+      </div>
+
+      <div style="text-align: center;" class="ico-btn">
+        <el-button style="font-weight: bold;" class="iconfont el-icon-idea ico" circle></el-button>
+        <div class="notice">创作中心</div>
+      </div>
+
+      <el-button type="primary" class="upload-btn">
+        <el-icon>
+          <Upload />
+        </el-icon>
+        <span class="notice">投稿</span>
+      </el-button>
     </div>
-
-    <div class="ico-btn">
-      <el-button circle><el-icon class="ico">
-          <Message />
-        </el-icon></el-button>
-      <div class="notice">消息</div>
-    </div>
-
-    <div class="ico-btn">
-      <el-button class="iconfont el-icon-fengche ico" circle></el-button>
-      <div class="notice">动态</div>
-    </div>
-
-    <div class="ico-btn">
-      <el-button circle><el-icon class="ico">
-          <Star />
-        </el-icon></el-button>
-      <div class="notice">收藏</div>
-    </div>
-
-    <div class="ico-btn">
-      <el-button circle><el-icon class="ico">
-          <Clock />
-        </el-icon></el-button>
-      <div class="notice">历史</div>
-    </div>
-
-    <div style="text-align: center;" class="ico-btn">
-      <el-button style="font-weight: bold;" class="iconfont el-icon-idea ico" circle></el-button>
-      <div class="notice">创作中心</div>
-    </div>
-
-    <el-button type="primary" class="upload-btn">
-      <el-icon>
-        <Upload />
-      </el-icon>
-      <span class="notice">投稿</span>
-    </el-button>
   </el-menu>
 </template>
 
 <script lang="ts" setup>
 import TopMenuImg from "./TopMenuImg.vue"
+import LoginWindow from "./LoginWindow.vue"
+import * as common from "../common"
+import { useRoute } from 'vue-router'
+
+const route = useRoute();
+
+let topMenuImg: HTMLElement
 
 let menu: HTMLElement
 
+let searchInput: HTMLElement
+
 let searchKey = ref("")
 
+let loginStatus = ref(false)
+
+let loginWindowStatus = ref(false)
+
+const loginPop = ref()
+
+watch(() => route.path, (newPath) => {
+  if (newPath === "/") {
+    topMenuImg.style.display = "block"
+    menu.style.backgroundColor = "transparent"
+    menu.style.border = "none"
+    searchInput.style.background = "rgba(255, 255, 255, 0.75)"
+  } else {
+    topMenuImg.style.display = "none"
+    menu.style.backgroundColor = "white"
+    menu.style.borderBottom = "1px solid #dedfe0"
+    searchInput.style.background = "#f4f4f5"
+  }
+})
+
 onMounted(() => {
+  topMenuImg = document.getElementById("top-menu-img") as HTMLElement
+  if (location.pathname === "/") {
+    topMenuImg.style.display = "block"
+  }
   menu = document.getElementById("menu") as HTMLElement
+  searchInput = document.querySelector(".el-input__wrapper") as HTMLElement
   window.addEventListener('scroll', scrollListenerHandler)
+  loginStatus.value = common.isLogin()
 })
 onUnmounted(() => {
   window.removeEventListener("scroll", scrollListenerHandler)
 })
 
 function scrollListenerHandler() {
-  if (document.documentElement.scrollTop > 104) {
-    menu.style.backgroundColor = "white"
-    menu.style.borderBottom = "1px solid #dedfe0"
-  } else {
-    menu.style.backgroundColor = "transparent"
-    menu.style.border = "none"
+  if (route.path === "/") {
+    if (document.documentElement.scrollTop > 104) {
+      menu.style.backgroundColor = "white"
+      menu.style.borderBottom = "1px solid #dedfe0"
+      searchInput.style.background = "#f4f4f5"
+    } else {
+      menu.style.backgroundColor = "transparent"
+      menu.style.border = "none"
+      searchInput.style.background = "rgba(255, 255, 255, 0.75)"
+    }
   }
   menu.style.marginLeft = -document.documentElement.scrollLeft.toString() + "px"
+}
+
+function openLoginWindow() {
+  loginPop.value.hide()
+  loginWindowStatus.value = true
+  loginStatus.value = true //Todo
 }
 </script>
 
@@ -181,6 +244,59 @@ function scrollListenerHandler() {
   border-radius: 10px;
 }
 
+.login-btn {
+  width: 40px;
+  height: 40px;
+  background-color: #409EFF;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.before-login-pop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px;
+  cursor: default;
+}
+
+.before-login-pop .info1 {
+  width: 100%;
+  font-weight: bold;
+}
+
+.before-login-pop .good {
+  font-size: 16px;
+}
+
+.before-login-pop .pop-login-btn {
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.before-login-pop .register-span {
+  color: #409EFF;
+  cursor: pointer;
+}
+
+.before-login-pop .register-span:hover {
+  color: #79bbff;
+}
+
+.after-login-menu {
+  display: flex;
+  align-items: center;
+}
+
 .avatar {
   margin-right: 10px;
   cursor: pointer;
@@ -188,8 +304,8 @@ function scrollListenerHandler() {
 
 .ico-btn:hover {
   font-size: 30px;
-  /*让功能按钮向下垂一点*/
   cursor: pointer;
+  /*让功能按钮向下垂一点*/
 }
 
 .ico-btn .el-button {

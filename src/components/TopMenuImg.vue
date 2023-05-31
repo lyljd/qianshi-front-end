@@ -1,18 +1,18 @@
 <template>
   <header>
     <div class="view">
-      <img src="top-menu-img/view-morning.jpg" class="morning" alt="">
-      <img src="top-menu-img/view-afternoon.jpg" class="afternoon" alt="">
+      <img src="../../public/top-menu-img/view-morning.jpg" class="morning" alt="">
+      <img src="../../public/top-menu-img/view-afternoon.jpg" class="afternoon" alt="">
       <video autoplay loop muted class="evening">
-        <source src="top-menu-img/view-evening.webm" type="video/webm" />
+        <source src="../../public/top-menu-img/view-evening.webm" type="video/webm" />
       </video>
-      <img src="top-menu-img/view-evening-snow.png" class="window-cover" alt="">
+      <img src="../../public/top-menu-img/view-evening-snow.png" class="window-cover" alt="">
     </div>
 
     <div class="tree">
-      <img src="top-menu-img/tree-morning.png" class="morning" alt="">
-      <img src="top-menu-img/tree-afternoon.png" class="afternoon" alt="">
-      <img src="top-menu-img/tree-evening.png" class="evening" alt="">
+      <img src="../../public/top-menu-img/tree-morning.png" class="morning" alt="">
+      <img src="../../public/top-menu-img/tree-afternoon.png" class="afternoon" alt="">
+      <img src="../../public/top-menu-img/tree-evening.png" class="evening" alt="">
     </div>
   </header>
 </template>
@@ -45,6 +45,7 @@ header {
   height: 160px;
   position: relative;
   overflow: hidden;
+  display: none;
 
   --percentage: 0.5;
 }
