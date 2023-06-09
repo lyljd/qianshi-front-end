@@ -38,7 +38,7 @@
 
         <span class="item">
           <span class="iconfont el-icon-lishijilu icon"></span>
-          <span>{{ videoDuration }}</span>
+          <span>{{ videoDateFormatter(video.date) }}</span>
         </span>
 
         <span v-if="video.empower">
@@ -977,6 +977,18 @@ function delDanmu(did: number) {
     "offset": 77,
     "type": "success",
   })
+}
+
+function videoDateFormatter(date: number) {
+  let fd = common.timestampFormatter(date)
+
+  let mons = fd.month < 10 ? "0" + fd.month.toString() : fd.month.toString()
+  let ds = fd.day < 10 ? "0" + fd.day.toString() : fd.day.toString()
+  let hs = fd.hour < 10 ? "0" + fd.hour.toString() : fd.hour.toString()
+  let mins = fd.minute < 10 ? "0" + fd.minute.toString() : fd.minute.toString()
+  let ss = fd.second < 10 ? "0" + fd.second.toString() : fd.second.toString()
+
+  return fd.year + "-" + mons + "-" + ds + " " + hs + ":" + mins + ":" + ss
 }
 
 function danmuTimeFormatter(_: any, __: any, cellValue: number, ___: any) {
