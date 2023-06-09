@@ -8,12 +8,12 @@
 
     <div class="recommendation">
       <div class="row">
-        <VideoCard class="mr10 mb10"></VideoCard>
-        <VideoCard class="ml10 mb10"></VideoCard>
+        <VideoCard :data="video" class="mr10 mb10"></VideoCard>
+        <VideoCard :data="video" class="ml10 mb10"></VideoCard>
       </div>
       <div class="row">
-        <VideoCard class="mr10 mt10"></VideoCard>
-        <VideoCard class="ml10 mt10"></VideoCard>
+        <VideoCard :data="video" class="mr10 mt10"></VideoCard>
+        <VideoCard :data="video" class="ml10 mt10"></VideoCard>
       </div>
     </div>
 
@@ -27,7 +27,7 @@
   <div v-for="(item) in 4" class="channel">
     <div class="title-container"><span class="title">频道{{ item }}</span></div>
     <div class="channel-row">
-      <VideoCard class="card" v-for="() in 4"></VideoCard>
+      <VideoCard :data="video" class="card" v-for="() in 4"></VideoCard>
 
       <VideoRefreshBtn></VideoRefreshBtn>
     </div>
@@ -44,6 +44,18 @@ import VideoCard from "../components/VideoCard.vue"
 import VideoRefreshBtn from "../components/VideoRefreshBtn.vue"
 import Advertisement from "../components/Advertisement.vue"
 import DeveloperInfo from "../components/DeveloperInfo.vue"
+
+let video = {
+  "vid": 1,
+  "coverUrl": "",
+  "playNum": 0,
+  "danmuNum": 0,
+  "duration": 0,
+  "title": "标题",
+  "uid": 1,
+  "nickname": "Bonnenult",
+  "date": 1685599556000
+}
 </script>
 
 <style scoped>

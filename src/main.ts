@@ -7,6 +7,7 @@ import 'element-plus/dist/index.css'
 import router from './router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './assets/iconfont/iconfont.css'
+import './assets/iconfont/iconfont.js'
 import 'animate.css';
 
 const app = createApp(App)

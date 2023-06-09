@@ -13,10 +13,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/v/:vid",
     component: () => import("../views/Video.vue")
   },
-  {
-    path: "/live",
-    component: () => import("../views/LiveIndex.vue")
-  },
 ]
 
 const router = createRouter({

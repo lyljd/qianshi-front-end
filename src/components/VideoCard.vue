@@ -1,48 +1,62 @@
 <template>
-  <div @click="ToVideo" class="video-card">
-    <el-image class="cover" src="">
+  <div class="video-card">
+    <el-image @click="common.ToVideo(data.vid)" class="cover" :src="data.coverUrl">
       <template #error>
-        <div class="default">封面加载失败</div>
+        <div @click="common.ToVideo(data.vid)" class="default">封面加载失败</div>
       </template>
     </el-image>
     <div class="info">
       <span>
         <span class="iconfont el-icon-bofangshu icon"></span>
-        播放数
+        {{ common.numFormatterW(data.playNum) }}
         <span class="danmushu">
           <span class="iconfont el-icon-danmushu icon"></span>
-          弹幕数
+          {{ common.numFormatterW(data.danmuNum) }}
         </span>
       </span>
-      <span class="duration">时长</span>
+      <span class="duration">{{ common.videoTimeFormatterHMS(data.duration) }}</span>
     </div>
     <div class="content">
-      <div class="title-container"><span class="title">标题</span></div>
+      <div class="title-container"><span @click="common.ToVideo(data.vid)" class="title">{{ data.title }}</span></div>
       <div class="up-time-container">
-        <span class="up-time-text"><span class="iconfont el-icon-UPzhu icon"></span>
-          昵称 · 日期</span>
+        <span @click="common.ToUser(data.uid)" class="up-time-text">
+          <span style="font-size: 14px;" class="iconfont el-icon-UPzhu icon"></span>
+          {{ data.nickname }} · {{ common.timestampFormatterMD(data.date) }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-function ToVideo() {
-  window.open("/v/1", "_blank");
-}
+import * as common from "../common"
+
+defineProps<{
+  data: {
+    vid: number
+    coverUrl: string
+    playNum: number
+    danmuNum: number
+    duration: number
+    title: string
+    uid: number
+    nickname: string
+    date: number
+  }
+}>()
 </script>
 
 <style scoped>
 .video-card {
   width: 270px;
   height: 200px;
-  cursor: pointer;
 }
 
 .video-card .cover {
   width: 270px;
   height: 151.875px;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .video-card .info {
@@ -57,6 +71,7 @@ function ToVideo() {
   position: absolute;
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .video-card .info .icon {
@@ -93,6 +108,11 @@ function ToVideo() {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.video-card .up-time-text {
+  display: flex;
+  align-items: center;
 }
 
 .video-card .up-time-text:hover {

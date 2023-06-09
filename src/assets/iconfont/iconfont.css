@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4087073 */
-  src: url('iconfont.woff2?t=1685084234593') format('woff2'),
-       url('iconfont.woff?t=1685084234593') format('woff'),
-       url('iconfont.ttf?t=1685084234593') format('truetype');
+  src: url('iconfont.woff2?t=1686295082297') format('woff2'),
+       url('iconfont.woff?t=1686295082297') format('woff'),
+       url('iconfont.ttf?t=1686295082297') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,122 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.el-icon-ashbin:before {
+  content: "\e744";
+}
+
+.el-icon-jingyin:before {
+  content: "\e64e";
+}
+
+.el-icon-quanping:before {
+  content: "\ea68";
+}
+
+.el-icon-bofang:before {
+  content: "\e6a4";
+}
+
+.el-icon-zanting:before {
+  content: "\e6a5";
+}
+
+.el-icon-quxiaoquanping:before {
+  content: "\e758";
+}
+
+.el-icon-yinliang:before {
+  content: "\e6e3";
+}
+
+.el-icon-huazhonghua:before {
+  content: "\e624";
+}
+
+.el-icon-diandiandianshu:before {
+  content: "\e679";
+}
+
+.el-icon-cai:before {
+  content: "\e6c5";
+}
+
+.el-icon-zan:before {
+  content: "\e6c6";
+}
+
+.el-icon-level_1:before {
+  content: "\e6cc";
+}
+
+.el-icon-level_2:before {
+  content: "\e6cd";
+}
+
+.el-icon-level_3:before {
+  content: "\e6ce";
+}
+
+.el-icon-level_4:before {
+  content: "\e6cf";
+}
+
+.el-icon-level_5:before {
+  content: "\e6d0";
+}
+
+.el-icon-level_6:before {
+  content: "\e6d1";
+}
+
+.el-icon-browse:before {
+  content: "\e66a";
+}
+
+.el-icon-shezhi:before {
+  content: "\e67e";
+}
+
+.el-icon-fenxiang:before {
+  content: "\e669";
+}
+
+.el-icon-good:before {
+  content: "\e753";
+}
+
+.el-icon-collection:before {
+  content: "\e79d";
+}
+
+.el-icon-Bbi:before {
+  content: "\e668";
+}
+
+.el-icon-bofangqi-danmuguan:before {
+  content: "\e696";
+}
+
+.el-icon-bofangqi-danmukai:before {
+  content: "\e697";
+}
+
+.el-icon-sixin:before {
+  content: "\e6b8";
+}
+
+.el-icon-lishijilu:before {
+  content: "\e671";
+}
+
+.el-icon-jinzhi:before {
+  content: "\e608";
+}
+
+.el-icon-cry:before {
+  content: "\e74a";
 }
 
 .el-icon-danmushu:before {
@@ -23,6 +139,10 @@
 
 .el-icon-UPzhu:before {
   content: "\e667";
+}
+
+.el-icon-UPzhu-copy:before {
+  content: "\e874";
 }
 
 .el-icon-idea:before {

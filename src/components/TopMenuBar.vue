@@ -182,7 +182,7 @@ function openLoginWindow() {
   background-color: transparent;
   position: fixed;
   top: 0px;
-  z-index: 1;
+  z-index: 99999;
 }
 
 .el-menu--horizontal>.el-menu-item.is-active,
@@ -215,10 +215,6 @@ function openLoginWindow() {
 
 .el-sub-menu {
   width: 55px;
-}
-
-.flex-grow {
-  flex-grow: 1;
 }
 
 .logo {
