@@ -7,6 +7,14 @@ function isLogin(): boolean {
   return token !== null && token !== ""
 }
 
+function isMe(uid: number): boolean {
+  const localUid = localStorage.getItem("uid")
+  if (localUid && uid.toString() === localUid) {
+    return true
+  }
+  return false
+}
+
 function logout() {
   localStorage.removeItem("uid")
   localStorage.removeItem("nickname")
@@ -158,6 +166,7 @@ function checkCookieExists(cookieName:string) {
 export {
   isMobile,
   isLogin,
+  isMe,
   logout,
   btnCD,
   numFormatterW,

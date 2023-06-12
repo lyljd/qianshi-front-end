@@ -105,7 +105,7 @@ function verifyPassword() {
 function showLoginError(msg: string) {
   ElMessage({
     "message": msg,
-    "offset": 77,
+    "offset": 60,
     "customClass": "zIndex999",
     "type": "error",
   })

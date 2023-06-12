@@ -266,7 +266,7 @@ function signin() {
   if (signinStatus.value) {
     ElMessage({
       "message": "今日已签到，请明日再来",
-      "offset": 57,
+      "offset": 60,
       "type": "info"
     })
     return

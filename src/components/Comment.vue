@@ -5,7 +5,8 @@
     </el-avatar>
     <div class="right">
       <div class="user-info">
-        <span @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname }}</span>
+        <span :class="{ nicknameVip: data.isVip }" @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname
+        }}</span>
 
         <svg class="icon-symbol level" aria-hidden="true">
           <use :xlink:href="'#el-icon-level_' + data.level"></use>
@@ -25,14 +26,13 @@
         <span>
           <span class="date">{{ common.timestampFormatterMD(data.date) }}</span>
 
-          <span @click="data.isLike = !data.isLike; data.isDislike = false" :class="{ blue: data.isLike }"
-            :title="data.likeNum.toString()" class="iconfont el-icon-zan like-btn">{{ common.numFormatterW(data.likeNum)
+          <span @click="like" :class="{ blue: data.isLike }" :title="data.likeNum.toString()"
+            class="iconfont el-icon-zan like-btn">{{ common.numFormatterW(data.likeNum)
             }}</span>
 
-          <span @click=" data.isDislike = !data.isDislike; data.isLike = false " :class=" { blue: data.isDislike } "
-            class="iconfont el-icon-cai dislike-btn"></span>
+          <span @click="dislike" :class="{ blue: data.isDislike }" class="iconfont el-icon-cai dislike-btn"></span>
 
-          <span @click=" openChildSendArea(data.parentCid, data.cid, data.nickname, data.isChild) "
+          <span @click="openChildSendArea(data.parentCid, data.cid, data.nickname, data.isChild)"
             class="reply-btn">回复</span>
         </span>
 
@@ -41,11 +41,11 @@
             <span class="iconfont el-icon-diandiandianshu extra"></span>
           </template>
           <div class="extra-container">
-            <el-popconfirm @confirm=" deleteComment(data.cid) " title="删除评论后，评论下所有回复都会被删除，是否继续?" confirm-button-text="确认"
+            <el-popconfirm @confirm="deleteComment(data.cid)" title="删除评论后，评论下所有回复都会被删除，是否继续?" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
                 <!--TODO 应该从localStorage里取当前登录uid来判断-->
-                <div v-if=" data.isUp " class="comment-detele">删除</div>
+                <div v-if="data.isUp" class="comment-detele">删除</div>
               </template>
             </el-popconfirm>
             <div class="comment-report">举报</div>
@@ -53,14 +53,14 @@
         </el-popover>
       </div>
 
-      <div v-show=" data.isTop || data.isUpLike " class="status">
-        <span v-show=" data.isTop " class="top">置顶</span>
-        <span v-show=" data.isUpLike " class="up-like">UP主觉得很赞</span>
+      <div v-show="data.isTop || data.isUpLike" class="status">
+        <span v-show="data.isTop" class="top">置顶</span>
+        <span v-show="data.isUpLike" class="up-like">UP主觉得很赞</span>
       </div>
 
       <div v-for="(  item  ) in   data.reply?.value  ">
-        <ChildComment :openChildSendArea=" openChildSendArea " :deleteComment=" deleteChildComment " :scrollId=" scrollId "
-          :data=" item "></ChildComment>
+        <ChildComment :vAuthorUid="vAuthorUid" :openChildSendArea="openChildSendArea" :deleteComment="deleteChildComment"
+          :scrollId="scrollId" :data="item"></ChildComment>
         <!-- {{ item.content }} -->
       </div>
     </div>
@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import { ElMessage } from 'element-plus'
 import * as common from "../common"
 
 let commentEle: HTMLTextAreaElement
@@ -78,6 +79,7 @@ type Comment = {
   avatarUrl: string
   nickname: string
   level: number
+  isVip: boolean
   isTop: boolean
   isUp: boolean
   isUpLike: boolean
@@ -105,6 +107,7 @@ let props = defineProps<{
   scrollId: number
   deleteComment: Function
   openChildSendArea: Function
+  vAuthorUid: number
 }>()
 
 onMounted(() => {
@@ -135,6 +138,44 @@ function deleteChildComment(cid: number) {
     }
   }
   props.data.reply?.value.splice(deleteIndex, 1)
+}
+
+function like() {
+  if (common.isMe(props.data.uid)) {
+    ElMessage({
+      "message": "不能给自己的评论点赞",
+      "offset": 77,
+    })
+    return
+  }
+  if (!props.data.isLike) {
+    props.data.isLike = true
+    props.data.likeNum++
+  } else {
+    props.data.isLike = false
+    props.data.likeNum--
+  }
+  if (common.isMe(props.vAuthorUid)) {
+    props.data.isUpLike = props.data.isLike
+  }
+  props.data.isDislike = false
+}
+
+function dislike() {
+  if (common.isMe(props.data.uid)) {
+    ElMessage({
+      "message": "不能给自己的评论点踩",
+      "offset": 77,
+    })
+    return
+  }
+  if (props.data.isLike) {
+    props.data.likeNum--
+    props.data.isLike = false
+    props.data.isUpLike = false
+
+  }
+  props.data.isDislike = !props.data.isDislike
 }
 </script>
 
@@ -173,6 +214,10 @@ export default {
 .container .user-info .nickname:hover {
   color: #409EFF;
   cursor: pointer;
+}
+
+.container .user-info .nicknameVip {
+  color: #FF6699;
 }
 
 .container .user-info .level {
@@ -277,4 +322,5 @@ export default {
   color: #909399;
   background-color: #e9e9eb;
   padding: 3px;
-}</style>
+}
+</style>

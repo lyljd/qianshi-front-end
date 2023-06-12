@@ -8,7 +8,7 @@
   "coinNum": 56890,
   "starNum": 8978,
   "shareNum": 3670,
-  "isLike": true,
+  "isLike": false,
   "isCoin": false,
   "isStar": false,
   "videoUrl": "../../public/byt.mp4",
@@ -27,6 +27,7 @@
         "avatarUrl": "../../public/avatar.jpeg",
         "nickname": "Bonnenult",
         "level": 6,
+        "isVip": true,
         "isTop": true,
         "isUp": true,
         "isUpLike": false,
@@ -46,6 +47,7 @@
               "avatarUrl": "../../public/avatar2.jpg",
               "nickname": "惜缘灬冷颜",
               "level": 3,
+              "isVip": false,
               "isTop": false,
               "isUp": false,
               "isUpLike": true,
@@ -63,6 +65,7 @@
               "avatarUrl": "../../public/avatar.jpeg",
               "nickname": "Bonnenult",
               "level": 6,
+              "isVip": true,
               "isTop": false,
               "isUp": true,
               "isUpLike": false,
@@ -87,6 +90,7 @@
         "avatarUrl": "../../public/avatar.jpeg",
         "nickname": "Bonnenult",
         "level": 6,
+        "isVip": true,
         "isTop": false,
         "isUp": true,
         "isUpLike": false,
@@ -120,7 +124,8 @@
       "date": 1685793356049,
       "size": 20,
       "color": "#FFFFFF",
-      "speed": 3
+      "speed": 3,
+      "isUp": true
     },
     {
       "did": 2,
@@ -128,8 +133,9 @@
       "value": "你好呀",
       "date": 1685799556000,
       "size": 25,
-      "color": "#F56C6C",
-      "speed": 4
+      "color": "#67C23A",
+      "speed": 4,
+      "isUp": false
     }
   ],
   "collection": {

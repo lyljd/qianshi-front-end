@@ -27,11 +27,10 @@
 
     <div v-else>
       <div v-for="(item, index) in data.value">
-        <Comment :openChildSendArea="openChildSendArea" :deleteComment="deleteComment" :scrollId="scrollId" :data="item">
+        <Comment :vAuthorUid="vAuthorUid" :openChildSendArea="openChildSendArea" :deleteComment="deleteComment" :scrollId="scrollId" :data="item">
         </Comment>
 
-        <div @click="item.reply!.isOpen = true"
-          v-show="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">共{{
+        <div @click="viewMore(item)" v-show="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">共{{
             item.reply?.num }}条回复，<span class="view">点击查看</span></div>
 
         <el-pagination @click="getChildCommentByPage(item.cid)"
@@ -65,6 +64,7 @@ type Comment = {
   avatarUrl: string
   nickname: string
   level: number
+  isVip: boolean
   isTop: boolean
   isUp: boolean
   isUpLike: boolean
@@ -93,6 +93,7 @@ let props = defineProps<{
     value: Comment[]
   }
   vid: number
+  vAuthorUid: number
 }>()
 
 let content = ref("")
@@ -144,6 +145,7 @@ function send(comment: Comment[]) {
     "avatarUrl": "../../public/avatar.jpeg",
     "nickname": "Bonnenult",
     "level": 6,
+    "isVip": true,
     "isTop": false,
     "isUp": true,
     "isUpLike": false,
@@ -197,6 +199,7 @@ function childSend() {
     "avatarUrl": "../../public/avatar.jpeg",
     "nickname": "Bonnenult",
     "level": 6,
+    "isVip": true,
     "isTop": false,
     "isUp": true,
     "isUpLike": false,
@@ -242,6 +245,32 @@ function getChildCommentByPage(cid: number) {
   }
   console.log(location.host + `/api/v/${props.vid}/comment/${cid}?page=${curPage}`)
   isClickPage = false
+}
+
+function viewMore(comment: Comment) {
+  comment.reply!.isOpen = true
+  comment.reply?.value.push({
+    "cid": props.data.num,
+    "uid": 3,
+    "avatarUrl": "../../public/avatar2.jpg",
+    "nickname": "惜缘灬冷颜",
+    "level": 3,
+    "isVip": false,
+    "isTop": false,
+    "isUp": false,
+    "isUpLike": false,
+    "content": "嘻嘻😁",
+    "date": 1686358790156,
+    "likeNum": 0,
+    "isLike": false,
+    "isDislike": false,
+    "isChild": true,
+    "parentCid": 1,
+    "to": {
+      "uid": 1,
+      "nickname": "Bonnenult"
+    }
+  })
 }
 </script>
 

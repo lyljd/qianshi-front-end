@@ -110,7 +110,8 @@
                       <div class="option">
                         <div style="margin-bottom: 5px;">颜色</div>
                         <div>
-                          <el-color-picker :append-to=" videoContainer " v-model=" dmColor " :predefine=" predefinedmColors " />
+                          <el-color-picker :append-to=" videoContainer " v-model=" dmColor "
+                            :predefine=" predefinedmColors " />
                         </div>
                       </div>
 
@@ -264,11 +265,11 @@
         <div v-show=" !moreStatus && isMore " @click=" setIntroFull " class="more">展开更多</div>
         <div v-show=" moreStatus " @click=" setIntroUnFull " class="more">收起</div>
         <div id="tag-row" class="tag-row">
-          <el-tag class="tag" v-for="(tag) in video.tags" type="info" round>{{ tag }}</el-tag>
+          <el-tag class="tag" v-for="(  tag  ) in   video.tags  " type="info" round>{{ tag }}</el-tag>
         </div>
       </el-card>
 
-      <CommentArea :vid=" video.vid " :data=" video.comment "></CommentArea>
+      <CommentArea :vAuthorUid=" video.author.uid " :vid=" video.vid " :data=" video.comment "></CommentArea>
     </div>
 
 
@@ -289,7 +290,7 @@
 
           <div :title=" video.author.signature " class="signature">{{ video.author.signature || "-" }}</div>
 
-          <el-button @click=" video.author.isFocu = true " v-if=" !video.author.isFocu " class="focus" type="primary">+ 关注
+          <el-button @click=" focuAuthor " v-if=" !video.author.isFocu " class="focus" type="primary">+ 关注
             {{
             common.numFormatterW(video.author.focuNum) }}</el-button>
           <el-button @click=" video.author.isFocu = false " v-else="video.author.isFocu" class="focus" type="info">已关注 {{
@@ -341,7 +342,7 @@
         <div class="collection-list">
           <ul>
             <li :class=" { collectionItemHighlight: item.vid === video.vid } "
-              v-for="(item) in video.collection.videos">
+              v-for="(  item  ) in   video.collection.videos  ">
               <span @click=" video.vid = item.vid " class="title">{{ item.title }}</span>
               <span class="duration">{{ common.videoTimeFormatterHMS(item.duration) }}</span>
             </li>
@@ -360,7 +361,7 @@
 
       <div>
         <VideoCard :class=" { cardFCA: video.collection.videos.length === 0 } " :data=" item " class="card"
-          v-for="(item) in video.recommend"></VideoCard>
+          v-for="(  item  ) in   video.recommend  "></VideoCard>
       </div>
     </div>
   </div>
@@ -406,6 +407,7 @@ type Comment = {
   avatarUrl: string
   nickname: string
   level: number
+  isVip: boolean
   isTop: boolean
   isUp: boolean
   isUpLike: boolean
@@ -445,6 +447,7 @@ type Danmu = {
   size: number
   color: string
   speed: number
+  isUp: boolean
   init?: boolean
   flag?: boolean
   x?: number
@@ -792,15 +795,24 @@ function animation() {
 
 function draw() {
   video.danmu.forEach(d => {
-    if (d.flag === true) {
+    if (d.flag) {
       c2d.font = d.size * proportion.value + "px system-ui"
       d.width = c2d.measureText(d.value).width
       c2d.fillStyle = d.color
       c2d.fillText(d.value, d.x as number, d.y as number)
       d.x = d.x as number - d.speed * proportion.value
-      if (d.new === true) {
+      let newAndUpGap = 0
+      if (d.new) {
         c2d.strokeStyle = d.color
         c2d.strokeRect(d.x as number, d.y as number - d.size, d.width + 8, d.size + 6.5)
+        newAndUpGap = 5
+      }
+
+      if (d.isUp) {
+        c2d.fillStyle = "#FF6699"
+        c2d.fillText("up", d.x as number - 25 - newAndUpGap * 2, d.y as number)
+        c2d.strokeStyle = "#FF6699"
+        c2d.strokeRect(d.x as number - 27.5 - newAndUpGap * 2, d.y as number - d.size, 27.5 + newAndUpGap, d.size + 6.5)
       }
       if (d.x as number <= -d.width) {
         d.flag = false
@@ -954,7 +966,17 @@ function sendDanmu() {
     common.btnCD(ele, 5000)
   })
   //TODO 这里did应该从后端返回的值取得
-  video.danmu.push({ did: video.danmu[video.danmu.length - 1].did + 1, time: Math.floor(videoEle.currentTime), value: danmuInput.value, date: Date.now(), size: dmSize.value, color: dmColor.value, speed: parseInt(dmSpeed.value), new: true })
+  video.danmu.push({
+    did: video.danmu[video.danmu.length - 1].did + 1,
+    time: Math.floor(videoEle.currentTime),
+    value: danmuInput.value,
+    date: Date.now(),
+    size: dmSize.value,
+    color: dmColor.value,
+    speed: parseInt(dmSpeed.value),
+    new: true,
+    isUp: common.isMe(video.author.uid)
+  })
   danmuInput.value = ""
 }
 
@@ -1018,10 +1040,24 @@ function setIntroUnFull() {
 }
 
 function likeVideo() {
+  if (common.isMe(video.author.uid)) {
+    ElMessage({
+      "message": "不能给自己的视频点赞",
+      "offset": 77,
+    })
+    return
+  }
   video.isLike = !video.isLike
 }
 
 function coinVideo() {
+  if (common.isMe(video.author.uid)) {
+    ElMessage({
+      "message": "不能给自己的视频投币",
+      "offset": 77,
+    })
+    return
+  }
   video.isCoin = !video.isCoin
 }
 
@@ -1036,6 +1072,17 @@ function copyVideoUrl() {
     "offset": 77,
     "appendTo": videoContainer,
   })
+}
+
+function focuAuthor() {
+  if (common.isMe(video.author.uid)) {
+    ElMessage({
+      "message": "不能关注自己",
+      "offset": 77,
+    })
+    return
+  }
+  video.author.isFocu = true
 }
 </script>
 
