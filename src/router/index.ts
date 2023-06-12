@@ -13,6 +13,10 @@ const routes: Array<RouteRecordRaw> = [
     path: "/v/:vid",
     component: () => import("../views/Video.vue")
   },
+  {
+    path: "/u/:uid",
+    component: () => import("../views/User.vue")
+  },
 ]
 
 const router = createRouter({

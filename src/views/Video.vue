@@ -75,8 +75,8 @@
           </el-table>
         </el-dialog>
 
-        <transition leave-active-class="animate__animated animate__fadeOut"
-          enter-active-class="animate__animated animate__fadeIn">
+        <transition leaveActiveClass="animate__animated animate__fadeOut"
+          enterActiveClass="animate__animated animate__fadeIn">
           <div id="vfcbar-container" v-show=" videoFuncBarShow ">
             <el-progress @click=" handleProgressClick " class="progress" :percentage=" videoHasPercentage "
               :show-text=" false " />
@@ -489,7 +489,8 @@ const predefinedmColors = ref([
   '#FFC0CB',
 ])
 
-let video: Video = reactive(mockVideo)
+let video: Video = reactive(mockVideo) //TODO
+document.title = video.title + " - 浅时" //TODO
 
 const shortcutKeyDesc = [
   {

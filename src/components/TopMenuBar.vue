@@ -31,7 +31,7 @@
 
     <div class="flex-grow" />
 
-    <el-popover ref="loginPop" :width="400" trigger="hover">
+    <el-popover ref="loginPop" :width="400">
       <template #reference>
         <div @click="openLoginWindow()" v-show="!loginStatus" class="login-btn">登录</div>
       </template>
@@ -45,24 +45,71 @@
       </div>
     </el-popover>
 
-    <LoginWindow v-model="loginWindowStatus"></LoginWindow>
+    <LoginWindow ref="loginWindow"></LoginWindow>
 
     <div v-show="loginStatus" class="after-login-menu">
-      <el-avatar class="avatar" size="40" src="" @error="true">
-        <img src="../../public/default-avatar.png" />
-      </el-avatar>
+      <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
+        <template #reference>
+          <el-avatar @click="toMe" class="avatar" size="40" :src="avatarUrl" @error="true">
+            <img  @click="toMe" src="../../public/default-avatar.png" />
+          </el-avatar>
+        </template>
+        <el-button @click="signin" :type="!signinStatus ? 'success' : 'info'"
+          :style="{ cursor: !signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
+        <ul class="almul">
+          <div class="nickname">
+            <span @click="toMe" class="nickname-span">{{ ahi.nickname }}</span>
+          </div>
+          <div class="tags">
+            <span v-show="ahi.isVip" class="vip">会员</span>
+            <svg class="icon-symbol level" aria-hidden="true">
+              <use :xlink:href="'#el-icon-level_' + ahi.level"></use>
+            </svg>
+          </div>
+          <div class="currency">
+            <span>硬币:<span style="color: black;">{{ ahi.coin }}</span></span>
+          </div>
+          <div class="num-container">
+            <div class="num">
+              <div class="number">{{ common.numFormatterW(ahi.focuNum) }}</div>
+              <div class="text">关注</div>
+            </div>
+            <div class="num">
+              <div class="number">{{ common.numFormatterW(ahi.fanNum) }}</div>
+              <div class="text">粉丝</div>
+            </div>
+            <div class="num">
+              <div class="number">{{ common.numFormatterW(ahi.trendNum) }}</div>
+              <div class="text">动态</div>
+            </div>
+          </div>
+          <li>个人中心</li>
+          <li @click="logout">退出登录</li>
+        </ul>
+      </el-popover>
 
       <div class="ico-btn">
         <el-button class="iconfont el-icon-vip ico" circle></el-button>
         <div class="notice">会员</div>
       </div>
 
-      <div class="ico-btn">
-        <el-button circle><el-icon class="ico">
-            <Message />
-          </el-icon></el-button>
-        <div class="notice">消息</div>
-      </div>
+      <el-popover :show-arrow=false>
+        <template #reference>
+          <div class="ico-btn">
+            <el-button circle><el-icon class="ico">
+                <Message />
+              </el-icon></el-button>
+            <div class="notice">消息</div>
+          </div>
+        </template>
+        <ul class="almul"> <!--after login menu ul-->
+          <li>回复我的</li>
+          <li>@我的</li>
+          <li>收到的赞</li>
+          <li>系统消息</li>
+          <li>我的消息</li>
+        </ul>
+      </el-popover>
 
       <div class="ico-btn">
         <el-button class="iconfont el-icon-fengche ico" circle></el-button>
@@ -103,22 +150,41 @@ import TopMenuImg from "./TopMenuImg.vue"
 import LoginWindow from "./LoginWindow.vue"
 import * as common from "../common"
 import { useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
+
+type AvatarHoverInfo = {
+  nickname: string,
+  isVip: boolean,
+  level: number,
+  coin: number,
+  focuNum: number,
+  fanNum: number,
+  trendNum: number,
+}
 
 const route = useRoute();
 
+const loginWindow = ref<InstanceType<typeof LoginWindow>>()
+
+const loginPop = ref()
+const avatarPop = ref()
 let topMenuImg: HTMLElement
-
 let menu: HTMLElement
-
 let searchInput: HTMLElement
 
 let searchKey = ref("")
-
-let loginStatus = ref(false)
-
-let loginWindowStatus = ref(false)
-
-const loginPop = ref()
+let loginStatus = ref(common.isLogin())
+let avatarUrl = ref(localStorage.getItem("avatarUrl"))
+let ahi: AvatarHoverInfo = reactive({
+  "nickname": "null",
+  "isVip": false,
+  "level": 1,
+  "coin": 0,
+  "focuNum": 0,
+  "fanNum": 0,
+  "trendNum": 0,
+})
+let signinStatus = ref(true)
 
 watch(() => route.path, (newPath) => {
   if (newPath === "/") {
@@ -142,7 +208,6 @@ onMounted(() => {
   menu = document.getElementById("menu") as HTMLElement
   searchInput = document.querySelector(".el-input__wrapper") as HTMLElement
   window.addEventListener('scroll', scrollListenerHandler)
-  loginStatus.value = common.isLogin()
 })
 onUnmounted(() => {
   window.removeEventListener("scroll", scrollListenerHandler)
@@ -163,10 +228,64 @@ function scrollListenerHandler() {
   menu.style.marginLeft = -document.documentElement.scrollLeft.toString() + "px"
 }
 
+function AfterLoginCB(au: string) {
+  loginStatus.value = true
+  avatarUrl.value = au
+}
+
 function openLoginWindow() {
   loginPop.value.hide()
-  loginWindowStatus.value = true
-  loginStatus.value = true //Todo
+  loginWindow.value?.show(AfterLoginCB)
+}
+
+function logout() {
+  avatarPop.value.hide()
+  common.logout()
+  loginStatus.value = false
+}
+
+function onAvatarPopShow() {
+  signinStatus.value = common.checkCookieExists("signinStatus")
+  ahi.nickname = "Bonnenult"
+  ahi.isVip = true
+  ahi.level = 6
+  ahi.coin = 233
+  ahi.focuNum = 6
+  ahi.fanNum = 2377801
+  ahi.trendNum = 101
+}
+
+function setCookieExpireTomorrow0(name: string, value: string) {
+  var now = new Date();
+  var expires = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  expires.setHours(0, 0, 0, 0);
+  document.cookie = name + "=" + value + "; expires=" + expires.toUTCString() + "; path=/";
+}
+
+function signin() {
+  if (signinStatus.value) {
+    ElMessage({
+      "message": "今日已签到，请明日再来",
+      "offset": 57,
+      "type": "info"
+    })
+    return
+  }
+  signinStatus.value = true
+  setCookieExpireTomorrow0("signinStatus", "true")
+  ahi.coin += 5 //TODO
+  ElMessage({
+    "message": "签到成功",
+    "offset": 57,
+    "type": "success"
+  })
+}
+
+function toMe() {
+  let uid = localStorage.getItem("uid")
+  if (uid) {
+    common.ToUser(parseInt(uid))
+  }
 }
 </script>
 
@@ -293,6 +412,105 @@ function openLoginWindow() {
   align-items: center;
 }
 
+.signin {
+  position: absolute;
+  width: 30px;
+  height: 20px;
+  left: calc(100% - 40px);
+}
+
+.almul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.almul .level {
+  font-size: 27.5px;
+  cursor: pointer;
+}
+
+.almul .nickname {
+  text-align: center;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.almul .tags {
+  text-align: center;
+  margin-top: -5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.almul .tags .vip {
+  font-size: 12px;
+  background-color: #FF6699;
+  color: white;
+  line-height: 12px;
+  padding: 1px;
+  margin-right: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.almul .nickname-span:hover {
+  color: #409EFF;
+  cursor: pointer;
+}
+
+.almul .currency {
+  text-align: center;
+  font-size: 12px;
+  cursor: default;
+  color: #909399;
+  margin-top: -5px;
+}
+
+.almul .num-container {
+  width: 100%;
+  height: 35px;
+  display: flex;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dedfe0;
+}
+
+.almul .num-container .num {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.almul .num-container .num .number {
+  font-size: 16px;
+  color: black;
+}
+
+.almul .num-container .num .number:hover {
+  cursor: pointer;
+  color: #409EFF;
+}
+
+.almul .num-container .num .text {
+  font-size: 12px;
+  color: #909399;
+  cursor: default;
+}
+
+.almul li {
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.almul li:hover {
+  background-color: #e9e9eb;
+}
+
 .avatar {
   margin-right: 10px;
   cursor: pointer;
@@ -339,5 +557,4 @@ function openLoginWindow() {
 .el-menu--collapse .el-menu .el-submenu,
 .el-menu--popup {
   min-width: auto !important;
-}
-</style>
+}</style>

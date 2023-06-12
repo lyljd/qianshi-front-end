@@ -7,6 +7,14 @@ function isLogin(): boolean {
   return token !== null && token !== ""
 }
 
+function logout() {
+  localStorage.removeItem("uid")
+  localStorage.removeItem("nickname")
+  localStorage.removeItem("avatarUrl")
+  localStorage.removeItem("token")
+  localStorage.removeItem("refreshToken")
+}
+
 function btnCD(btn: HTMLButtonElement, cd: number) {
   let time = cd / 1000
   let text = btn.innerText
@@ -136,9 +144,21 @@ function ToDeveloper() {
   window.open("https://github.com/lyljd", "_blank")
 }
 
+function checkCookieExists(cookieName:string) {
+  var cookies = document.cookie.split(';');
+  for (var i = 0; i < cookies.length; i++) {
+    var cookie = cookies[i].trim();
+    if (cookie.startsWith(cookieName + "=")) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export {
   isMobile,
   isLogin,
+  logout,
   btnCD,
   numFormatterW,
   videoTimeFormatterHMS,
@@ -146,5 +166,6 @@ export {
   ToUser,
   ToDeveloper,
   timestampFormatter,
-  timestampFormatterMD
+  timestampFormatterMD,
+  checkCookieExists,
 }
