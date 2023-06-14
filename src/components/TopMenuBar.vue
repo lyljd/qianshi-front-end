@@ -50,7 +50,7 @@
     <div v-show="loginStatus" class="after-login-menu">
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
-          <el-avatar @click="toMe" class="avatar" size="40" :src="avatarUrl" @error="true">
+          <el-avatar @click="toMe" class="avatar" :src="avatarUrl" @error="true">
             <img  @click="toMe" src="../../public/default-avatar.png" />
           </el-avatar>
         </template>

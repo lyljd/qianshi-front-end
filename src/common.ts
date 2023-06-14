@@ -58,7 +58,10 @@ function numFormatterW(num: number) {
   if (num < 10000) {
     return num.toString()
   }
-  return toFixed(num / 10000, 1).toString() + "万"
+  if (num < 100000000) {
+    return toFixed(num / 10000, 1).toString() + "万"
+  }
+  return toFixed(num / 100000000, 1).toString() + "亿"
 }
 
 function videoTimeFormatterHMS(time: number) {

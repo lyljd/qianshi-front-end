@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5226523",
+      "name": "female",
+      "font_class": "female",
+      "unicode": "e619",
+      "unicode_decimal": 58905
+    },
+    {
+      "icon_id": "5226564",
+      "name": "male",
+      "font_class": "male",
+      "unicode": "e62a",
+      "unicode_decimal": 58922
+    },
+    {
       "icon_id": "11487984",
       "name": "ashbin",
       "font_class": "ashbin",

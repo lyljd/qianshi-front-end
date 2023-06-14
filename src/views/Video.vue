@@ -265,7 +265,7 @@
         <div v-show=" !moreStatus && isMore " @click=" setIntroFull " class="more">展开更多</div>
         <div v-show=" moreStatus " @click=" setIntroUnFull " class="more">收起</div>
         <div id="tag-row" class="tag-row">
-          <el-tag class="tag" v-for="(  tag  ) in   video.tags  " type="info" round>{{ tag }}</el-tag>
+          <el-tag class="tag" v-for="(   tag   ) in    video.tags   " type="info" round>{{ tag }}</el-tag>
         </div>
       </el-card>
 
@@ -276,7 +276,7 @@
 
     <div class="right">
       <div class="avatar-container">
-        <el-avatar @click=" common.ToUser(video.author.uid) " class="avatar" size="40" :src=" video.author.avatarUrl "
+        <el-avatar @click=" common.ToUser(video.author.uid) " class="avatar" :src=" video.author.avatarUrl "
           @error=" true ">
           <img @click=" common.ToUser(video.author.uid) " src="../../public/default-avatar.png" />
         </el-avatar>
@@ -290,11 +290,8 @@
 
           <div :title=" video.author.signature " class="signature">{{ video.author.signature || "-" }}</div>
 
-          <el-button @click=" focuAuthor " v-if=" !video.author.isFocu " class="focus" type="primary">+ 关注
-            {{
-            common.numFormatterW(video.author.focuNum) }}</el-button>
-          <el-button @click=" video.author.isFocu = false " v-else="video.author.isFocu" class="focus" type="info">已关注 {{
-            common.numFormatterW(video.author.focuNum) }}</el-button>
+          <el-button id="focu-btn" @click=" focuAuthor " class="focus" :type=" !video.author.isFocu ? 'primary' : 'info' ">{{
+            focuBtnInnerText }}</el-button>
         </div>
       </div>
 
@@ -342,7 +339,7 @@
         <div class="collection-list">
           <ul>
             <li :class=" { collectionItemHighlight: item.vid === video.vid } "
-              v-for="(  item  ) in   video.collection.videos  ">
+              v-for="(   item   ) in    video.collection.videos   ">
               <span @click=" video.vid = item.vid " class="title">{{ item.title }}</span>
               <span class="duration">{{ common.videoTimeFormatterHMS(item.duration) }}</span>
             </li>
@@ -361,7 +358,7 @@
 
       <div>
         <VideoCard :class=" { cardFCA: video.collection.videos.length === 0 } " :data=" item " class="card"
-          v-for="(  item  ) in   video.recommend  "></VideoCard>
+          v-for="(   item   ) in    video.recommend   "></VideoCard>
       </div>
     </div>
   </div>
@@ -556,6 +553,7 @@ let playSpeed = ref(1)
 let videoQuality = ref("原画")
 let proportion = ref(1)
 let shortcutKeyDescriptionWindowVisible = ref(false)
+let focuBtnInnerText = ref(!video.author.isFocu ? "+ 关注 " + common.numFormatterW(video.author.focuNum) : "已关注 " + common.numFormatterW(video.author.focuNum))
 
 let videoEle: HTMLVideoElement
 let videoContainer: any
@@ -566,6 +564,7 @@ let vfcbarContainer: HTMLDivElement
 let canvas: HTMLCanvasElement
 let c2d: CanvasRenderingContext2D
 let contextMenu: HTMLDivElement
+let focuBtn: HTMLElement
 
 onMounted(() => {
   videoEle = document.getElementById("video") as HTMLVideoElement
@@ -577,6 +576,7 @@ onMounted(() => {
   canvas = document.getElementById("canvas") as HTMLCanvasElement
   c2d = canvas.getContext("2d") as CanvasRenderingContext2D
   contextMenu = document.getElementById('contextMenu') as HTMLDivElement
+  focuBtn = document.getElementById('focu-btn') as HTMLElement
 
   c2d.scale(2, 2)
   requestAnimationFrame(animation)
@@ -1082,7 +1082,14 @@ function focuAuthor() {
     })
     return
   }
-  video.author.isFocu = true
+  if (!video.author.isFocu) {
+    video.author.isFocu = true
+    focuBtnInnerText.value = "已关注 " + common.numFormatterW(video.author.focuNum)
+  } else {
+    video.author.isFocu = false
+    focuBtnInnerText.value = "+ 关注 " + common.numFormatterW(video.author.focuNum)
+  }
+  focuBtn.blur()
 }
 </script>
 
