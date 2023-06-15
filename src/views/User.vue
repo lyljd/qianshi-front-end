@@ -9,16 +9,16 @@
       <template #default>
         <div class="top-img-container">
           <div style="text-align: center;">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 1 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 1"
-              class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 2 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 2"
-              class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 1 ? 'not-allowed' : 'pointer' }"
+              @click="userHomeInfo.topImgNo = 1" class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 2 ? 'not-allowed' : 'pointer' }"
+              @click="userHomeInfo.topImgNo = 2" class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
           </div>
           <div style="text-align: center;">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 3 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 3"
-              class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 4 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 4"
-              class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 3 ? 'not-allowed' : 'pointer' }"
+              @click="userHomeInfo.topImgNo = 3" class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 4 ? 'not-allowed' : 'pointer' }"
+              @click="userHomeInfo.topImgNo = 4" class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
           </div>
         </div>
       </template>
@@ -259,15 +259,15 @@ function focu() {
 .info {
   position: absolute;
   top: 155px;
-  left: 90px;
+  margin-left: 20px;
   display: flex;
   align-items: center;
 }
 
 .btns {
   position: absolute;
-  top: 185px;
-  left: 1030px;
+  margin-top: 128px;
+  margin-left: 960px;
   width: 160px;
 }
 

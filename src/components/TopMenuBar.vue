@@ -245,7 +245,7 @@ function logout() {
 }
 
 function onAvatarPopShow() {
-  signinStatus.value = common.checkCookieExists("signinStatus")
+  signinStatus.value = common.checkCookieExists(`signinStatus-${localStorage.getItem("uid")}`)
   ahi.nickname = "Bonnenult"
   ahi.isVip = true
   ahi.level = 6
@@ -272,7 +272,7 @@ function signin() {
     return
   }
   signinStatus.value = true
-  setCookieExpireTomorrow0("signinStatus", "true")
+  setCookieExpireTomorrow0(`signinStatus-${localStorage.getItem("uid")}`, "true")
   ahi.coin += 5 //TODO
   ElMessage({
     "message": "签到成功",
