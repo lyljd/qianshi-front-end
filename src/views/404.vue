@@ -13,7 +13,7 @@
 <style scoped>
 .container {
   width: 100%;
-  height: calc(100vh - 57px);
+  height: calc(100vh - 93px);
   min-height: 480px;
   display: flex;
   align-items: center;

@@ -27,10 +27,12 @@
 
     <div v-else>
       <div v-for="(item, index) in data.value">
-        <Comment :vAuthorUid="vAuthorUid" :openChildSendArea="openChildSendArea" :deleteComment="deleteComment" :scrollId="scrollId" :data="item">
+        <Comment :vAuthorUid="vAuthorUid" :openChildSendArea="openChildSendArea" :deleteComment="deleteComment"
+          :scrollId="scrollId" :data="item">
         </Comment>
 
-        <div @click="viewMore(item)" v-show="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">共{{
+        <div @click="viewMore(item)"
+          v-show="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">共{{
             item.reply?.num }}条回复，<span class="view">点击查看</span></div>
 
         <el-pagination @click="getChildCommentByPage(item.cid)"
@@ -48,7 +50,7 @@
       </div>
     </div>
 
-    <el-pagination @current-change="getCommentByPage" style="margin-top: 20px;" background hide-on-single-page
+    <el-pagination @current-change="getCommentByPage" class="page" background hide-on-single-page
       layout="prev, pager, next" :total="data.num" />
 
   </el-card>
@@ -354,4 +356,11 @@ function viewMore(comment: Comment) {
   margin-left: 47.5px;
   margin-bottom: 0;
   margin-top: 20px;
-}</style>
+}
+
+.comment-container .page {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+</style>

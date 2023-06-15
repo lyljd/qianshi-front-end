@@ -2,19 +2,23 @@
   <div class="container">
     <img style="width: 1140px; height: 180px;" :src="`../../public/userhome-top-img/${userHomeInfo.topImgNo}.png`">
 
-    <div @click="replaceTopImg" class="replace-top-img">更换头图</div>
+    <div v-if="common.isMe(userHomeInfo.uid)" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
     <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false"
       :size="'338px'">
       <template #default>
         <div class="top-img-container">
           <div style="text-align: center;">
-            <img @click="userHomeInfo.topImgNo = 1" class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
-            <img @click="userHomeInfo.topImgNo = 2" class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 1 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 1"
+              class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 2 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 2"
+              class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
           </div>
           <div style="text-align: center;">
-            <img @click="userHomeInfo.topImgNo = 3" class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
-            <img @click="userHomeInfo.topImgNo = 4" class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 3 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 3"
+              class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
+            <img :style="{ cursor: userHomeInfo.topImgNo === 4 ? 'not-allowed' : 'pointer' }" @click="userHomeInfo.topImgNo = 4"
+              class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
           </div>
         </div>
       </template>
@@ -50,7 +54,7 @@
       </div>
     </div>
 
-    <div class="btns">
+    <div v-if="!common.isMe(userHomeInfo.uid)" class="btns">
       <el-button @click="focu">{{ focuBtnInnerText }}</el-button>
       <el-button>发消息</el-button>
     </div>
@@ -59,10 +63,10 @@
       <el-menu class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
         <el-menu-item :index="`/u/${$route.params.uid}`">主页</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/dynamic`">动态</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/video`">投稿 {{ userHomeInfo.videoNum }}</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/channel`">合集和列表 {{ userHomeInfo.collectionNum }}</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏 {{ userHomeInfo.starNum }}</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/video`">投稿</el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集</el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏</el-menu-item>
+        <el-menu-item v-show="common.isMe(userHomeInfo.uid)" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
 
         <div class="search-container">
           <el-input v-model="searchKey" class="search" placeholder="搜索视频、动态" clearable>
@@ -104,7 +108,7 @@
       </el-menu>
     </el-card>
 
-    <router-view></router-view>
+    <router-view style="margin-bottom: 20px;"></router-view>
   </div>
 </template>
 
@@ -128,9 +132,6 @@ type UserHomeInfo = {
   likeNum: number
   playNum: number
   readNum: number
-  videoNum: number
-  collectionNum: number
-  starNum: number
 }
 
 let userHomeInfo: UserHomeInfo = reactive(mockUserHomeInfo) //TODO
@@ -346,6 +347,7 @@ function focu() {
 .menu-container {
   margin-left: -1px;
   margin-right: -1px;
+  margin-bottom: 10px;
 }
 
 .menu {
@@ -365,8 +367,6 @@ function focu() {
 }
 
 .search {
-  border: 1px solid #909399;
-  border-radius: 10px;
   height: 30px;
   width: 225px;
 }

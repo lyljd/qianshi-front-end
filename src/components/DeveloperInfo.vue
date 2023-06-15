@@ -13,7 +13,6 @@
 
 <style scoped>
 .dev-info {
-  margin-bottom: 20px;
   color: #909399;
   font-size: 14px;
   display: flex;

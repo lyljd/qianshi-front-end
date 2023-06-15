@@ -265,7 +265,7 @@
         <div v-show=" !moreStatus && isMore " @click=" setIntroFull " class="more">展开更多</div>
         <div v-show=" moreStatus " @click=" setIntroUnFull " class="more">收起</div>
         <div id="tag-row" class="tag-row">
-          <el-tag class="tag" v-for="(   tag   ) in    video.tags   " type="info" round>{{ tag }}</el-tag>
+          <el-tag class="tag" v-for="(tag) in video.tags" type="info" round>{{ tag }}</el-tag>
         </div>
       </el-card>
 
@@ -290,7 +290,8 @@
 
           <div :title=" video.author.signature " class="signature">{{ video.author.signature || "-" }}</div>
 
-          <el-button id="focu-btn" @click=" focuAuthor " class="focus" :type=" !video.author.isFocu ? 'primary' : 'info' ">{{
+          <el-button id="focu-btn" @click=" focuAuthor " class="focus"
+            :type=" !video.author.isFocu ? 'primary' : 'info' ">{{
             focuBtnInnerText }}</el-button>
         </div>
       </div>
@@ -320,7 +321,7 @@
         </el-table>
       </transition>
 
-      <el-card v-if=" video.collection.videos.length > 0 " class="collection-container" shadow="never">
+      <el-card v-if=" video.collection " class="collection-container" shadow="never">
         <template #header>
           <div class="header">
             <span class="name" :title=" video.collection.name ">{{ video.collection.name }}</span>
@@ -339,7 +340,7 @@
         <div class="collection-list">
           <ul>
             <li :class=" { collectionItemHighlight: item.vid === video.vid } "
-              v-for="(   item   ) in    video.collection.videos   ">
+              v-for="(item) in video.collection.videos">
               <span @click=" video.vid = item.vid " class="title">{{ item.title }}</span>
               <span class="duration">{{ common.videoTimeFormatterHMS(item.duration) }}</span>
             </li>
@@ -351,14 +352,14 @@
         <Advertisement></Advertisement>
       </div>
 
-      <div v-if=" video.recommend.length > 0 && video.collection.videos.length === 0 " class="autoStreaming-row">
+      <div v-if=" !video.collection && video.recommend.length > 0 " class="autoStreaming-row">
         <div>接下来播放</div>
         <div class="autoStreaming">自动连播<el-switch @click=" setAutoStreaming " v-model=" autoStreaming " /></div>
       </div>
 
       <div>
-        <VideoCard :class=" { cardFCA: video.collection.videos.length === 0 } " :data=" item " class="card"
-          v-for="(   item   ) in    video.recommend   "></VideoCard>
+        <VideoCard :class=" { cardFCA: !video.collection && video.recommend.length > 1 } " :data=" item " class="card"
+          v-for="(item) in video.recommend"></VideoCard>
       </div>
     </div>
   </div>
@@ -394,7 +395,7 @@ type Video = {
   }
   author: AuthorInfo
   danmu: Danmu[]
-  collection: Collection
+  collection?: Collection
   recommend: Recommend[]
 }
 
@@ -597,10 +598,12 @@ onMounted(() => {
   }
 
   const cards = document.querySelectorAll('.right .card:nth-child(2)') as NodeListOf<HTMLElement>
-  if (video.collection.videos.length > 0) {
-    cards[0].style.marginTop = '20px'
-  } else {
-    cards[0].style.marginTop = '40px'
+  if (cards.length > 0) {
+    if (video.collection) {
+      cards[0].style.marginTop = '20px'
+    } else {
+      cards[0].style.marginTop = '40px'
+    }
   }
 
   videoEle.addEventListener('loadedmetadata', function () {

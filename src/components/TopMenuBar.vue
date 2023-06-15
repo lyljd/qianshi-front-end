@@ -51,7 +51,7 @@
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
           <el-avatar @click="toMe" class="avatar" :src="avatarUrl" @error="true">
-            <img  @click="toMe" src="../../public/default-avatar.png" />
+            <img @click="toMe" src="../../public/default-avatar.png" />
           </el-avatar>
         </template>
         <el-button @click="signin" :type="!signinStatus ? 'success' : 'info'"
@@ -557,4 +557,5 @@ function toMe() {
 .el-menu--collapse .el-menu .el-submenu,
 .el-menu--popup {
   min-width: auto !important;
-}</style>
+}
+</style>

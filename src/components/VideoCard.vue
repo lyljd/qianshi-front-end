@@ -5,7 +5,7 @@
         <div @click="common.ToVideo(data.vid)" class="default">封面加载失败</div>
       </template>
     </el-image>
-    <div class="info">
+    <div @click="common.ToVideo(data.vid)" class="info">
       <span>
         <span class="iconfont el-icon-bofangshu icon"></span>
         {{ common.numFormatterW(data.playNum) }}
@@ -19,10 +19,11 @@
     <div class="content">
       <div class="title-container"><span @click="common.ToVideo(data.vid)" class="title">{{ data.title }}</span></div>
       <div class="up-time-container">
-        <span @click="common.ToUser(data.uid)" class="up-time-text">
-          <span style="font-size: 14px;" class="iconfont el-icon-UPzhu icon"></span>
-          {{ data.nickname }} · {{ common.timestampFormatterMD(data.date) }}
-        </span>
+        <div @click="common.ToUser(data.uid)" class="up-time-text">
+          <span :title="data.nickname + ' · ' + common.timestampFormatterMD(data.date)" class="up-time-text-span"><span
+              style="font-size: 14px;" class="iconfont el-icon-UPzhu icon"></span>
+            {{ data.nickname }} · {{ common.timestampFormatterMD(data.date) }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -115,9 +116,14 @@ defineProps<{
   align-items: center;
 }
 
-.video-card .up-time-text:hover {
-  color: #409EFF;
+.video-card .up-time-text-span {
+  display: flex;
+  align-items: center;
   cursor: pointer;
+}
+
+.video-card .up-time-text-span:hover {
+  color: #409EFF;
 }
 
 .video-card .up-time-container .icon {

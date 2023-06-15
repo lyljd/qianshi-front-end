@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: "/u/:uid", component: () => import("../views/User/Home.vue") },
       { path: "/u/:uid/dynamic", component: () => import("../views/User/Dynamic.vue") },
       { path: "/u/:uid/video", component: () => import("../views/User/Video.vue") },
-      { path: "/u/:uid/channel", component: () => import("../views/User/Channel.vue") },
+      { path: "/u/:uid/collection", component: () => import("../views/User/Collection.vue") },
       { path: "/u/:uid/favlist", component: () => import("../views/User/Favlist.vue") },
       { path: "/u/:uid/setting", component: () => import("../views/User/Setting.vue") },
     ]

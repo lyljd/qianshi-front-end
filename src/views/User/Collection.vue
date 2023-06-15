@@ -1,35 +1,38 @@
 <template>
-  <el-card style="margin-left: -1px;margin-right: -1px;">
-    <div v-if="mockFavlistNum > 0 || common.isMe(parseInt($route.params.uid as string))" class="container">
+  <el-card style="margin-left: -1px; margin-right: -1px;">
+    <div v-if="mockCollectionNum > 0 || common.isMe(parseInt($route.params.uid as string))" class="container">
       <div class="left">
         <ul>
-          <li v-if="common.isMe(parseInt($route.params.uid as string))" @click="newFavlist" class="new-favlist">新建收藏夹</li>
-          <li v-for="(item, index) in mockFavlistNum"
-            :class="{ active: index === activeId, inactive: index !== activeId }" :title="'收藏夹' + item.toString()"
-            @click="activeId = index">收藏夹{{ item }}</li>
+          <li v-if="common.isMe(parseInt($route.params.uid as string))" @click="newCollection" class="new-favlist">新建合集
+          </li>
+          <li v-for="(item, index) in mockCollectionNum"
+            :class="{ active: index === activeId, inactive: index !== activeId }" :title="'合集' + item.toString()"
+            @click="activeId = index">合集{{ item }}</li>
         </ul>
       </div>
 
       <div class="divide"></div>
 
       <div class="right">
-        <div v-show="mockFavlistNum > 0" class="right-head">
+        <div v-show="mockCollectionNum > 0" class="right-head">
           <div class="info">
             <div class="title">{{ title }}</div>
             <div class="num">共{{ mockVideoTotalNum }}个视频</div>
-            <span v-if="common.isMe(parseInt($route.params.uid as string))" @click="deleteFavlist"
+            <div class="num">{{ common.numFormatterW(0) }}播放</div>
+            <el-tooltip effect="light" :content="'都是些奇奇怪怪的东西' || '-'" placement="bottom">
+              <span class="iconfont el-icon-browse num">简介</span>
+            </el-tooltip>
+            <span @click="addToCollection" v-if="common.isMe(parseInt($route.params.uid as string))"
+              class="add">+添加</span>
+            <span v-if="common.isMe(parseInt($route.params.uid as string))" @click="deleteCollection"
               class="iconfont el-icon-ashbin delete">删除</span>
-          </div>
-          <div v-if="common.isMe(parseInt($route.params.uid as string))" class="option">
-            <span class="span">公开</span>
-            <el-switch v-model="open" />
           </div>
         </div>
 
         <div v-if="mockVideoNum > 0" class="right-body">
           <div v-for="() in mockVideoNum">
             <VideoCard class="card" :data="mockVideo"></VideoCard>
-            <el-popconfirm @confirm="deleteItem" width="212" hide-icon title="你确认要取消收藏该视频吗？" confirm-button-text="确认"
+            <el-popconfirm @confirm="removeItem" width="212" hide-icon title="你确认要从此合集中移除该视频吗？" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
                 <span v-if="common.isMe(parseInt($route.params.uid as string))"
@@ -40,15 +43,15 @@
         </div>
 
         <div class="right-foot">
-          <el-pagination background layout="prev, pager, next" :page-size="9" :total="mockVideoTotalNum"
+          <el-pagination background layout="prev, pager, next" :page-size="9" :total=mockVideoTotalNum
             :hide-on-single-page="true" />
         </div>
 
-        <el-empty v-show="mockVideoNum === 0" description="暂无收藏" />
+        <el-empty v-show="mockVideoNum === 0" description="暂无合集" />
       </div>
     </div>
     <div v-else>
-      <el-empty description="暂无收藏" />
+      <el-empty description="暂无合集" />
     </div>
   </el-card>
 </template>
@@ -67,39 +70,49 @@ const mockVideo = {
   "title": "标题",
   "uid": 2,
   "nickname": "admin",
-  "date": 1685599556000
+  "date": 1685799558000
 }
-const mockFavlistNum = 6
-const mockVideoNum = 9
-const mockVideoTotalNum = 13
+const mockCollectionNum = 3
+const mockVideoNum = 4
+const mockVideoTotalNum = 4
 
 let title = ref("标题")
 let activeId = ref(0)
-let open = ref(true)
+let newName = ref("")
+let newIntro = ref("")
 
-function newFavlist() {
-  ElMessageBox.prompt('请输入新收藏夹的名称', '新建收藏夹', {
+function newCollection() {
+  ElMessageBox({
+    title: '新建合集',
+    message: h('div', { style: 'margin-right: 20px;' }, [
+      h('div', null, [
+        h('span', null, '请输入新合集的名称'),
+      ]),
+      h('div', null, [
+        h('input', { id: 'new-name', onInput: onNewNameChange }),
+      ]),
+      h('div', { style: 'margin-top: 20px;' }, [
+        h('span', null, '请输入新合集的简介'),
+      ]),
+      h('div', null, [
+        h('input', { id: 'new-intro', onInput: onNewIntroChange }),
+      ]),
+      h('span', { id: 'notice' }, '名称的长度范围为1～20，简介的长度最大为50'),
+    ]),
+    showClose: false,
+    showCancelButton: true,
     confirmButtonText: '提交',
     cancelButtonText: '取消',
-    inputPattern: /^.{1,20}$/,
-    inputErrorMessage: '名称的长度范围为1～20',
     closeOnClickModal: false,
     closeOnPressEscape: false,
     lockScroll: false,
-    showClose: false
+    beforeClose: beforeNewCollectionWindowClose,
   })
-    .then(({ value }) => {
-      ElMessage({
-        type: 'success',
-        offset: 77,
-        message: `新收藏夹的名称为：${value}`,
-      })
-    })
   //TODO 向数组添加一个元素，并设置activeId为数组长度-1
 }
 
-function deleteFavlist() {
-  ElMessageBox.confirm('你确认要删除该收藏夹吗？', '确认提示', {
+function deleteCollection() {
+  ElMessageBox.confirm('你确认要删除该合集吗？', '确认提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     closeOnClickModal: false,
@@ -117,13 +130,53 @@ function deleteFavlist() {
   //TODO 删除后若当前activeId不为0则减1
 }
 
-function deleteItem() {
+function removeItem() {
   ElMessage({
     type: 'success',
     offset: 77,
-    message: "取消收藏成功",
+    message: "移除成功",
   })
   //TODO 若有多的视频，则请求一个补充到最后
+}
+
+function onNewNameChange() {
+  newName.value = (document.getElementById("new-name") as HTMLInputElement).value;
+  checkInput()
+}
+
+function onNewIntroChange() {
+  newIntro.value = (document.getElementById("new-intro") as HTMLInputElement).value;
+  checkInput()
+}
+
+function checkInput() {
+  if (newName.value.length >= 1 && newName.value.length <= 20 && newIntro.value.length <= 50) {
+    (document.getElementById("notice") as HTMLSpanElement).style.display = "none"
+    return true
+  }
+  (document.getElementById("notice") as HTMLSpanElement).style.display = "inline"
+  return false
+}
+
+function beforeNewCollectionWindowClose(action: string, _: any, done: Function) {
+  if (action === "confirm") {
+    if (!checkInput()) {
+      return
+    }
+    ElMessage({
+      type: 'success',
+      offset: 77,
+      message: `新合集的名称为：${newName.value}，新合集的简介为：${newIntro.value}`,
+    })
+    newName.value = ""
+    newIntro.value = ""
+  }
+  done()
+}
+
+function addToCollection() {
+  alert("敬请期待")
+  //TODO 这里需要用到远程搜索：https://element-plus.org/zh-CN/component/autocomplete.html#%E8%BF%9C%E7%A8%8B%E6%90%9C%E7%B4%A2
 }
 </script>
 
@@ -220,6 +273,17 @@ function deleteItem() {
   color: #c45656;
 }
 
+.right-head .info .add {
+  margin-left: 20px;
+  font-size: 14px;
+  color: #67C23A;
+  cursor: pointer;
+}
+
+.right-head .info .add:hover {
+  color: #529b2e;
+}
+
 .right-head .option {
   display: flex;
   align-items: center;
@@ -272,5 +336,27 @@ function deleteItem() {
 
 .el-input__wrapper.is-focus {
   box-shadow: 0 0 0 1px #409EFF inset !important
+}
+
+#new-name,
+#new-intro {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 5px;
+  height: 25px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #dedfe0;
+}
+
+#new-name:hover,
+#new-intro:hover {
+  border-color: #c8c9cc;
+}
+
+#notice {
+  color: red;
+  font-size: 12px;
+  display: none;
 }
 </style>
