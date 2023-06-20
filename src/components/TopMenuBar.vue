@@ -33,7 +33,7 @@
 
     <el-popover ref="loginPop" :width="400">
       <template #reference>
-        <div @click="openLoginWindow()" v-show="!loginStatus" class="login-btn">登录</div>
+        <div @click="openLoginWindow()" v-show="!isLogin" class="login-btn">登录</div>
       </template>
       <div class="before-login-pop">
         <div class="info1">登录后你可以：</div>
@@ -47,7 +47,7 @@
 
     <LoginWindow ref="loginWindow"></LoginWindow>
 
-    <div v-show="loginStatus" class="after-login-menu">
+    <div v-show="isLogin" class="after-login-menu">
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
           <el-avatar @click="toMe" class="avatar" :src="avatarUrl" @error="true">
@@ -151,6 +151,8 @@ import LoginWindow from "./LoginWindow.vue"
 import * as common from "../common"
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useStore } from "../store"
+import { storeToRefs } from "pinia"
 
 type AvatarHoverInfo = {
   nickname: string,
@@ -162,10 +164,12 @@ type AvatarHoverInfo = {
   trendNum: number,
 }
 
-const route = useRoute();
+const route = useRoute()
+const store = useStore()
+const { isLogin } = storeToRefs(store)
+store.openLoginWindow = openLoginWindow
 
 const loginWindow = ref<InstanceType<typeof LoginWindow>>()
-
 const loginPop = ref()
 const avatarPop = ref()
 let topMenuImg: HTMLElement
@@ -173,7 +177,6 @@ let menu: HTMLElement
 let searchInput: HTMLElement
 
 let searchKey = ref("")
-let loginStatus = ref(common.isLogin())
 let avatarUrl = ref(localStorage.getItem("avatarUrl"))
 let ahi: AvatarHoverInfo = reactive({
   "nickname": "null",
@@ -228,24 +231,30 @@ function scrollListenerHandler() {
   menu.style.marginLeft = -document.documentElement.scrollLeft.toString() + "px"
 }
 
-function AfterLoginCB(au: string) {
-  loginStatus.value = true
-  avatarUrl.value = au
-}
 
 function openLoginWindow() {
   loginPop.value.hide()
-  loginWindow.value?.show(AfterLoginCB)
+  loginWindow.value?.show((au: string) => {
+    avatarUrl.value = au
+  })
+}
+
+function clearLoginStorage() {
+  localStorage.removeItem("uid")
+  localStorage.removeItem("nickname")
+  localStorage.removeItem("avatarUrl")
+  localStorage.removeItem("token")
+  localStorage.removeItem("refreshToken")
 }
 
 function logout() {
   avatarPop.value.hide()
-  common.logout()
-  loginStatus.value = false
+  clearLoginStorage()
+  store.isLogin = false
 }
 
 function onAvatarPopShow() {
-  signinStatus.value = common.checkCookieExists(`signinStatus-${localStorage.getItem("uid")}`)
+  signinStatus.value = false //TODO
   ahi.nickname = "Bonnenult"
   ahi.isVip = true
   ahi.level = 6
@@ -253,13 +262,6 @@ function onAvatarPopShow() {
   ahi.focuNum = 6
   ahi.fanNum = 2377801
   ahi.trendNum = 101
-}
-
-function setCookieExpireTomorrow0(name: string, value: string) {
-  var now = new Date();
-  var expires = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  expires.setHours(0, 0, 0, 0);
-  document.cookie = name + "=" + value + "; expires=" + expires.toUTCString() + "; path=/";
 }
 
 function signin() {
@@ -272,7 +274,6 @@ function signin() {
     return
   }
   signinStatus.value = true
-  setCookieExpireTomorrow0(`signinStatus-${localStorage.getItem("uid")}`, "true")
   ahi.coin += 5 //TODO
   ElMessage({
     "message": "签到成功",

@@ -315,7 +315,12 @@
           <el-table-column prop="date" label="发送时间" width="90" sortable :formatter=" danmuDateFormatter " />
           <el-table-column width="32" :align=" 'center' ">
             <template #default=" scope ">
-              <span @click=" delDanmu(scope.row.did) " class="iconfont el-icon-ashbin danmu-del"></span>
+              <el-popconfirm @confirm="delDanmu(scope.row.did)" hide-icon title="你确认要删除该弹幕吗?"
+              confirm-button-text="确认" cancel-button-text="取消">
+              <template #reference>
+                <span v-show="isLogin" class="iconfont el-icon-ashbin danmu-del"></span>
+              </template>
+            </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -372,6 +377,8 @@ import CommentArea from '../components/CommentArea.vue'
 import * as common from "../common"
 import mockVideo from "../mock/video.json"
 import { ElMessage } from 'element-plus'
+import { useStore } from "../store"
+import { storeToRefs } from "pinia"
 
 type Video = {
   vid: number,
@@ -477,6 +484,9 @@ type Recommend = {
   date: number
 }
 
+let video: Video = reactive(mockVideo) //TODO
+document.title = video.title + " - 浅时" //TODO
+
 const predefinedmColors = ref([
   '#FFFFFF',
   '#909399',
@@ -489,9 +499,6 @@ const predefinedmColors = ref([
   '#800080',
   '#FFC0CB',
 ])
-
-let video: Video = reactive(mockVideo) //TODO
-document.title = video.title + " - 浅时" //TODO
 
 const shortcutKeyDesc = [
   {
@@ -528,6 +535,30 @@ const shortcutKeyDesc = [
   },
 ]
 
+const store = useStore()
+let { isLogin } = storeToRefs(store)
+store.$subscribe((_, state) => {
+  if (state.isLogin) {
+    isMe.value = common.isMe(video.author.uid)
+    init()
+  } else {
+    isMe.value = false
+    reset()
+  }
+})
+
+let videoEle: HTMLVideoElement
+let videoContainer: any
+let danmuSendBtns: NodeListOf<HTMLButtonElement>
+let tagRow: HTMLDivElement
+let introTextarea: HTMLTextAreaElement
+let vfcbarContainer: HTMLDivElement
+let canvas: HTMLCanvasElement
+let c2d: CanvasRenderingContext2D
+let contextMenu: HTMLDivElement
+let focuBtn: HTMLElement
+
+let isMe = ref(common.isMe(video.author.uid))
 let danmuStatus = ref(localStorage.getItem("danmuStatus") !== "false" ? true : false)
 let danmuInput = ref("")
 let dmSize = ref(25)
@@ -554,18 +585,15 @@ let playSpeed = ref(1)
 let videoQuality = ref("原画")
 let proportion = ref(1)
 let shortcutKeyDescriptionWindowVisible = ref(false)
-let focuBtnInnerText = ref(!video.author.isFocu ? "+ 关注 " + common.numFormatterW(video.author.focuNum) : "已关注 " + common.numFormatterW(video.author.focuNum))
+let focuBtnInnerText = ref("")
 
-let videoEle: HTMLVideoElement
-let videoContainer: any
-let danmuSendBtns: NodeListOf<HTMLButtonElement>
-let tagRow: HTMLDivElement
-let introTextarea: HTMLTextAreaElement
-let vfcbarContainer: HTMLDivElement
-let canvas: HTMLCanvasElement
-let c2d: CanvasRenderingContext2D
-let contextMenu: HTMLDivElement
-let focuBtn: HTMLElement
+watch(video, (newVal) => {
+  if (!newVal.author.isFocu) {
+    focuBtnInnerText.value = "+ 关注 " + common.numFormatterW(video.author.focuNum)
+  } else {
+    focuBtnInnerText.value = "已关注 " + common.numFormatterW(video.author.focuNum)
+  }
+})
 
 onMounted(() => {
   videoEle = document.getElementById("video") as HTMLVideoElement
@@ -788,6 +816,22 @@ onMounted(() => {
   })
 })
 
+function init() {
+  //TODO request API
+  //mock
+  video.author.isFocu = true
+  video.isCoin = true
+}
+
+function reset() {
+  //TODO Re request API
+  //mock
+  video.author.isFocu = false
+  video.isLike = false
+  video.isCoin = false
+  video.isStar = false
+}
+
 function animation() {
   if (playStatus.value) {
     c2d.clearRect(0, 0, canvas.width / 2, canvas.height / 2)
@@ -962,6 +1006,10 @@ function cancelFullScreen() {
 }
 
 function sendDanmu() {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
   if (danmuSendBtns[0].disabled || danmuInput.value.trim().length === 0) {
     return
   }
@@ -978,13 +1026,14 @@ function sendDanmu() {
     color: dmColor.value,
     speed: parseInt(dmSpeed.value),
     new: true,
-    isUp: common.isMe(video.author.uid)
+    isUp: isMe.value
   })
   danmuInput.value = ""
 }
 
 function delDanmu(did: number) {
-  //TODO did === 2应该换成请求api后失败
+  //TODO did === 2应该换成请求api后失败；弹幕可以由发送人和up删除
+  // 为了保护弹幕发送人的隐私，后端不会传发送人的信息过来，也就是说如果有删除弹幕的请求，就必须直达后端，前端不会做拦截
   if (did === 2) {
     ElMessage({
       "message": "删除失败，此弹幕不属于你！",
@@ -1043,7 +1092,11 @@ function setIntroUnFull() {
 }
 
 function likeVideo() {
-  if (common.isMe(video.author.uid)) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+  if (isMe.value) {
     ElMessage({
       "message": "不能给自己的视频点赞",
       "offset": 77,
@@ -1054,7 +1107,11 @@ function likeVideo() {
 }
 
 function coinVideo() {
-  if (common.isMe(video.author.uid)) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+  if (isMe.value) {
     ElMessage({
       "message": "不能给自己的视频投币",
       "offset": 77,
@@ -1065,6 +1122,10 @@ function coinVideo() {
 }
 
 function starVideo() {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
   video.isStar = !video.isStar
 }
 
@@ -1078,21 +1139,28 @@ function copyVideoUrl() {
 }
 
 function focuAuthor() {
-  if (common.isMe(video.author.uid)) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+  if (isMe.value) {
     ElMessage({
       "message": "不能关注自己",
       "offset": 77,
     })
     return
   }
-  if (!video.author.isFocu) {
-    video.author.isFocu = true
-    focuBtnInnerText.value = "已关注 " + common.numFormatterW(video.author.focuNum)
-  } else {
-    video.author.isFocu = false
-    focuBtnInnerText.value = "+ 关注 " + common.numFormatterW(video.author.focuNum)
-  }
+  video.author.isFocu = !video.author.isFocu
   focuBtn.blur()
+}
+
+function openLoginWindow() {
+  ElMessage({
+    "message": "请登录后再操作",
+    "offset": 77,
+    "customClass": "zIndex999",
+  })
+  store.openLoginWindow()
 }
 </script>
 

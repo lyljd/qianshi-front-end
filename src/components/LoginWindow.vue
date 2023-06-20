@@ -43,6 +43,7 @@
 <script setup lang="ts">
 import * as common from "../common"
 import { ElMessage, ElNotification } from 'element-plus'
+import { useStore } from "../store"
 
 type LoginInfo = {
   uid: number,
@@ -57,19 +58,21 @@ defineExpose({
   show
 })
 
+const store = useStore()
+
 const el = ref()
 const pl = ref()
 
+let CB: Function
 let dialogVisible = ref(false)
-let loginCB: Function //登录后回调函数，由父组件传来；一般在登录后都会有一些逻辑需要处理
 let email = ref("")
 let vcode = ref("")
 let password = ref("")
 let option = ref(true)
 
 function show(cb: Function) {
-  loginCB = cb
   dialogVisible.value = true
+  CB = cb
 }
 
 function switchEmailLogin() {
@@ -155,8 +158,9 @@ function emailLogin() {
     return
   }
   dialogVisible.value = false
+  store.isLogin = true
   let li = mockLogin()
-  loginCB(li.avatarUrl)
+  CB(li.avatarUrl)
   saveLoginInfo(li)
   showLoginSuccess(li.nickname, li.lastIpLocation)
   vcode.value = ""
@@ -177,8 +181,9 @@ function passwordLogin() {
     return
   }
   dialogVisible.value = false
+  store.isLogin = true
   let li = mockLogin()
-  loginCB(li.avatarUrl)
+  CB(li.avatarUrl)
   saveLoginInfo(li)
   showLoginSuccess(li.nickname, li.lastIpLocation)
   password.value = ""

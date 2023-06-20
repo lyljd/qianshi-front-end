@@ -41,11 +41,10 @@
             <span class="iconfont el-icon-diandiandianshu extra"></span>
           </template>
           <div class="extra-container">
-            <el-popconfirm @confirm="deleteComment(data.cid)" title="删除评论后，评论下所有回复都会被删除，是否继续?" confirm-button-text="确认"
-              cancel-button-text="取消">
+            <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon title="删除评论后，评论下所有回复都会被删除，是否继续?"
+              confirm-button-text="确认" cancel-button-text="取消">
               <template #reference>
-                <!--TODO 应该从localStorage里取当前登录uid来判断-->
-                <div v-if="data.isUp" class="comment-detele">删除</div>
+                <div v-if="isMe || isUp" class="comment-detele">删除</div>
               </template>
             </el-popconfirm>
             <div class="comment-report">举报</div>
@@ -61,7 +60,6 @@
       <div v-for="(  item  ) in   data.reply?.value  ">
         <ChildComment :vAuthorUid="vAuthorUid" :openChildSendArea="openChildSendArea" :deleteComment="deleteChildComment"
           :scrollId="scrollId" :data="item"></ChildComment>
-        <!-- {{ item.content }} -->
       </div>
     </div>
   </div>
@@ -70,8 +68,8 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
 import * as common from "../common"
-
-let commentEle: HTMLTextAreaElement
+import { useStore } from "../store"
+import { storeToRefs } from "pinia"
 
 type Comment = {
   cid: number
@@ -110,6 +108,25 @@ let props = defineProps<{
   vAuthorUid: number
 }>()
 
+const store = useStore()
+let { isLogin } = storeToRefs(store)
+store.$subscribe((_, state) => {
+  if (state.isLogin) {
+    isMe.value = common.isMe(props.data.uid)
+    isUp.value = common.isMe(props.vAuthorUid)
+    init()
+  } else {
+    isMe.value = false
+    isUp.value = false
+    reset()
+  }
+})
+
+let commentEle: HTMLTextAreaElement
+
+let isMe = ref(common.isMe(props.data.uid))
+let isUp = ref(common.isMe(props.vAuthorUid))
+
 onMounted(() => {
   commentEle = document.getElementById("comment-" + props.data.cid) as HTMLTextAreaElement
   props.data.height = commentEle.scrollHeight.toString() + "px"
@@ -124,6 +141,14 @@ onMounted(() => {
     }
   }
 })
+
+function init() {
+  //TODO request API
+}
+
+function reset() {
+  //TODO Re request API
+}
 
 function deleteChildComment(cid: number) {
   let deleteIndex = -1
@@ -141,7 +166,11 @@ function deleteChildComment(cid: number) {
 }
 
 function like() {
-  if (common.isMe(props.data.uid)) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+  if (isMe) {
     ElMessage({
       "message": "不能给自己的评论点赞",
       "offset": 77,
@@ -155,14 +184,18 @@ function like() {
     props.data.isLike = false
     props.data.likeNum--
   }
-  if (common.isMe(props.vAuthorUid)) {
+  if (isUp) {
     props.data.isUpLike = props.data.isLike
   }
   props.data.isDislike = false
 }
 
 function dislike() {
-  if (common.isMe(props.data.uid)) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+  if (isMe) {
     ElMessage({
       "message": "不能给自己的评论点踩",
       "offset": 77,
@@ -176,6 +209,15 @@ function dislike() {
 
   }
   props.data.isDislike = !props.data.isDislike
+}
+
+function openLoginWindow() {
+  ElMessage({
+    "message": "请登录后再操作",
+    "offset": 77,
+    "customClass": "zIndex999",
+  })
+  store.openLoginWindow()
 }
 </script>
 

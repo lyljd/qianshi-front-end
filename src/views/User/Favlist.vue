@@ -1,9 +1,9 @@
 <template>
   <el-card style="margin-left: -1px;margin-right: -1px;">
-    <div v-if="mockFavlistNum > 0 || common.isMe(parseInt($route.params.uid as string))" class="container">
+    <div v-if="mockFavlistNum > 0 || isMe" class="container">
       <div class="left">
         <ul>
-          <li v-if="common.isMe(parseInt($route.params.uid as string))" @click="newFavlist" class="new-favlist">新建收藏夹</li>
+          <li v-if="isMe" @click="newFavlist" class="new-favlist">新建收藏夹</li>
           <li v-for="(item, index) in mockFavlistNum"
             :class="{ active: index === activeId, inactive: index !== activeId }" :title="'收藏夹' + item.toString()"
             @click="activeId = index">收藏夹{{ item }}</li>
@@ -17,10 +17,9 @@
           <div class="info">
             <div class="title">{{ title }}</div>
             <div class="num">共{{ mockVideoTotalNum }}个视频</div>
-            <span v-if="common.isMe(parseInt($route.params.uid as string))" @click="deleteFavlist"
-              class="iconfont el-icon-ashbin delete">删除</span>
+            <span v-if="isMe" @click="deleteFavlist" class="iconfont el-icon-ashbin delete">删除</span>
           </div>
-          <div v-if="common.isMe(parseInt($route.params.uid as string))" class="option">
+          <div v-if="isMe" class="option">
             <span class="span">公开</span>
             <el-switch v-model="open" />
           </div>
@@ -32,8 +31,7 @@
             <el-popconfirm @confirm="deleteItem" width="212" hide-icon title="你确认要取消收藏该视频吗？" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
-                <span v-if="common.isMe(parseInt($route.params.uid as string))"
-                  class="iconfont el-icon-ashbin delete-item"></span>
+                <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
               </template>
             </el-popconfirm>
           </div>
@@ -57,6 +55,8 @@
 import VideoCard from "../../components/VideoCard.vue"
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as common from "../../common"
+import { useRoute } from 'vue-router'
+import { useStore } from "../../store"
 
 const mockVideo = {
   "vid": 0,
@@ -73,29 +73,78 @@ const mockFavlistNum = 6
 const mockVideoNum = 9
 const mockVideoTotalNum = 13
 
+const store = useStore()
+store.$subscribe((_, state) => {
+  if (state.isLogin) {
+    isMe.value = common.isMe(parseInt(route.params.uid as string))
+  } else {
+    isMe.value = false
+  }
+})
+
+let route: any
+let isMe = ref(false)
 let title = ref("标题")
 let activeId = ref(0)
 let open = ref(true)
+let newName = ref("")
+
+onMounted(() => {
+  route = useRoute();
+  isMe.value = common.isMe(parseInt(route.params.uid as string))
+})
 
 function newFavlist() {
-  ElMessageBox.prompt('请输入新收藏夹的名称', '新建收藏夹', {
+  ElMessageBox({
+    title: '新建收藏夹',
+    message: h('div', { style: 'margin-right: 20px;' }, [
+      h('div', null, [
+        h('span', null, '请输入新收藏夹的名称'),
+      ]),
+      h('div', null, [
+        h('input', { id: 'new-name', onInput: onNewNameChange }),
+      ]),
+      h('span', { id: 'notice' }, '名称的长度范围为1～20'),
+    ]),
+    showClose: false,
+    showCancelButton: true,
     confirmButtonText: '提交',
     cancelButtonText: '取消',
-    inputPattern: /^.{1,20}$/,
-    inputErrorMessage: '名称的长度范围为1～20',
     closeOnClickModal: false,
     closeOnPressEscape: false,
     lockScroll: false,
-    showClose: false
+    beforeClose: beforeNewFavlistWindowClose,
   })
-    .then(({ value }) => {
-      ElMessage({
-        type: 'success',
-        offset: 77,
-        message: `新收藏夹的名称为：${value}`,
-      })
-    })
   //TODO 向数组添加一个元素，并设置activeId为数组长度-1
+}
+
+function onNewNameChange() {
+  newName.value = (document.getElementById("new-name") as HTMLInputElement).value;
+  checkInput()
+}
+
+function checkInput() {
+  if (newName.value.length >= 1 && newName.value.length <= 20) {
+    (document.getElementById("notice") as HTMLSpanElement).style.display = "none"
+    return true
+  }
+  (document.getElementById("notice") as HTMLSpanElement).style.display = "inline"
+  return false
+}
+
+function beforeNewFavlistWindowClose(action: string, _: any, done: Function) {
+  if (action === "confirm") {
+    newName.value = newName.value.trim();
+    if (!checkInput()) {
+      return
+    }
+    ElMessage({
+      type: 'success',
+      offset: 77,
+      message: `新收藏夹的名称为：${newName.value}`,
+    })
+  }
+  done()
 }
 
 function deleteFavlist() {
@@ -262,15 +311,23 @@ function deleteItem() {
 </style>
 
 <style>
-.el-input__wrapper {
-  box-shadow: 0 0 0 1px #dedfe0 inset !important;
+#new-name {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 5px;
+  height: 25px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #dedfe0;
 }
 
-.el-input__wrapper:hover {
-  box-shadow: 0 0 0 1px #c8c9cc inset !important;
+#new-name:hover {
+  border-color: #c8c9cc;
 }
 
-.el-input__wrapper.is-focus {
-  box-shadow: 0 0 0 1px #409EFF inset !important
+#notice {
+  color: red;
+  font-size: 12px;
+  display: none;
 }
 </style>

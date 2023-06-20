@@ -1,5 +1,5 @@
 <template>
-  <el-card style="margin-left: -1px; margin-right: -1px;" v-if="common.isMe(parseInt($route.params.uid as string))"
+  <el-card style="margin-left: -1px; margin-right: -1px;" v-if="isMe"
     header="隐私设置">
     <div class="column">
       <div class="option">
@@ -23,12 +23,21 @@
 </template>
 
 <script setup lang="ts">
+//TODO 如果设置了不公开，后端返回数据时就直接返回空，前端不需要其他ui了
 import * as common from "../../common"
+import { useRoute } from 'vue-router'
 
+let route: any
+let isMe = ref(false)
 let openStar = ref(true)
 let openCoin = ref(true)
 let openLike = ref(true)
 let openFan = ref(true)
+
+onMounted(()=>{
+  route = useRoute();
+  isMe.value = common.isMe(parseInt(route.params.uid as string))
+})
 </script>
 
 <style scoped>

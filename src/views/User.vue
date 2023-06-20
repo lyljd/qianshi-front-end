@@ -2,7 +2,7 @@
   <div class="container">
     <img style="width: 1140px; height: 180px;" :src="`../../public/userhome-top-img/${userHomeInfo.topImgNo}.png`">
 
-    <div v-if="common.isMe(userHomeInfo.uid)" @click="replaceTopImg" class="replace-top-img">更换头图</div>
+    <div v-if="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
     <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false"
       :size="'338px'">
@@ -48,15 +48,15 @@
           </svg>
           <span v-show="userHomeInfo.isVip" class="vip">会员</span>
         </div>
-        <input :readonly="common.isMe(userHomeInfo.uid) ? false : true" id="signature"
-          :class="{ 'signature-row-me': common.isMe(userHomeInfo.uid), 'signature-row': !common.isMe(userHomeInfo.uid) }"
-          placeholder="编辑个性签名" v-model="userHomeInfo.signature" />
+        <input :readonly="isMe ? false : true" id="signature"
+          :class="{ 'signature-row-me': isMe, 'signature-row': !isMe }" :placeholder="isMe ? '编辑个性签名' : ''"
+          v-model="userHomeInfo.signature" />
       </div>
     </div>
 
-    <div v-if="!common.isMe(userHomeInfo.uid)" class="btns">
+    <div v-if="!isMe" class="btns">
       <el-button @click="focu">{{ focuBtnInnerText }}</el-button>
-      <el-button>发消息</el-button>
+      <el-button @click="sendMessage">发消息</el-button>
     </div>
 
     <el-card class="menu-container">
@@ -66,7 +66,7 @@
         <el-menu-item :index="`/u/${$route.params.uid}/video`">投稿</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏</el-menu-item>
-        <el-menu-item v-show="common.isMe(userHomeInfo.uid)" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
+        <el-menu-item v-show="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
 
         <div class="search-container">
           <el-input v-model="searchKey" class="search" placeholder="搜索视频、动态" clearable>
@@ -116,6 +116,8 @@
 import * as common from "../common"
 import { ElMessage } from 'element-plus'
 import mockUserHomeInfo from "../mock/userHome.json"
+import { useStore } from "../store"
+import { storeToRefs } from "pinia"
 
 type UserHomeInfo = {
   uid: number
@@ -137,10 +139,23 @@ type UserHomeInfo = {
 let userHomeInfo: UserHomeInfo = reactive(mockUserHomeInfo) //TODO
 document.title = userHomeInfo.nickname + "的个人空间 - 浅时" //TODO
 
+const store = useStore()
+let { isLogin } = storeToRefs(store)
+store.$subscribe((_, state) => {
+  if (state.isLogin) {
+    isMe.value = common.isMe(userHomeInfo.uid)
+    init()
+  } else {
+    isMe.value = false
+    reset()
+  }
+})
+
 let avatarContainer: HTMLDivElement
 let replaceAvatarEle: HTMLDivElement
 let signatureEle: HTMLInputElement
 
+let isMe = ref(common.isMe(userHomeInfo.uid))
 let searchKey = ref("")
 let oldTopImgNo = ref(1)
 let replaceTopImgDrawerShow = ref(false)
@@ -159,6 +174,7 @@ onMounted(() => {
   })
 
   signatureEle.addEventListener("blur", function () {
+    userHomeInfo.signature = userHomeInfo.signature.trim()
     if (userHomeInfo.signature.length > 50) {
       ElMessage({
         "message": "签名的长度最大为50，超出部分已自动选中",
@@ -169,6 +185,14 @@ onMounted(() => {
     }
   })
 })
+
+function init() {
+  //TODO request API
+}
+
+function reset() {
+  //TODO Re request API
+}
 
 function replaceAvatar() {
   alert("更换头像")
@@ -190,7 +214,11 @@ function saveTopImg() {
 }
 
 function focu() {
-  if (common.isMe(userHomeInfo.uid)) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+  if (isMe) {
     ElMessage({
       "message": "不能关注自己",
       "offset": 77,
@@ -204,6 +232,23 @@ function focu() {
     userHomeInfo.isFocu = false
     focuBtnInnerText.value = "关注"
   }
+}
+
+function sendMessage() {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+  alert("敬请期待")
+}
+
+function openLoginWindow() {
+  ElMessage({
+    "message": "请登录后再操作",
+    "offset": 77,
+    "customClass": "zIndex999",
+  })
+  store.openLoginWindow()
 }
 </script>
 
@@ -371,10 +416,6 @@ function focu() {
   width: 225px;
 }
 
-:deep(.el-input__wrapper) {
-  background: none;
-}
-
 .num-container {
   display: flex;
   align-items: center;
@@ -401,5 +442,18 @@ function focu() {
 .fan-num:hover {
   color: #409EFF;
   cursor: pointer;
+}
+
+:deep(.el-input__wrapper) {
+  box-shadow: 0 0 0 1px #dedfe0 inset !important;
+  border-radius: 10px;
+}
+
+:deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #c8c9cc inset !important;
+}
+
+:deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #409EFF inset !important
 }
 </style>

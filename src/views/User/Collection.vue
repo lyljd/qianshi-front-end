@@ -1,9 +1,9 @@
 <template>
   <el-card style="margin-left: -1px; margin-right: -1px;">
-    <div v-if="mockCollectionNum > 0 || common.isMe(parseInt($route.params.uid as string))" class="container">
+    <div v-if="mockCollectionNum > 0 || isMe" class="container">
       <div class="left">
         <ul>
-          <li v-if="common.isMe(parseInt($route.params.uid as string))" @click="newCollection" class="new-favlist">新建合集
+          <li v-if="isMe" @click="newCollection" class="new-favlist">新建合集
           </li>
           <li v-for="(item, index) in mockCollectionNum"
             :class="{ active: index === activeId, inactive: index !== activeId }" :title="'合集' + item.toString()"
@@ -22,10 +22,8 @@
             <el-tooltip effect="light" :content="'都是些奇奇怪怪的东西' || '-'" placement="bottom">
               <span class="iconfont el-icon-browse num">简介</span>
             </el-tooltip>
-            <span @click="addToCollection" v-if="common.isMe(parseInt($route.params.uid as string))"
-              class="add">+添加</span>
-            <span v-if="common.isMe(parseInt($route.params.uid as string))" @click="deleteCollection"
-              class="iconfont el-icon-ashbin delete">删除</span>
+            <span @click="addToCollection" v-if="isMe" class="add">+添加</span>
+            <span v-if="isMe" @click="deleteCollection" class="iconfont el-icon-ashbin delete">删除</span>
           </div>
         </div>
 
@@ -35,8 +33,7 @@
             <el-popconfirm @confirm="removeItem" width="212" hide-icon title="你确认要从此合集中移除该视频吗？" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
-                <span v-if="common.isMe(parseInt($route.params.uid as string))"
-                  class="iconfont el-icon-ashbin delete-item"></span>
+                <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
               </template>
             </el-popconfirm>
           </div>
@@ -60,6 +57,8 @@
 import VideoCard from "../../components/VideoCard.vue"
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as common from "../../common"
+import { useRoute } from 'vue-router'
+import { useStore } from "../../store"
 
 const mockVideo = {
   "vid": 0,
@@ -76,10 +75,26 @@ const mockCollectionNum = 3
 const mockVideoNum = 4
 const mockVideoTotalNum = 4
 
+const store = useStore()
+store.$subscribe((_, state) => {
+  if (state.isLogin) {
+    isMe.value = common.isMe(parseInt(route.params.uid as string))
+  } else {
+    isMe.value = false
+  }
+})
+
+let route: any
+let isMe = ref(false)
 let title = ref("标题")
 let activeId = ref(0)
 let newName = ref("")
 let newIntro = ref("")
+
+onMounted(() => {
+  route = useRoute();
+  isMe.value = common.isMe(parseInt(route.params.uid as string))
+})
 
 function newCollection() {
   ElMessageBox({
@@ -160,6 +175,8 @@ function checkInput() {
 
 function beforeNewCollectionWindowClose(action: string, _: any, done: Function) {
   if (action === "confirm") {
+    newName.value = newName.value.trim()
+    newIntro.value = newIntro.value.trim()
     if (!checkInput()) {
       return
     }
@@ -168,8 +185,6 @@ function beforeNewCollectionWindowClose(action: string, _: any, done: Function) 
       offset: 77,
       message: `新合集的名称为：${newName.value}，新合集的简介为：${newIntro.value}`,
     })
-    newName.value = ""
-    newIntro.value = ""
   }
   done()
 }
@@ -326,18 +341,6 @@ function addToCollection() {
 </style>
 
 <style>
-.el-input__wrapper {
-  box-shadow: 0 0 0 1px #dedfe0 inset !important;
-}
-
-.el-input__wrapper:hover {
-  box-shadow: 0 0 0 1px #c8c9cc inset !important;
-}
-
-.el-input__wrapper.is-focus {
-  box-shadow: 0 0 0 1px #409EFF inset !important
-}
-
 #new-name,
 #new-intro {
   width: 100%;

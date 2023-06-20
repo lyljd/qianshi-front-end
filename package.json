@@ -13,6 +13,7 @@
     "animate.css": "^4.1.1",
     "element-plus": "^2.3.5",
     "normalize.css": "^8.0.1",
+    "pinia": "^2.1.4",
     "vue": "^3.2.47",
     "vue-router": "^4.2.1"
   },

@@ -2,25 +2,12 @@ function isMobile(): boolean {
   return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i) === null
 }
 
-function isLogin(): boolean {
-  const token = localStorage.getItem("token")
-  return token !== null && token !== ""
-}
-
 function isMe(uid: number): boolean {
   const localUid = localStorage.getItem("uid")
   if (localUid && uid.toString() === localUid) {
     return true
   }
   return false
-}
-
-function logout() {
-  localStorage.removeItem("uid")
-  localStorage.removeItem("nickname")
-  localStorage.removeItem("avatarUrl")
-  localStorage.removeItem("token")
-  localStorage.removeItem("refreshToken")
 }
 
 function btnCD(btn: HTMLButtonElement, cd: number) {
@@ -155,7 +142,7 @@ function ToDeveloper() {
   window.open("https://github.com/lyljd", "_blank")
 }
 
-function checkCookieExists(cookieName:string) {
+function checkCookieExists(cookieName: string) {
   var cookies = document.cookie.split(';');
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i].trim();
@@ -168,9 +155,7 @@ function checkCookieExists(cookieName:string) {
 
 export {
   isMobile,
-  isLogin,
   isMe,
-  logout,
   btnCD,
   numFormatterW,
   videoTimeFormatterHMS,

@@ -1,8 +1,8 @@
 <template>
   <div class="dev-info">
-    <a href="https://beian.miit.gov.cn" target="_blank">渝ICP备2023xxxxxx号</a>
-    <span>Copyright © 2023 <a href="http://qianshi.fun" target="__blank">qianshi.fun</a></span>
-    <span>Developed by <a href="https://github.com/lyljd" target="__blank">Bonnenult</a></span>
+    <a class="interactive" href="https://beian.miit.gov.cn" target="_blank">渝ICP备2023xxxxxx号</a>
+    <span>Copyright © 2023 <a class="interactive" href="http://qianshi.fun" target="__blank">qianshi.fun</a></span>
+    <span>Developed by <a class="interactive" href="https://github.com/lyljd" target="__blank">Bonnenult</a></span>
     <span>此网站仅供学习使用，侵权请联系：ljd9031#163.com(#换@)</span>
   </div>
 </template>
@@ -20,7 +20,11 @@
   flex-direction: column;
 }
 
-a:hover {
+.interactive {
   color: #409EFF;
+}
+
+.interactive:hover {
+  color: #337ecc;
 }
 </style>

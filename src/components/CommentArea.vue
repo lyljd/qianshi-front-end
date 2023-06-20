@@ -59,6 +59,9 @@
 <script setup lang="ts">
 import * as common from "../common"
 import Comment from './Comment.vue'
+import { useStore } from "../store"
+import { storeToRefs } from "pinia"
+import { ElMessage } from 'element-plus'
 
 type Comment = {
   cid: number
@@ -98,6 +101,9 @@ let props = defineProps<{
   vAuthorUid: number
 }>()
 
+const store = useStore()
+let { isLogin } = storeToRefs(store)
+
 let content = ref("")
 let childContent = ref("")
 let scrollId = ref(-2)
@@ -133,6 +139,10 @@ function commentSwitchNew() {
 }
 
 function send(comment: Comment[]) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
   if (sendBtns[0].disabled || content.value.trim().length === 0) {
     return
   }
@@ -186,6 +196,10 @@ function openChildSendArea(cid: number, toId: number, nickname: string, isDBC: b
 }
 
 function childSend() {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
   if (sendBtns[0].disabled || childContent.value.trim().length === 0) {
     return
   }
@@ -273,6 +287,15 @@ function viewMore(comment: Comment) {
       "nickname": "Bonnenult"
     }
   })
+}
+
+function openLoginWindow() {
+  ElMessage({
+    "message": "请登录后再操作",
+    "offset": 77,
+    "customClass": "zIndex999",
+  })
+  store.openLoginWindow()
 }
 </script>
 
