@@ -33,7 +33,7 @@
 
     <el-popover ref="loginPop" :width="400">
       <template #reference>
-        <div @click="openLoginWindow()" v-show="!isLogin" class="login-btn">登录</div>
+        <div @click="openLoginWindow()" v-if="!isLogin" class="login-btn">登录</div>
       </template>
       <div class="before-login-pop">
         <div class="info1">登录后你可以：</div>
@@ -47,22 +47,22 @@
 
     <LoginWindow ref="loginWindow"></LoginWindow>
 
-    <div v-show="isLogin" class="after-login-menu">
+    <div v-if="isLogin" class="after-login-menu">
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
-          <el-avatar @click="toMe" class="avatar" :src="avatarUrl" @error="true">
-            <img @click="toMe" src="../../public/default-avatar.png" />
+          <el-avatar @click="toHome" class="avatar" :src="avatarUrl" @error="true">
+            <img @click="toHome" src="../../public/default-avatar.png" />
           </el-avatar>
         </template>
         <el-button @click="signin" :type="!signinStatus ? 'success' : 'info'"
           :style="{ cursor: !signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
         <ul class="almul">
           <div class="nickname">
-            <span @click="toMe" class="nickname-span">{{ ahi.nickname }}</span>
+            <span @click="toHome" class="nickname-span">{{ ahi.nickname }}</span>
           </div>
           <div class="tags">
             <span v-show="ahi.isVip" class="vip">会员</span>
-            <svg class="icon-symbol level" aria-hidden="true">
+            <svg @click="common.ToMe" class="icon-symbol level" aria-hidden="true">
               <use :xlink:href="'#el-icon-level_' + ahi.level"></use>
             </svg>
           </div>
@@ -83,7 +83,8 @@
               <div class="text">动态</div>
             </div>
           </div>
-          <li>个人中心</li>
+          <li v-if="ahi.power > 0">后台管理</li>
+          <li @click="common.ToMe">个人中心</li>
           <li @click="logout">退出登录</li>
         </ul>
       </el-popover>
@@ -162,6 +163,7 @@ type AvatarHoverInfo = {
   focuNum: number,
   fanNum: number,
   trendNum: number,
+  power: number,
 }
 
 const route = useRoute()
@@ -186,6 +188,7 @@ let ahi: AvatarHoverInfo = reactive({
   "focuNum": 0,
   "fanNum": 0,
   "trendNum": 0,
+  "power": 5,
 })
 let signinStatus = ref(true)
 
@@ -254,7 +257,8 @@ function logout() {
 }
 
 function onAvatarPopShow() {
-  signinStatus.value = false //TODO
+  //<!--TODO
+  signinStatus.value = false
   ahi.nickname = "Bonnenult"
   ahi.isVip = true
   ahi.level = 6
@@ -262,6 +266,7 @@ function onAvatarPopShow() {
   ahi.focuNum = 6
   ahi.fanNum = 2377801
   ahi.trendNum = 101
+  //-->
 }
 
 function signin() {
@@ -282,7 +287,7 @@ function signin() {
   })
 }
 
-function toMe() {
+function toHome() {
   let uid = localStorage.getItem("uid")
   if (uid) {
     common.ToUser(parseInt(uid))
@@ -302,7 +307,7 @@ function toMe() {
   background-color: transparent;
   position: fixed;
   top: 0px;
-  z-index: 99999;
+  z-index: 1;
 }
 
 .el-menu--horizontal>.el-menu-item.is-active,
@@ -422,7 +427,7 @@ function toMe() {
 
 .almul {
   list-style: none;
-  margin: 0;
+  margin: -7px;
   padding: 0;
 }
 

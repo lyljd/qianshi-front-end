@@ -1,6 +1,4 @@
 <template>
-  <el-backtop :right="50" :bottom="50" />
-
   <div class="container">
     <div class="rotation-chart">
       <Carousel></Carousel>
@@ -8,12 +6,12 @@
 
     <div class="recommendation">
       <div class="row">
-        <VideoCard :data="video" class="mr10 mb10"></VideoCard>
-        <VideoCard :data="video" class="ml10 mb10"></VideoCard>
+        <VideoCard :data="mockVideo" class="mr10 mb10"></VideoCard>
+        <VideoCard :data="mockVideo" class="ml10 mb10"></VideoCard>
       </div>
       <div class="row">
-        <VideoCard :data="video" class="mr10 mt10"></VideoCard>
-        <VideoCard :data="video" class="ml10 mt10"></VideoCard>
+        <VideoCard :data="mockVideo" class="mr10 mt10"></VideoCard>
+        <VideoCard :data="mockVideo" class="ml10 mt10"></VideoCard>
       </div>
     </div>
 
@@ -27,7 +25,7 @@
   <div v-for="(item) in 4" class="channel">
     <div class="title-container"><span class="title">频道{{ item }}</span></div>
     <div class="channel-row">
-      <VideoCard :data="video" class="card" v-for="() in 4"></VideoCard>
+      <VideoCard :data="mockVideo" class="card" v-for="() in 4"></VideoCard>
 
       <VideoRefreshBtn></VideoRefreshBtn>
     </div>
@@ -45,7 +43,7 @@ import VideoRefreshBtn from "../components/VideoRefreshBtn.vue"
 import Advertisement from "../components/Advertisement.vue"
 import DeveloperInfo from "../components/DeveloperInfo.vue"
 
-let video = {
+const mockVideo = {
   "vid": 1,
   "coverUrl": "",
   "playNum": 0,
@@ -55,7 +53,7 @@ let video = {
   "uid": 1,
   "nickname": "Bonnenult",
   "date": 1685599556000
-}
+} //TODO
 </script>
 
 <style scoped>

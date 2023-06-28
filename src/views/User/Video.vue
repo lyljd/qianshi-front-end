@@ -1,7 +1,7 @@
 <template>
   <el-tabs style="margin-left: -1px; margin-right: -1px;" type="border-card">
     <el-tab-pane :label="`视频 ${mockVideoTotalNum}`">
-      <el-tabs v-if="mockVideoNum > 0" v-model="videoSortBy"> <!-- v-show 没有视频时不显示-->
+      <el-tabs v-if="mockVideoNum > 0" v-model="videoSortBy">
         <el-tab-pane label="最新发布" name="date"></el-tab-pane>
         <el-tab-pane label="最多播放" name="play"></el-tab-pane>
         <el-tab-pane label="最多收藏" name="star"></el-tab-pane>
@@ -14,7 +14,7 @@
       <el-empty v-if="mockVideoNum === 0" description="暂无视频" />
     </el-tab-pane>
     <el-tab-pane :label="`专栏 ${mockReadTotalNum}`">
-      <el-tabs v-if="mockReadNum > 0" v-model="readSortBy"> <!-- v-show 没有专栏时不显示-->
+      <el-tabs v-if="mockReadNum > 0" v-model="readSortBy">
         <el-tab-pane label="最新发布" name="date"></el-tab-pane>
         <el-tab-pane label="最多阅读" name="read"></el-tab-pane>
         <el-tab-pane label="最多收藏" name="star"></el-tab-pane>
@@ -27,6 +27,7 @@
 <script setup lang="ts">
 import SmallVideoCard from '../../components/SmallVideoCard.vue'
 
+//<!--TODO
 const mockVideo = {
   "vid": 0,
   "coverUrl": "",
@@ -39,6 +40,7 @@ const mockVideoNum = 25
 const mockVideoTotalNum = 35
 const mockReadNum = 0
 const mockReadTotalNum = 0
+//-->
 
 let videoSortBy = "date"
 let readSortBy = "date"

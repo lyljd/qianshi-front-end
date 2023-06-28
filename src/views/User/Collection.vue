@@ -186,6 +186,8 @@ function beforeNewCollectionWindowClose(action: string, _: any, done: Function) 
       message: `新合集的名称为：${newName.value}，新合集的简介为：${newIntro.value}`,
     })
   }
+  newName.value = ""
+  newIntro.value = ""
   done()
 }
 

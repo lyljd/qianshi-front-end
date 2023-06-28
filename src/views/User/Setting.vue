@@ -4,40 +4,50 @@
     <div class="column">
       <div class="option">
         <span>公开我投币的视频</span>
-        <el-switch v-model="openCoin" />
+        <el-switch v-model="userSetting.openCoin" />
       </div>
       <div class="option">
         <span>公开我点赞的视频</span>
-        <el-switch v-model="openLike" />
+        <el-switch v-model="userSetting.openLike" />
       </div>
       <div class="option">
         <span>公开我的收藏</span>
-        <el-switch v-model="openStar" />
+        <el-switch v-model="userSetting.openStar" />
       </div>
       <div class="option">
         <span>公开我的关注列表</span>
-        <el-switch v-model="openFan" />
+        <el-switch v-model="userSetting.openFan" />
       </div>
     </div>
   </el-card>
+  <el-empty v-else description="无权访问" />
 </template>
 
 <script setup lang="ts">
-//TODO 如果设置了不公开，后端返回数据时就直接返回空，前端不需要其他ui了
 import * as common from "../../common"
 import { useRoute } from 'vue-router'
+import mockUserSetting from "../../mock/user/setting.json"
+
+type UserSetting = {
+  openStar: boolean,
+  openCoin: boolean,
+  openLike: boolean,
+  openFan: boolean,
+}
+
+let userSetting: UserSetting = reactive(getUserSetting())
 
 let route: any
 let isMe = ref(false)
-let openStar = ref(true)
-let openCoin = ref(true)
-let openLike = ref(true)
-let openFan = ref(true)
 
 onMounted(()=>{
   route = useRoute();
   isMe.value = common.isMe(parseInt(route.params.uid as string))
 })
+
+function getUserSetting() {
+  return mockUserSetting //TODO
+}
 </script>
 
 <style scoped>

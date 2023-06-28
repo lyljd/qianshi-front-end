@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
+import * as common from "../common"
 
 export const useStore = defineStore("qianshi", {
   state: () => ({
-    isLogin: localStorage.getItem("token") !== null && localStorage.getItem("token") !== "",
+    isLogin: common.isLogin(),
     openLoginWindow: () => { }
   }),
 })

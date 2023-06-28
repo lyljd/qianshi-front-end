@@ -144,6 +144,7 @@ function beforeNewFavlistWindowClose(action: string, _: any, done: Function) {
       message: `新收藏夹的名称为：${newName.value}`,
     })
   }
+  newName.value = ""
   done()
 }
 

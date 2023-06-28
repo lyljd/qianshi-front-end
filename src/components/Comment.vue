@@ -52,9 +52,9 @@
         </el-popover>
       </div>
 
-      <div v-show="data.isTop || data.isUpLike" class="status">
-        <span v-show="data.isTop" class="top">置顶</span>
-        <span v-show="data.isUpLike" class="up-like">UP主觉得很赞</span>
+      <div v-if="data.isTop || data.isUpLike" class="status">
+        <span v-if="data.isTop" class="top">置顶</span>
+        <span v-if="data.isUpLike" class="up-like">UP主觉得很赞</span>
       </div>
 
       <div v-for="(  item  ) in   data.reply?.value  ">
@@ -170,7 +170,7 @@ function like() {
     openLoginWindow()
     return
   }
-  if (isMe) {
+  if (isMe.value) {
     ElMessage({
       "message": "不能给自己的评论点赞",
       "offset": 77,
@@ -195,7 +195,7 @@ function dislike() {
     openLoginWindow()
     return
   }
-  if (isMe) {
+  if (isMe.value) {
     ElMessage({
       "message": "不能给自己的评论点踩",
       "offset": 77,

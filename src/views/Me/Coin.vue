@@ -1,0 +1,49 @@
+<template>
+  <div>
+    <strong>硬币余额：</strong>
+    <span style="color: #67C23A;">{{ coinNum }}</span>
+  </div>
+  <div class="notice" style="margin-top: 40px;">
+    <strong style="margin-bottom: 5px;">硬币有什么用？</strong>
+    <div class="item">
+      <span class="iconfont el-icon-dian dian"></span>
+      硬币用于对优秀的视频作品进行投币支持，这是对UP主的一种肯定
+    </div>
+    <div class="item">
+      <span class="iconfont el-icon-dian dian"></span>
+      硬币还可用于修改昵称、兑换会员等
+    </div>
+  </div>
+  <div class="notice">
+    <strong style="margin-bottom: 5px;">如何获得硬币？</strong>
+    <div class="item">
+      <span class="iconfont el-icon-dian dian"></span>
+      每日签到后可获得5个硬币（鼠标悬浮在顶部菜单栏头像处可签到）
+    </div>
+    <div class="item">
+      <span class="iconfont el-icon-dian dian"></span>
+      UP主可通过投稿视频来获得更多硬币（观众投币的百分之十将作为UP主的硬币收入奖励）
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+let coinNum = ref(getCoinNum())
+
+function getCoinNum() {
+  return 233 //TODO
+}
+</script>
+
+<style scoped>
+.notice {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.notice .item {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+</style>

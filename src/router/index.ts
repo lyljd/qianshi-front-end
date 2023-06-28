@@ -25,6 +25,19 @@ const routes: Array<RouteRecordRaw> = [
       { path: "/u/:uid/setting", component: () => import("../views/User/Setting.vue") },
     ]
   },
+  {
+    path: "/me",
+    component: () => import("../views/Me.vue"),
+    children: [
+      { path: "/me", component: () => import("../views/Me/Home.vue") },
+      { path: "/me/setting", component: () => import("../views/Me/Setting.vue") },
+      { path: "/me/security", component: () => import("../views/Me/Security.vue") },
+      { path: "/me/coin", component: () => import("../views/Me/Coin.vue") },
+    ],
+    meta: {
+      title: '个人中心',
+    }
+  },
 ]
 
 const router = createRouter({
@@ -33,6 +46,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  if (to.meta.title) {
+    document.title = to.meta.title + " - 浅时"
+  } else {
+    document.title = "浅时"
+  }
+
   window.scrollTo(0, 0) //设置滚动条位置到顶部
   next()
 });

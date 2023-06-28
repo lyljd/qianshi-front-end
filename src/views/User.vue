@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <img style="width: 1140px; height: 180px;" :src="`../../public/userhome-top-img/${userHomeInfo.topImgNo}.png`">
+    <img style="width: 1140px; height: 180px;" :src="`../../public/userhome-top-img/${user.topImgNo}.png`">
 
     <div v-if="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
@@ -9,16 +9,16 @@
       <template #default>
         <div class="top-img-container">
           <div style="text-align: center;">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 1 ? 'not-allowed' : 'pointer' }"
-              @click="userHomeInfo.topImgNo = 1" class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 2 ? 'not-allowed' : 'pointer' }"
-              @click="userHomeInfo.topImgNo = 2" class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
+            <img :style="{ cursor: user.topImgNo === 1 ? 'not-allowed' : 'pointer' }"
+              @click="user.topImgNo = 1" class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
+            <img :style="{ cursor: user.topImgNo === 2 ? 'not-allowed' : 'pointer' }"
+              @click="user.topImgNo = 2" class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
           </div>
           <div style="text-align: center;">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 3 ? 'not-allowed' : 'pointer' }"
-              @click="userHomeInfo.topImgNo = 3" class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
-            <img :style="{ cursor: userHomeInfo.topImgNo === 4 ? 'not-allowed' : 'pointer' }"
-              @click="userHomeInfo.topImgNo = 4" class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
+            <img :style="{ cursor: user.topImgNo === 3 ? 'not-allowed' : 'pointer' }"
+              @click="user.topImgNo = 3" class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
+            <img :style="{ cursor: user.topImgNo === 4 ? 'not-allowed' : 'pointer' }"
+              @click="user.topImgNo = 4" class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
           </div>
         </div>
       </template>
@@ -31,26 +31,26 @@
     <div class="info">
       <div id="avatar-container">
         <div id="replace-avatar" @click="replaceAvatar" class="replace-avatar">更换头像</div>
-        <el-avatar :size="60" :src="userHomeInfo.avatarUrl" @error="true">
+        <el-avatar :size="60" :src="user.avatarUrl" @error="true">
           <img src="../../public/default-avatar.png" />
         </el-avatar>
       </div>
 
       <div class="right">
         <div class="head-row">
-          <span class="nickname">{{ userHomeInfo.nickname }}</span>
-          <span v-show="userHomeInfo.gender === 'male'" style="color: #a0cfff;"
+          <span class="nickname">{{ user.nickname }}</span>
+          <span v-show="user.gender === 'male'" style="color: #a0cfff;"
             class="iconfont el-icon-male gender"></span>
-          <span v-show="userHomeInfo.gender === 'female'" style="color: #ff6699;"
+          <span v-show="user.gender === 'female'" style="color: #ff6699;"
             class="iconfont el-icon-female gender"></span>
-          <svg class="icon-symbol level" aria-hidden="true">
-            <use :xlink:href="'#el-icon-level_' + userHomeInfo.level"></use>
+          <svg @click="common.ToMe" class="icon-symbol level" aria-hidden="true">
+            <use :xlink:href="'#el-icon-level_' + user.level"></use>
           </svg>
-          <span v-show="userHomeInfo.isVip" class="vip">会员</span>
+          <span v-if="user.isVip" class="vip">会员</span>
         </div>
         <input :readonly="isMe ? false : true" id="signature"
           :class="{ 'signature-row-me': isMe, 'signature-row': !isMe }" :placeholder="isMe ? '编辑个性签名' : ''"
-          v-model="userHomeInfo.signature" />
+          v-model="user.signature" />
       </div>
     </div>
 
@@ -66,7 +66,7 @@
         <el-menu-item :index="`/u/${$route.params.uid}/video`">投稿</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏</el-menu-item>
-        <el-menu-item v-show="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
+        <el-menu-item v-if="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
 
         <div class="search-container">
           <el-input v-model="searchKey" class="search" placeholder="搜索视频、动态" clearable>
@@ -81,27 +81,27 @@
         <div class="num-container">
           <div class="num-box">
             <div class="num-span">关注数</div>
-            <div :title="(userHomeInfo.focuNum).toString()" class="num focu-num">{{
-              common.numFormatterW(userHomeInfo.focuNum) }}</div>
+            <div :title="(user.focuNum).toString()" class="num focu-num">{{
+              common.numFormatterW(user.focuNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">粉丝数</div>
-            <div :title="(userHomeInfo.fanNum).toString()" class="num fan-num">{{
-              common.numFormatterW(userHomeInfo.fanNum) }}</div>
+            <div :title="(user.fanNum).toString()" class="num fan-num">{{
+              common.numFormatterW(user.fanNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">获赞数</div>
-            <div :title="(userHomeInfo.likeNum).toString()" class="num">{{ common.numFormatterW(userHomeInfo.likeNum) }}
+            <div :title="(user.likeNum).toString()" class="num">{{ common.numFormatterW(user.likeNum) }}
             </div>
           </div>
           <div class="num-box">
             <div class="num-span">播放数</div>
-            <div :title="(userHomeInfo.playNum).toString()" class="num">{{ common.numFormatterW(userHomeInfo.playNum) }}
+            <div :title="(user.playNum).toString()" class="num">{{ common.numFormatterW(user.playNum) }}
             </div>
           </div>
           <div class="num-box">
             <div class="num-span">阅读数</div>
-            <div :title="(userHomeInfo.readNum).toString()" class="num">{{ common.numFormatterW(userHomeInfo.readNum) }}
+            <div :title="(user.readNum).toString()" class="num">{{ common.numFormatterW(user.readNum) }}
             </div>
           </div>
         </div>
@@ -115,11 +115,11 @@
 <script setup lang="ts">
 import * as common from "../common"
 import { ElMessage } from 'element-plus'
-import mockUserHomeInfo from "../mock/userHome.json"
+import mockUser from "../mock/user.json"
 import { useStore } from "../store"
 import { storeToRefs } from "pinia"
 
-type UserHomeInfo = {
+type User = {
   uid: number
   nickname: string
   signature: string
@@ -136,18 +136,18 @@ type UserHomeInfo = {
   readNum: number
 }
 
-let userHomeInfo: UserHomeInfo = reactive(mockUserHomeInfo) //TODO
-document.title = userHomeInfo.nickname + "的个人空间 - 浅时" //TODO
+let user: User = reactive(getUser())
+document.title = user.nickname + "的个人空间 - 浅时"
 
 const store = useStore()
 let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(userHomeInfo.uid)
-    init()
+    isMe.value = common.isMe(user.uid)
+    user = getUser()
   } else {
     isMe.value = false
-    reset()
+    user = getUser()
   }
 })
 
@@ -155,11 +155,11 @@ let avatarContainer: HTMLDivElement
 let replaceAvatarEle: HTMLDivElement
 let signatureEle: HTMLInputElement
 
-let isMe = ref(common.isMe(userHomeInfo.uid))
+let isMe = ref(common.isMe(user.uid))
 let searchKey = ref("")
 let oldTopImgNo = ref(1)
 let replaceTopImgDrawerShow = ref(false)
-let focuBtnInnerText = ref(!userHomeInfo.isFocu ? "关注" : "已关注")
+let focuBtnInnerText = ref(!user.isFocu ? "关注" : "已关注")
 
 onMounted(() => {
   avatarContainer = document.getElementById("avatar-container") as HTMLDivElement
@@ -174,24 +174,20 @@ onMounted(() => {
   })
 
   signatureEle.addEventListener("blur", function () {
-    userHomeInfo.signature = userHomeInfo.signature.trim()
-    if (userHomeInfo.signature.length > 50) {
+    user.signature = user.signature.trim()
+    if (user.signature.length > 50) {
       ElMessage({
         "message": "签名的长度最大为50，超出部分已自动选中",
         "offset": 77,
       })
       signatureEle.focus()
-      signatureEle.setSelectionRange(50, userHomeInfo.signature.length)
+      signatureEle.setSelectionRange(50, user.signature.length)
     }
   })
 })
 
-function init() {
-  //TODO request API
-}
-
-function reset() {
-  //TODO Re request API
+function getUser() {
+  return mockUser //TODO
 }
 
 function replaceAvatar() {
@@ -200,12 +196,12 @@ function replaceAvatar() {
 
 function replaceTopImg() {
   replaceTopImgDrawerShow.value = true;
-  oldTopImgNo.value = userHomeInfo.topImgNo
+  oldTopImgNo.value = user.topImgNo
 }
 
 function cancelTopImg() {
   replaceTopImgDrawerShow.value = false
-  userHomeInfo.topImgNo = oldTopImgNo.value
+  user.topImgNo = oldTopImgNo.value
 }
 
 function saveTopImg() {
@@ -225,11 +221,11 @@ function focu() {
     })
     return
   }
-  if (!userHomeInfo.isFocu) {
-    userHomeInfo.isFocu = true
+  if (!user.isFocu) {
+    user.isFocu = true
     focuBtnInnerText.value = "已关注"
   } else {
-    userHomeInfo.isFocu = false
+    user.isFocu = false
     focuBtnInnerText.value = "关注"
   }
 }

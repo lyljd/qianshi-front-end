@@ -1,10 +1,12 @@
 <template>
+  <el-backtop :right="50" :bottom="50" />
+
   <div v-if="common.isMobile()">
     <TopMenuBar></TopMenuBar>
     <div v-if="$route.path !== '/'" class="placeholder"></div>
     <router-view></router-view>
     <div @click="inSiteMessage" class="in-site-message-container">
-      <span class="in-site-message">站内留言</span>
+      <span v-if="store.isLogin" class="in-site-message">站内留言</span>
     </div>
   </div>
   <div v-else>
@@ -17,18 +19,12 @@ import TopMenuBar from "./components/TopMenuBar.vue"
 import * as common from "./common"
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useStore } from "./store"
-import { storeToRefs } from "pinia"
 
 const store = useStore()
-let { isLogin } = storeToRefs(store)
 
 let message = ref("")
 
 function inSiteMessage() {
-  if (!isLogin.value) {
-    openLoginWindow()
-    return
-  }
   ElMessageBox({
     title: '站内留言',
     message: h('div', { style: 'margin-right: 10px;' }, [
@@ -66,6 +62,7 @@ function beforeMessageWindowClose(action: string, _: any, done: Function) {
       message: "提交成功",
     })
   }
+  message.value = ""
   done()
 }
 
@@ -76,15 +73,6 @@ function checkInput() {
   }
   (document.getElementById("notice") as HTMLSpanElement).style.display = "inline"
   return false
-}
-
-function openLoginWindow() {
-  ElMessage({
-    "message": "请登录后再操作",
-    "offset": 77,
-    "customClass": "zIndex999",
-  })
-  store.openLoginWindow(() => { })
 }
 </script>
 

@@ -2,6 +2,10 @@ function isMobile(): boolean {
   return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i) === null
 }
 
+function isLogin(): boolean {
+  return localStorage.getItem("token") !== null && localStorage.getItem("token") !== ""
+}
+
 function isMe(uid: number): boolean {
   const localUid = localStorage.getItem("uid")
   if (localUid && uid.toString() === localUid) {
@@ -138,6 +142,10 @@ function ToUser(uid: number) {
   window.open(`/u/${uid}`, "_blank")
 }
 
+function ToMe() {
+  window.open("/me", "_blank")
+}
+
 function ToDeveloper() {
   window.open("https://github.com/lyljd", "_blank")
 }
@@ -155,12 +163,14 @@ function checkCookieExists(cookieName: string) {
 
 export {
   isMobile,
+  isLogin,
   isMe,
   btnCD,
   numFormatterW,
   videoTimeFormatterHMS,
   ToVideo,
   ToUser,
+  ToMe,
   ToDeveloper,
   timestampFormatter,
   timestampFormatterMD,

@@ -5,7 +5,6 @@
       <div class="top">
         <div>
           <span class="comment-span">评论</span>
-          <!--TODO 评论数应该后端直接返回，而不是取数组长度-->
           <span class="comment-num">{{ common.numFormatterW(data.num) }}</span>
         </div>
 
@@ -32,12 +31,12 @@
         </Comment>
 
         <div @click="viewMore(item)"
-          v-show="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">共{{
+          v-if="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">共{{
             item.reply?.num }}条回复，<span class="view">点击查看</span></div>
 
         <el-pagination @click="getChildCommentByPage(item.cid)"
           @current-change="(page: number) => { curPage = page; isClickPage = true }"
-          v-show="item.reply !== undefined && item.reply.isOpen !== undefined"
+          v-if="item.reply !== undefined && item.reply.isOpen !== undefined"
           style="margin-top: 20px;margin-left: 47.5px;" small background hide-on-single-page layout="prev, pager, next"
           :total="item.reply?.num" />
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="nf-container">
     <span class="iconfont el-icon-cry ico"></span>
     <span class="code">404</span>
     <span class="msg">未找到页面</span>
@@ -11,7 +11,7 @@
 </script>
 
 <style scoped>
-.container {
+.nf-container {
   width: 100%;
   height: calc(100vh - 93px);
   min-height: 480px;
@@ -21,16 +21,16 @@
   flex-direction: column;
 }
 
-.ico {
+.nf-container .ico {
   font-size: 250px;
   margin-bottom: -20px;
 }
 
-.code {
+.nf-container .code {
   font-size: 100px;
 }
 
-.msg {
+.nf-container .msg {
   font-size: 25px;
   color: #909399;
 }

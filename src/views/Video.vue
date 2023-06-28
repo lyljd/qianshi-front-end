@@ -1,6 +1,4 @@
 <template>
-  <el-backtop :right="50" :bottom="50" />
-
   <div class="container">
     <div class="left">
       <div :title="video.title" class="title">{{ video.title }}</div>
@@ -308,7 +306,7 @@
       </div>
 
       <transition name="danmu-list">
-        <el-table v-show=" showDanmuList " class="danmu-list" :data=" video.danmu " max-height="483" size="small"
+        <el-table v-if=" showDanmuList " class="danmu-list" :data=" video.danmu " max-height="483" size="small"
           empty-text="暂无弹幕">
           <el-table-column prop="time" label="时间" width="65" sortable :formatter=" danmuTimeFormatter " />
           <el-table-column prop="value" label="弹幕内容" show-overflow-tooltip width="83" />
@@ -318,7 +316,7 @@
               <el-popconfirm @confirm="delDanmu(scope.row.did)" hide-icon title="你确认要删除该弹幕吗?"
               confirm-button-text="确认" cancel-button-text="取消">
               <template #reference>
-                <span v-show="isLogin" class="iconfont el-icon-ashbin danmu-del"></span>
+                <span v-if="isLogin" class="iconfont el-icon-ashbin danmu-del"></span>
               </template>
             </el-popconfirm>
             </template>
@@ -484,8 +482,8 @@ type Recommend = {
   date: number
 }
 
-let video: Video = reactive(mockVideo) //TODO
-document.title = video.title + " - 浅时" //TODO
+let video: Video = reactive(getVideo())
+document.title = video.title + " - 浅时"
 
 const predefinedmColors = ref([
   '#FFFFFF',
@@ -540,10 +538,10 @@ let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
     isMe.value = common.isMe(video.author.uid)
-    init()
+    video = getVideo()
   } else {
     isMe.value = false
-    reset()
+    video = getVideo()
   }
 })
 
@@ -816,20 +814,8 @@ onMounted(() => {
   })
 })
 
-function init() {
-  //TODO request API
-  //mock
-  video.author.isFocu = true
-  video.isCoin = true
-}
-
-function reset() {
-  //TODO Re request API
-  //mock
-  video.author.isFocu = false
-  video.isLike = false
-  video.isCoin = false
-  video.isStar = false
+function getVideo() {
+  return mockVideo //TODO
 }
 
 function animation() {
