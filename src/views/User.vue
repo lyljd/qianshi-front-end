@@ -9,16 +9,16 @@
       <template #default>
         <div class="top-img-container">
           <div style="text-align: center;">
-            <img :style="{ cursor: user.topImgNo === 1 ? 'not-allowed' : 'pointer' }"
-              @click="user.topImgNo = 1" class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
-            <img :style="{ cursor: user.topImgNo === 2 ? 'not-allowed' : 'pointer' }"
-              @click="user.topImgNo = 2" class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
+            <img :style="{ cursor: user.topImgNo === 1 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 1"
+              class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
+            <img :style="{ cursor: user.topImgNo === 2 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 2"
+              class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
           </div>
           <div style="text-align: center;">
-            <img :style="{ cursor: user.topImgNo === 3 ? 'not-allowed' : 'pointer' }"
-              @click="user.topImgNo = 3" class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
-            <img :style="{ cursor: user.topImgNo === 4 ? 'not-allowed' : 'pointer' }"
-              @click="user.topImgNo = 4" class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
+            <img :style="{ cursor: user.topImgNo === 3 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 3"
+              class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
+            <img :style="{ cursor: user.topImgNo === 4 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 4"
+              class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
           </div>
         </div>
       </template>
@@ -39,16 +39,14 @@
       <div class="right">
         <div class="head-row">
           <span class="nickname">{{ user.nickname }}</span>
-          <span v-show="user.gender === 'male'" style="color: #a0cfff;"
-            class="iconfont el-icon-male gender"></span>
-          <span v-show="user.gender === 'female'" style="color: #ff6699;"
-            class="iconfont el-icon-female gender"></span>
+          <span v-show="user.gender === '男'" style="color: #a0cfff;" class="iconfont el-icon-male gender"></span>
+          <span v-show="user.gender === '女'" style="color: #ff6699;" class="iconfont el-icon-female gender"></span>
           <svg @click="common.ToMe" class="icon-symbol level" aria-hidden="true">
             <use :xlink:href="'#el-icon-level_' + user.level"></use>
           </svg>
           <span v-if="user.isVip" class="vip">会员</span>
         </div>
-        <input :readonly="isMe ? false : true" id="signature"
+        <input ref="signatureInput" @blur="saveSignature" :readonly="isMe ? false : true"
           :class="{ 'signature-row-me': isMe, 'signature-row': !isMe }" :placeholder="isMe ? '编辑个性签名' : ''"
           v-model="user.signature" />
       </div>
@@ -151,9 +149,9 @@ store.$subscribe((_, state) => {
   }
 })
 
+const signatureInput = ref<HTMLInputElement>()
 let avatarContainer: HTMLDivElement
 let replaceAvatarEle: HTMLDivElement
-let signatureEle: HTMLInputElement
 
 let isMe = ref(common.isMe(user.uid))
 let searchKey = ref("")
@@ -164,7 +162,6 @@ let focuBtnInnerText = ref(!user.isFocu ? "关注" : "已关注")
 onMounted(() => {
   avatarContainer = document.getElementById("avatar-container") as HTMLDivElement
   replaceAvatarEle = document.getElementById("replace-avatar") as HTMLDivElement
-  signatureEle = document.getElementById("signature") as HTMLInputElement
 
   avatarContainer.addEventListener("mouseenter", function () {
     replaceAvatarEle.style.display = "flex"
@@ -172,22 +169,22 @@ onMounted(() => {
   avatarContainer.addEventListener("mouseleave", function () {
     replaceAvatarEle.style.display = "none"
   })
-
-  signatureEle.addEventListener("blur", function () {
-    user.signature = user.signature.trim()
-    if (user.signature.length > 50) {
-      ElMessage({
-        "message": "签名的长度最大为50，超出部分已自动选中",
-        "offset": 77,
-      })
-      signatureEle.focus()
-      signatureEle.setSelectionRange(50, user.signature.length)
-    }
-  })
 })
 
 function getUser() {
   return mockUser //TODO
+}
+
+function saveSignature() {
+  user.signature = user.signature.trim()
+  if (user.signature.length > 50) {
+    ElMessage({
+      "message": "签名的长度最大为50，超出部分已自动选中",
+      "offset": 77,
+    })
+    signatureInput.value!.focus()
+    signatureInput.value!.setSelectionRange(50, user.signature.length)
+  }
 }
 
 function replaceAvatar() {

@@ -5,8 +5,8 @@
     <TopMenuBar></TopMenuBar>
     <div v-if="$route.path !== '/'" class="placeholder"></div>
     <router-view></router-view>
-    <div @click="inSiteMessage" class="in-site-message-container">
-      <span v-if="store.isLogin" class="in-site-message">站内留言</span>
+    <div class="in-site-message-container">
+      <span @click="inSiteMessage" v-if="store.isLogin" class="in-site-message">站内留言</span>
     </div>
   </div>
   <div v-else>

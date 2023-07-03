@@ -53,7 +53,8 @@
       <el-card v-if="userHome.notice != '' || isMe" header="公告">
         <div :class="{ 'space-notice-gap': isMe }">
           <textarea :class="{ 'space-notice-me': isMe, 'space-notice': !isMe }" v-model="userHome.notice"
-            :readonly="isMe ? false : true" id="space-notice" placeholder="编辑我的空间公告"></textarea>
+            :readonly="isMe ? false : true" ref="noticeTextarea" @blur="saveSpaceNotice"
+            placeholder="编辑我的空间公告"></textarea>
         </div>
       </el-card>
 
@@ -123,7 +124,7 @@ store.$subscribe((_, state) => {
   }
 })
 
-let noticeEle: HTMLTextAreaElement
+const noticeTextarea = ref<HTMLTextAreaElement>()
 
 let route: any
 let isMe = ref(false)
@@ -132,23 +133,22 @@ let newTitle = ref("")
 onMounted(() => {
   route = useRoute()
   isMe.value = common.isMe(parseInt(route.params.uid as string))
-
-  noticeEle = document.getElementById("space-notice") as HTMLTextAreaElement
-  noticeEle.addEventListener("blur", function () {
-    userHome.notice = userHome.notice.trim()
-    if (userHome.notice.length > 150) {
-      ElMessage({
-        "message": "公告的字数最多为150，超出部分已自动选中",
-        "offset": 77,
-      })
-      noticeEle.focus()
-      noticeEle.setSelectionRange(150, userHome.notice.length)
-    }
-  })
 })
 
 function getUserHome() {
   return mockUserHome //TODO
+}
+
+function saveSpaceNotice() {
+  userHome.notice = userHome.notice.trim()
+  if (userHome.notice.length > 150) {
+    ElMessage({
+      "message": "公告的字数最多为150，超出部分已自动选中",
+      "offset": 77,
+    })
+    noticeTextarea.value!.focus()
+    noticeTextarea.value!.setSelectionRange(150, userHome.notice.length)
+  }
 }
 
 function apply() {
