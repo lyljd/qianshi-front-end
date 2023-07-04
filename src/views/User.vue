@@ -41,7 +41,7 @@
           <span class="nickname">{{ user.nickname }}</span>
           <span v-show="user.gender === '男'" style="color: #a0cfff;" class="iconfont el-icon-male gender"></span>
           <span v-show="user.gender === '女'" style="color: #ff6699;" class="iconfont el-icon-female gender"></span>
-          <svg @click="common.ToMe" class="icon-symbol level" aria-hidden="true">
+          <svg @click="common.ToNewPage('/me')" class="icon-symbol level" aria-hidden="true">
             <use :xlink:href="'#el-icon-level_' + user.level"></use>
           </svg>
           <span v-if="user.isVip" class="vip">会员</span>

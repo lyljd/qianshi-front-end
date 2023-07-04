@@ -263,6 +263,7 @@ function getChildCommentByPage(cid: number) {
 }
 
 function viewMore(comment: Comment) {
+  scrollId.value = -2
   comment.reply!.isOpen = true
   comment.reply?.value.push({
     "cid": props.data.num,
@@ -346,10 +347,16 @@ function openLoginWindow() {
   box-sizing: border-box;
   padding: 10px;
   font-size: 14px;
+  border: 1px solid #dedfe0;
+}
+
+.comment-input:hover {
+  border: 1px solid #c8c9cc;
 }
 
 .comment-input:focus {
   outline: none;
+  border: 1px solid #409EFF;
 }
 
 .comment-send {

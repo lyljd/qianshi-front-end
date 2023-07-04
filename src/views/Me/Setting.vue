@@ -6,10 +6,12 @@
       <span v-show="nnmdy" class="iconfont el-icon-info nnmdy">已修改</span>
       <span class="info">注：修改一次昵称需要消耗5个硬币</span>
     </div>
+
     <div>
       <span class="notice">我的签名：</span>
       <input v-model="meSetting.signature" class="signature">
     </div>
+
     <div>
       <span class="notice">&emsp;&emsp;性别：</span>
       <el-radio-group v-model="meSetting.gender">
@@ -18,14 +20,16 @@
         <el-radio-button label="保密" />
       </el-radio-group>
     </div>
+
     <div>
       <span class="notice">出生日期：</span>
       <el-config-provider :locale="locale">
-        <el-date-picker v-model="meSetting.birthday" value-format="YYYYMMDD" class="birthday" type="date"
+        <el-date-picker v-model="meSetting.birthday" value-format="YYYYMMDD" type="date"
           placeholder="选择日期" :disabled-date="birthdaySelectCheck" />
       </el-config-provider>
       <span class="info">注：可直接输入，格式为：YYYY-MM-DD</span>
     </div>
+
     <div class="personal-tag-row">
       <span style="min-width: 75px;" class="notice">个人标签：</span>
       <div class="tag-container">
@@ -39,6 +43,7 @@
         </el-button>
       </div>
     </div>
+    
     <div class="btn-row">
       <el-button @click="saveSetting" id="sava-setting-btn" type="primary" size="large">保存</el-button>
     </div>
@@ -185,7 +190,6 @@ function saveSetting() {
 
 .set-container .personal-tag-row {
   margin-top: -5px;
-  width: 950px;
 }
 
 .set-container .tag-container {
@@ -195,8 +199,6 @@ function saveSetting() {
 
 .set-container .tag {
   margin-right: 5px;
-  white-space: nowrap;
-  overflow-wrap: break-word;
 }
 
 .set-container .tag,
@@ -204,10 +206,7 @@ function saveSetting() {
   height: 30px;
   font-size: 14px;
   border-radius: 5px;
-}
-
-.set-container .new-tag-btn {
-  width: 100px;
+  min-width: 100px;
 }
 
 .set-container .new-tag-input {
@@ -233,16 +232,5 @@ function saveSetting() {
 
 .set-container input:focus {
   border: 1px solid #409EFF;
-}
-</style>
-
-<style>
-.set-container .birthday {
-  border-radius: 5px;
-  border: 1px solid #c8c9cc;
-}
-
-.set-container .birthday:hover {
-  border: 1px solid #b1b3b8;
 }
 </style>

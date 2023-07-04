@@ -38,6 +38,19 @@ const routes: Array<RouteRecordRaw> = [
       title: '个人中心',
     }
   },
+  {
+    path: "/platform",
+    component: () => import("../views/Platform.vue"),
+    children: [
+      { path: "/platform", component: () => import("../views/Platform/Home.vue") },
+      { path: "/platform/upload", component: () => import("../views/Platform/Upload.vue") },
+      { path: "/platform/article", component: () => import("../views/Platform/Article.vue") },
+      { path: "/platform/appeal", component: () => import("../views/Platform/Appeal.vue") },
+    ],
+    meta: {
+      title: '创作中心',
+    }
+  },
 ]
 
 const router = createRouter({

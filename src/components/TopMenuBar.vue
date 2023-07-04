@@ -10,18 +10,19 @@
     <el-menu-item index="/">首页</el-menu-item>
     <el-menu-item index="/hot">热门</el-menu-item>
     <el-sub-menu>
-      <template #title>频道</template>
-      <el-menu-item index="/channel/anime">番剧</el-menu-item>
-      <el-menu-item index="/channel/game">游戏</el-menu-item>
-      <el-menu-item index="/channel/music">音乐</el-menu-item>
-      <el-menu-item index="/channel/tech">科技</el-menu-item>
+      <template #title>分区</template>
+      <el-menu-item index="/region/anime">番剧</el-menu-item>
+      <el-menu-item index="/region/game">游戏</el-menu-item>
+      <el-menu-item index="/region/music">音乐</el-menu-item>
+      <el-menu-item index="/region/tech">科技</el-menu-item>
+      <el-menu-item index="/region/other">其它</el-menu-item>
     </el-sub-menu>
     <el-menu-item index="/read">专栏</el-menu-item>
     <el-menu-item index="/live">直播</el-menu-item>
 
     <div class="flex-grow" />
 
-    <div>
+    <div class="search-bar">
       <el-input id="search" v-model="searchKey" class="search" placeholder="搜索" clearable>
         <template #prefix><el-icon style="cursor: pointer;">
             <search />
@@ -62,7 +63,7 @@
           </div>
           <div class="tags">
             <span v-show="ahi.isVip" class="vip">会员</span>
-            <svg @click="common.ToMe" class="icon-symbol level" aria-hidden="true">
+            <svg @click="common.ToNewPage('/me')" class="icon-symbol level" aria-hidden="true">
               <use :xlink:href="'#el-icon-level_' + ahi.level"></use>
             </svg>
           </div>
@@ -84,7 +85,7 @@
             </div>
           </div>
           <li v-if="ahi.power > 0">后台管理</li>
-          <li @click="common.ToMe">个人中心</li>
+          <li @click="common.ToNewPage('/me')">个人中心</li>
           <li @click="logout">退出登录</li>
         </ul>
       </el-popover>
@@ -131,12 +132,12 @@
         <div class="notice">历史</div>
       </div>
 
-      <div style="text-align: center;" class="ico-btn">
+      <div @click="common.ToNewPage('/platform')" style="text-align: center;" class="ico-btn">
         <el-button style="font-weight: bold;" class="iconfont el-icon-idea ico" circle></el-button>
         <div class="notice">创作中心</div>
       </div>
 
-      <el-button type="primary" class="upload-btn">
+      <el-button @click="common.ToNewPage('/platform/upload')" type="primary" class="upload-btn">
         <el-icon>
           <Upload />
         </el-icon>
@@ -233,7 +234,6 @@ function scrollListenerHandler() {
   }
   menu.style.marginLeft = -document.documentElement.scrollLeft.toString() + "px"
 }
-
 
 function openLoginWindow() {
   loginPop.value.hide()
@@ -360,7 +360,7 @@ function toHome() {
   width: 300px;
 }
 
-:deep(.el-input__wrapper) {
+:deep(.search-bar .el-input__wrapper) {
   background: rgba(255, 255, 255, 0.75);
   border-radius: 10px;
 }
@@ -562,6 +562,10 @@ function toHome() {
 <style>
 .el-menu--collapse .el-menu .el-submenu,
 .el-menu--popup {
-  min-width: auto !important;
+  min-width: 70px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: -1px !important;
 }
 </style>

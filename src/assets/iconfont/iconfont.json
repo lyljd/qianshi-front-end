@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4766888",
+      "name": "read",
+      "font_class": "read",
+      "unicode": "e7d8",
+      "unicode_decimal": 59352
+    },
+    {
+      "icon_id": "595349",
+      "name": "评论",
+      "font_class": "pinglun",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "240135",
+      "name": "upload",
+      "font_class": "upload",
+      "unicode": "e75d",
+      "unicode_decimal": 59229
+    },
+    {
+      "icon_id": "1066978",
+      "name": "article",
+      "font_class": "article",
+      "unicode": "e69a",
+      "unicode_decimal": 59034
+    },
+    {
+      "icon_id": "19458206",
+      "name": "icon_appeal_24",
+      "font_class": "appeal",
+      "unicode": "e6ab",
+      "unicode_decimal": 59051
+    },
+    {
       "icon_id": "11870505",
       "name": "warning",
       "font_class": "warning",

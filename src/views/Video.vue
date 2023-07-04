@@ -1661,4 +1661,8 @@ function openLoginWindow() {
 .el-color-dropdown {
   background-color: rgb(240, 240, 240) !important;
 }
+
+.danmu-input-container .el-input__wrapper {
+  box-shadow: none !important;
+}
 </style>

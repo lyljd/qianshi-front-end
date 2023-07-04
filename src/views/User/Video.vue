@@ -65,3 +65,13 @@ let readSortBy = "date"
   justify-content: center;
 }
 </style>
+
+<style>
+.el-tabs__nav {
+  z-index: inherit;
+}
+
+.el-tabs__nav-wrap::after {
+  z-index: inherit;
+}
+</style>

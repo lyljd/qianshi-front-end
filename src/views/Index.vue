@@ -23,7 +23,7 @@
   </div>
 
   <div v-for="(item) in 4" class="channel">
-    <div class="title-container"><span class="title">频道{{ item }}</span></div>
+    <div class="title-container"><span class="title">分区{{ item }}</span></div>
     <div class="channel-row">
       <VideoCard :data="mockVideo" class="card" v-for="() in 4"></VideoCard>
 

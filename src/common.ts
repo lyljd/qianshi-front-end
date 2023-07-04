@@ -142,8 +142,8 @@ function ToUser(uid: number) {
   window.open(`/u/${uid}`, "_blank")
 }
 
-function ToMe() {
-  window.open("/me", "_blank")
+function ToNewPage(url: string) {
+  window.open(url, "_blank")
 }
 
 function ToDeveloper() {
@@ -170,7 +170,7 @@ export {
   videoTimeFormatterHMS,
   ToVideo,
   ToUser,
-  ToMe,
+  ToNewPage,
   ToDeveloper,
   timestampFormatter,
   timestampFormatterMD,

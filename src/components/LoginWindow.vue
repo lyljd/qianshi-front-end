@@ -302,7 +302,7 @@ function passwordLogin() {
   z-index: 99999 !important;
 }
 
-.el-input__wrapper {
+.window .el-input__wrapper {
   border: none !important;
   box-shadow: none !important;
   padding: 0px;
