@@ -24,7 +24,7 @@
 
       <div class="comment-info">
         <span>
-          <span class="date">{{ common.timestampFormatterMD(data.date) }}</span>
+          <span class="date">{{ common.timestampFormatterRich(data.date) }}</span>
 
           <span @click="like" :class="{ blue: data.isLike }" :title="data.likeNum.toString()"
             class="iconfont el-icon-zan like-btn">{{ common.numFormatterW(data.likeNum)
@@ -140,6 +140,14 @@ onMounted(() => {
       ele.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
     }
   }
+
+  //<!--解决在视频的父级评论区新发一条评论后，最后一个按钮没有被禁止的bug
+  let sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
+  let lastSendBtn = sendBtns[sendBtns.length - 1]
+  if (!lastSendBtn.disabled) {
+    common.btnCD(lastSendBtn, 10000)
+  }
+  //-->
 })
 
 function init() {

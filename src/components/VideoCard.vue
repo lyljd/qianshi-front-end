@@ -20,9 +20,9 @@
       <div class="title-container"><span @click="common.ToVideo(data.vid)" class="title">{{ data.title }}</span></div>
       <div class="up-time-container">
         <div @click="common.ToUser(data.uid)" class="up-time-text">
-          <span :title="data.nickname + ' · ' + common.timestampFormatterMD(data.date)" class="up-time-text-span"><span
+          <span :title="data.nickname + ' · ' + common.timestampFormatterRichExcludeHM(data.date)" class="up-time-text-span"><span
               style="font-size: 14px;" class="iconfont el-icon-UPzhu icon"></span>
-            {{ data.nickname }} · {{ common.timestampFormatterMD(data.date) }}</span>
+            {{ data.nickname }} · {{ common.timestampFormatterRichExcludeHM(data.date) }}</span>
         </div>
       </div>
     </div>

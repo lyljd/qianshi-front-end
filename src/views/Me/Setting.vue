@@ -55,6 +55,7 @@ import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 import mockMeSetting from "../../mock/me/setting.json"
 import { ElMessage } from 'element-plus'
 import * as common from "../../common"
+import { useStore } from "../../store"
 
 type MeSetting = {
   nickname: string
@@ -63,6 +64,9 @@ type MeSetting = {
   birthday: string
   tag: string[]
 }
+
+const store = useStore()
+store.setMeCurTitle("我的信息")
 
 let meSetting: MeSetting = reactive(getMeSetting())
 

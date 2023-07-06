@@ -137,7 +137,7 @@
         <div class="notice">创作中心</div>
       </div>
 
-      <el-button @click="common.ToNewPage('/platform/upload')" type="primary" class="upload-btn">
+      <el-button @click="common.ToNewPage('/platform/upload/video')" type="primary" class="upload-btn">
         <el-icon>
           <Upload />
         </el-icon>
@@ -307,7 +307,7 @@ function toHome() {
   background-color: transparent;
   position: fixed;
   top: 0px;
-  z-index: 1;
+  z-index: 99999;
 }
 
 .el-menu--horizontal>.el-menu-item.is-active,

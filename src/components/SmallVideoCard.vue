@@ -11,7 +11,7 @@
       <div class="num-time-container">
         <span class="iconfont el-icon-bofangshu icon"></span>
         <span>{{ common.numFormatterW(data.playNum) }}</span>
-        <span style="margin-left: 10px;">{{ common.timestampFormatterMD(data.date) }}</span>
+        <span style="margin-left: 10px;">{{ common.timestampFormatterRichExcludeHM(data.date) }}</span>
       </div>
     </div>
   </div>

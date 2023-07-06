@@ -1,7 +1,8 @@
 <template>
-  <el-tabs style="margin-left: -1px; margin-right: -1px;" type="border-card">
-    <el-tab-pane :label="`视频 ${mockVideoTotalNum}`">
-      <el-tabs v-if="mockVideoNum > 0" v-model="videoSortBy">
+  <el-tabs @tab-change="viewItemChange" v-model="viewItem" style="margin-left: -1px; margin-right: -1px;"
+    type="border-card">
+    <el-tab-pane name="video" :label="`视频 ${mockVideoTotalNum}`">
+      <el-tabs @tab-change="videoTabChange" v-if="mockVideoNum > 0" v-model="videoSortBy">
         <el-tab-pane label="最新发布" name="date"></el-tab-pane>
         <el-tab-pane label="最多播放" name="play"></el-tab-pane>
         <el-tab-pane label="最多收藏" name="star"></el-tab-pane>
@@ -13,8 +14,8 @@
         :hide-on-single-page="true" />
       <el-empty v-if="mockVideoNum === 0" description="暂无视频" />
     </el-tab-pane>
-    <el-tab-pane :label="`专栏 ${mockReadTotalNum}`">
-      <el-tabs v-if="mockReadNum > 0" v-model="readSortBy">
+    <el-tab-pane name="read" :label="`专栏 ${mockReadTotalNum}`">
+      <el-tabs @tab-change="readTabChange" v-if="mockReadNum > 0" v-model="readSortBy">
         <el-tab-pane label="最新发布" name="date"></el-tab-pane>
         <el-tab-pane label="最多阅读" name="read"></el-tab-pane>
         <el-tab-pane label="最多收藏" name="star"></el-tab-pane>
@@ -38,12 +39,52 @@ const mockVideo = {
 }
 const mockVideoNum = 25
 const mockVideoTotalNum = 35
-const mockReadNum = 0
-const mockReadTotalNum = 0
+const mockReadNum = 25
+const mockReadTotalNum = 35
 //-->
 
+let viewItem = "video"
 let videoSortBy = "date"
 let readSortBy = "date"
+let videoList = "" //mock
+let readList = "" //mock
+
+setVideoList(videoSortBy)
+
+function setVideoList(sortBy: string) {
+  console.log("GET localhost:9000/api/u/1/video/" + sortBy)
+  videoList = sortBy //mock
+}
+
+function setReadList(sortBy: string) {
+  console.log("GET localhost:9000/api/u/1/read/" + sortBy)
+  readList = readSortBy //mock
+}
+
+function viewItemChange(newViewItem: string) {
+  switch (newViewItem) {
+    case "video": {
+      if (videoList === "") {
+        setVideoList(videoSortBy)
+      }
+      break
+    }
+    case "read": {
+      if (readList === "") {
+        setReadList(readSortBy)
+      }
+      break
+    }
+  }
+}
+
+function videoTabChange(sortBy: string) {
+  setVideoList(sortBy)
+}
+
+function readTabChange(sortBy: string) {
+  setReadList(sortBy)
+}
 </script>
 
 <style scoped>

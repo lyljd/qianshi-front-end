@@ -1,0 +1,17 @@
+{
+  "num": 3,
+  "list": [
+    {
+      "title": "晴天 - 周杰伦",
+      "coverUrl": "../../public/cover/1.jpeg"
+    },
+    {
+      "title": "Paris",
+      "coverUrl": "../../public/cover/4.jpeg"
+    },
+    {
+      "title": "明日方舟3.5周年主题曲",
+      "coverUrl": "../../public/cover/5.jpeg"
+    }
+  ]
+}

@@ -47,6 +47,7 @@
 
 <script setup lang="ts">
 import mockMeHome from "../../mock/me/home.json"
+import { useStore } from "../../store"
 
 type MeHome = {
   avatarUrl: string
@@ -55,6 +56,9 @@ type MeHome = {
   exp: number
   reqExp: number
 }
+
+const store = useStore()
+store.setMeCurTitle("首页")
 
 let meHome: MeHome = reactive(getMeHome())
 

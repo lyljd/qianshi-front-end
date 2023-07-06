@@ -34,7 +34,7 @@ function btnCD(btn: HTMLButtonElement, cd: number) {
   }, 1000)
 }
 
-function toFixed(num: number, decimal: number) {
+function toFixed(num: number, decimal: number): string {
   let numS = num.toString();
   let index = numS.indexOf('.');
   if (index !== -1) {
@@ -45,7 +45,7 @@ function toFixed(num: number, decimal: number) {
   return parseFloat(numS).toFixed(decimal)
 }
 
-function numFormatterW(num: number) {
+function numFormatterW(num: number): string {
   if (num < 10000) {
     return num.toString()
   }
@@ -55,18 +55,18 @@ function numFormatterW(num: number) {
   return toFixed(num / 100000000, 1).toString() + "亿"
 }
 
-function videoTimeFormatterHMS(time: number) {
+function add0(num: number): string {
+  return num < 10 ? "0" + num.toString() : num.toString()
+}
+
+function videoTimeFormatterHMS(time: number): string {
   let h = Math.floor(time / 3600)
   time -= h * 3600
   let m = Math.floor(time / 60)
   time -= m * 60
   let s = time
 
-  let hs = h < 10 ? "0" + h.toString() : h.toString()
-  let ms = m < 10 ? "0" + m.toString() : m.toString()
-  let ss = s < 10 ? "0" + s.toString() : s.toString()
-
-  return h > 0 ? hs + ":" + ms + ":" + ss : ms + ":" + ss
+  return h > 0 ? add0(h) + ":" + add0(m) + ":" + add0(s) : add0(m) + ":" + add0(s)
 }
 
 type date = {
@@ -96,43 +96,77 @@ function timestampFormatter(timestamp: number): date {
   }
 }
 
-function timestampFormatterMD(timestamp: number) {
-  let date = timestampFormatter(timestamp)
-  let dateNow = timestampFormatter(Date.now())
+function timestampFormatterStandard(timestamp: number): string {
+  let d = timestampFormatter(timestamp)
+  return `${d.year}-${add0(d.month)}-${add0(d.day)} ${add0(d.hour)}:${add0(d.minute)}:${add0(d.second)}`
+} //返回日期格式：年-月-日 时:分:秒
 
-  if (date.year !== dateNow.year || date.month !== dateNow.month) {
-    let mons = date.month < 10 ? "0" + date.month.toString() : date.month.toString()
-    let ds = date.day < 10 ? "0" + date.day.toString() : date.day.toString()
-    return mons + "-" + ds
+function timestampFormatterStandardExcludeSecondOrAndYear(timestamp: number): string {
+  let d = timestampFormatter(timestamp)
+  let dn = timestampFormatter(Date.now())
+
+  let ret = `${add0(d.month)}-${add0(d.day)} ${add0(d.hour)}:${add0(d.minute)}`
+
+  if (d.year < dn.year) {
+    ret = `${d.year}-` + ret
   }
 
-  let dayDiff = dateNow.day - date.day
-  if (dayDiff >= 1) {
-    if (dayDiff === 1) {
-      let hs = date.hour < 10 ? "0" + date.hour.toString() : date.hour.toString()
-      let mins = date.minute < 10 ? "0" + date.minute.toString() : date.minute.toString()
-      return "昨天 " + hs + ":" + mins
+  return ret
+} //返回日期格式：月-日 时:分；若时间戳不为今年，则为：年-月-日 时:分
+
+function timestampFormatterAgo(timestamp: number): string {
+  let dts = timestamp
+  let dnts = Date.now()
+
+  let diff = Math.floor((dnts - dts) / 1000) //时间戳相减后再除以1000，可得到时间相差多少秒
+
+  let hAgo = Math.floor(diff / 3600)
+  if (hAgo >= 1) {
+    return hAgo + "小时前"
+  }
+
+  let mAgo = Math.floor(diff / 60)
+  if (mAgo >= 1) {
+    return mAgo + "分钟前"
+  }
+
+  if (diff === 0) {
+    return "刚刚"
+  }
+
+  return diff + "秒前"
+} //使用此函数时需确保时间戳在今日内；返回x（小时、分钟、秒）前 或 刚刚
+
+function timestampFormatterRich(timestamp: number): string {
+  let d = timestampFormatter(timestamp)
+  let dn = timestampFormatter(Date.now())
+
+  if (d.year < dn.year || d.month < dn.month || d.day < dn.day) {
+    return timestampFormatterStandardExcludeSecondOrAndYear(timestamp)
+  }
+
+  return timestampFormatterAgo(timestamp)
+} //返回日期格式：若时间戳不为今天，为：StandardExcludeSecondOrAndYear；反之则为Ago
+
+function timestampFormatterRichExcludeHM(timestamp: number): string {
+  let d = timestampFormatter(timestamp)
+  let dn = timestampFormatter(Date.now())
+
+  if (d.year < dn.year || d.month < dn.month || d.day < d.day) {
+    let d = timestampFormatter(timestamp)
+    let dn = timestampFormatter(Date.now())
+
+    let ret = `${add0(d.month)}-${add0(d.day)}`
+
+    if (d.year < dn.year) {
+      ret = `${d.year}-` + ret
     }
-    return `${dayDiff}天前`
+
+    return ret
   }
 
-  let hourDiff = dateNow.hour - date.hour
-  if (hourDiff >= 1) {
-    return `${hourDiff}小时前`
-  }
-
-  let minuteDiff = dateNow.minute - date.minute
-  if (minuteDiff >= 1) {
-    return `${minuteDiff}分钟前`
-  }
-
-  let secondDiff = dateNow.second - date.second
-  if (secondDiff >= 1) {
-    return `${secondDiff}秒前`
-  }
-
-  return "刚刚"
-}
+  return timestampFormatterAgo(timestamp)
+} //返回日期格式：不包含小时和分钟的Rich
 
 function ToVideo(vid: number) {
   window.open(`/v/${vid}`, "_blank")
@@ -150,7 +184,7 @@ function ToDeveloper() {
   window.open("https://github.com/lyljd", "_blank")
 }
 
-function checkCookieExists(cookieName: string) {
+function checkCookieExists(cookieName: string): boolean {
   var cookies = document.cookie.split(';');
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i].trim();
@@ -168,11 +202,16 @@ export {
   btnCD,
   numFormatterW,
   videoTimeFormatterHMS,
+  add0,
+  timestampFormatter,
+  timestampFormatterStandard,
+  timestampFormatterStandardExcludeSecondOrAndYear,
+  timestampFormatterAgo,
+  timestampFormatterRich,
+  timestampFormatterRichExcludeHM,
   ToVideo,
   ToUser,
   ToNewPage,
   ToDeveloper,
-  timestampFormatter,
-  timestampFormatterMD,
   checkCookieExists,
 }

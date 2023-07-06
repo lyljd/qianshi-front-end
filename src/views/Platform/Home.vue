@@ -112,6 +112,7 @@
 
 <script setup lang="ts">
 import mockPlatformHome from "../../mock/platform/home.json"
+import { useStore } from "../../store"
 
 type PlatformHome = {
   video: {
@@ -131,6 +132,9 @@ type PlatformHome = {
     shareNum: number
   }
 }
+
+const store = useStore()
+store.setPlatformCurTitle("首页")
 
 let pfHome: PlatformHome = reactive(getPlatformHome())
 

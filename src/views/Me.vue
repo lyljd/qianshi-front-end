@@ -1,7 +1,7 @@
 <template>
   <el-container v-if="store.isLogin" class="container">
     <el-aside width="150px">
-      <el-menu @select="menuSelect" :default-active=$route.path router="true">
+      <el-menu :default-active=$route.path router="true">
         <div class="page-title">个人中心</div>
         <el-menu-item index="/me">
           <span class="iconfont el-icon-home"></span>
@@ -36,28 +36,12 @@ import { useStore } from "../store"
 import NotFound from './404.vue'
 
 const store = useStore()
+store.setMeCurTitle = setCurTitle
 
-let curTitle = ref(getCurTitle(window.location.pathname))
+let curTitle = ref("")
 
-function menuSelect(index: string) {
-  curTitle.value = getCurTitle(index)
-}
-
-function getCurTitle(path: string) {
-  switch (path) {
-    case "/me": {
-      return "首页"
-    }
-    case "/me/setting": {
-      return "我的信息"
-    }
-    case "/me/security": {
-      return "账号安全"
-    }
-    case "/me/coin": {
-      return "我的硬币"
-    }
-  }
+function setCurTitle(title: string) {
+  curTitle.value = title
 }
 </script>
 

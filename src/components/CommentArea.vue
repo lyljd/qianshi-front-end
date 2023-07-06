@@ -36,9 +36,8 @@
 
         <el-pagination @click="getChildCommentByPage(item.cid)"
           @current-change="(page: number) => { curPage = page; isClickPage = true }"
-          v-if="item.reply !== undefined && item.reply.isOpen !== undefined"
-          style="margin-top: 20px;margin-left: 47.5px;" small background hide-on-single-page layout="prev, pager, next"
-          :total="item.reply?.num" />
+          v-if="item.reply !== undefined && item.reply.isOpen !== undefined" style="margin-top: 20px;margin-left: 47.5px;"
+          small background hide-on-single-page layout="prev, pager, next" :total="item.reply?.num" />
 
         <div v-show="item.cid === sendAreaId" style="display: flex; margin-left: 47.5px; margin-top: 20px;">
           <textarea v-model="childContent" class="comment-input" :placeholder="`回复 @${sendAreaNickname}：`"></textarea>
@@ -115,12 +114,10 @@ let curPage = 0 //在点过子评论的页码后会设置curPage
 
 let hotSpan: HTMLSpanElement
 let newSpan: HTMLSpanElement
-let sendBtns: NodeListOf<HTMLButtonElement>
 
 onMounted(() => {
   hotSpan = document.getElementById("hot-span") as HTMLSpanElement
   newSpan = document.getElementById("new-span") as HTMLSpanElement
-  sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
 })
 
 function commentSwitchHot() {
@@ -142,12 +139,16 @@ function send(comment: Comment[]) {
     openLoginWindow()
     return
   }
+
+  let sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
   if (sendBtns[0].disabled || content.value.trim().length === 0) {
     return
   }
+
   sendBtns.forEach((ele) => {
     common.btnCD(ele, 10000)
   })
+
   props.data.num++
   //TODO cid应该从后端拿
   comment.push({
@@ -168,6 +169,7 @@ function send(comment: Comment[]) {
     "isChild": false,
     "parentCid": props.data.num
   })
+
   content.value = ""
   scrollId.value = -1
 }
@@ -199,6 +201,8 @@ function childSend() {
     openLoginWindow()
     return
   }
+
+  let sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
   if (sendBtns[0].disabled || childContent.value.trim().length === 0) {
     return
   }
@@ -206,6 +210,7 @@ function childSend() {
   sendBtns.forEach((ele) => {
     common.btnCD(ele, 10000)
   })
+
   props.data.num++
   //TODO cid应该从后端拿
   let newComment: Comment = {
@@ -226,6 +231,7 @@ function childSend() {
     "isChild": true,
     "parentCid": sendAreaId.value
   }
+
   if (isDBChild.value) {
     newComment.to = {
       "uid": sendAreaToId.value,
@@ -281,7 +287,7 @@ function viewMore(comment: Comment) {
     "isLike": false,
     "isDislike": false,
     "isChild": true,
-    "parentCid": 1,
+    "parentCid": comment.cid,
     "to": {
       "uid": 1,
       "nickname": "Bonnenult"

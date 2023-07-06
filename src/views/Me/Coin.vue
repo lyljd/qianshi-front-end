@@ -28,6 +28,11 @@
 </template>
 
 <script setup lang="ts">
+import { useStore } from "../../store"
+
+const store = useStore()
+store.setMeCurTitle("我的硬币")
+
 let coinNum = ref(getCoinNum())
 
 function getCoinNum() {

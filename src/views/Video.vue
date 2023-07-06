@@ -309,16 +309,16 @@
         <el-table v-if=" showDanmuList " class="danmu-list" :data=" video.danmu " max-height="483" size="small"
           empty-text="暂无弹幕">
           <el-table-column prop="time" label="时间" width="65" sortable :formatter=" danmuTimeFormatter " />
-          <el-table-column prop="value" label="弹幕内容" show-overflow-tooltip width="83" />
-          <el-table-column prop="date" label="发送时间" width="90" sortable :formatter=" danmuDateFormatter " />
+          <el-table-column prop="value" label="弹幕内容" show-overflow-tooltip width="76" />
+          <el-table-column prop="date" label="发送时间" show-overflow-tooltip width="97" sortable :formatter="danmuDateFormatter" />
           <el-table-column width="32" :align=" 'center' ">
             <template #default=" scope ">
               <el-popconfirm @confirm="delDanmu(scope.row.did)" hide-icon title="你确认要删除该弹幕吗?"
               confirm-button-text="确认" cancel-button-text="取消">
-              <template #reference>
-                <span v-if="isLogin" class="iconfont el-icon-ashbin danmu-del"></span>
-              </template>
-            </el-popconfirm>
+                <template #reference>
+                  <span v-if="isLogin" class="iconfont el-icon-ashbin danmu-del"></span>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -342,8 +342,7 @@
         </template>
         <div class="collection-list">
           <ul>
-            <li :class=" { collectionItemHighlight: item.vid === video.vid } "
-              v-for="(item) in video.collection.videos">
+            <li :class=" { collectionItemHighlight: item.vid === video.vid } " v-for="( item ) in  video.collection.videos ">
               <span @click=" video.vid = item.vid " class="title">{{ item.title }}</span>
               <span class="duration">{{ common.videoTimeFormatterHMS(item.duration) }}</span>
             </li>
@@ -362,7 +361,7 @@
 
       <div>
         <VideoCard :class=" { cardFCA: !video.collection && video.recommend.length > 1 } " :data=" item " class="card"
-          v-for="(item) in video.recommend"></VideoCard>
+          v-for="( item ) in  video.recommend "></VideoCard>
       </div>
     </div>
   </div>
@@ -1041,15 +1040,7 @@ function delDanmu(did: number) {
 }
 
 function videoDateFormatter(date: number) {
-  let fd = common.timestampFormatter(date)
-
-  let mons = fd.month < 10 ? "0" + fd.month.toString() : fd.month.toString()
-  let ds = fd.day < 10 ? "0" + fd.day.toString() : fd.day.toString()
-  let hs = fd.hour < 10 ? "0" + fd.hour.toString() : fd.hour.toString()
-  let mins = fd.minute < 10 ? "0" + fd.minute.toString() : fd.minute.toString()
-  let ss = fd.second < 10 ? "0" + fd.second.toString() : fd.second.toString()
-
-  return fd.year + "-" + mons + "-" + ds + " " + hs + ":" + mins + ":" + ss
+  return common.timestampFormatterStandard(date)
 }
 
 function danmuTimeFormatter(_: any, __: any, cellValue: number, ___: any) {
@@ -1057,14 +1048,7 @@ function danmuTimeFormatter(_: any, __: any, cellValue: number, ___: any) {
 }
 
 function danmuDateFormatter(_: any, __: any, cellValue: number, ___: any) {
-  let date = common.timestampFormatter(cellValue)
-
-  let mons = date.month < 10 ? "0" + date.month.toString() : date.month.toString()
-  let ds = date.day < 10 ? "0" + date.day.toString() : date.day.toString()
-  let hs = date.hour < 10 ? "0" + date.hour.toString() : date.hour.toString()
-  let mins = date.minute < 10 ? "0" + date.minute.toString() : date.minute.toString()
-
-  return mons + "-" + ds + " " + hs + ":" + mins
+  return common.timestampFormatterStandardExcludeSecondOrAndYear(cellValue)
 }
 
 function setIntroFull() {

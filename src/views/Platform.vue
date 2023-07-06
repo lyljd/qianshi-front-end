@@ -1,17 +1,17 @@
 <template>
   <el-container v-if="store.isLogin" class="container">
     <el-aside width="150px">
-      <el-menu @select="menuSelect" :default-active=$route.path router="true">
+      <el-menu :default-active=$route.path router="true">
         <div class="page-title">创作中心</div>
         <el-menu-item index="/platform">
           <span class="iconfont el-icon-home"></span>
           <span class="span">首页</span>
         </el-menu-item>
-        <el-menu-item index="/platform/upload">
+        <el-menu-item index="/platform/upload/video">
           <span class="iconfont el-icon-upload"></span>
           <span class="span">投稿</span>
         </el-menu-item>
-        <el-menu-item index="/platform/article">
+        <el-menu-item index="/platform/article/video">
           <span class="iconfont el-icon-article"></span>
           <span class="span">稿件管理</span>
         </el-menu-item>
@@ -36,28 +36,12 @@ import { useStore } from "../store"
 import NotFound from './404.vue'
 
 const store = useStore()
+store.setPlatformCurTitle = setCurTitle
 
-let curTitle = ref(getCurTitle(window.location.pathname))
+let curTitle = ref("")
 
-function menuSelect(index: string) {
-  curTitle.value = getCurTitle(index)
-}
-
-function getCurTitle(path: string) {
-  switch (path) {
-    case "/platform": {
-      return "首页"
-    }
-    case "/platform/upload": {
-      return "投稿"
-    }
-    case "/platform/article": {
-      return "稿件管理"
-    }
-    case "/platform/appeal": {
-      return "申诉管理"
-    }
-  }
+function setCurTitle(title: string) {
+  curTitle.value = title
 }
 </script>
 

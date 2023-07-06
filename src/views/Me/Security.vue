@@ -29,11 +29,15 @@
 
 <script setup lang="ts">
 import mockMeSecurity from "../../mock/me/security.json"
+import { useStore } from "../../store"
 
 type MeSecurity = {
   isSetPassword: boolean
   email: string
 }
+
+const store = useStore()
+store.setMeCurTitle("账号安全")
 
 let meSecurity: MeSecurity = reactive(getMeSecurity())
 
