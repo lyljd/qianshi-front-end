@@ -156,6 +156,7 @@ function deleteFavlist() {
     closeOnPressEscape: false,
     showClose: false,
     type: 'warning',
+    autofocus: false,
   })
     .then(() => {
       ElMessage({

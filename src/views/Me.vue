@@ -82,7 +82,7 @@ function setCurTitle(title: string) {
 }
 
 .container .el-menu .el-menu-item:last-child {
-  border-bottom: none;
+  /* border-bottom: none; */
   border-bottom-left-radius: 10px;
 }
 

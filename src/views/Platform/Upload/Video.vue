@@ -1,107 +1,115 @@
 <template>
   <div class="v-container">
-    <div v-if="store.getUploadItem() === ''">
-      <el-upload :before-upload="beforeVideoUpload" :on-progress="onVideoUploadProgress"
-        :on-success="onVideoUploadSuccess" :on-error="onVideoUploadError" action="/api/resource/video" accept="video/*"
-        drag>
+    <div v-show="store.getUploadItem() === ''">
+      <el-upload :before-upload="beforeVideoUpload" :on-remove="onVideoUploadRemove" :on-change="onVideoUploadChange"
+        :on-progress="onVideoUploadProgress" :on-success="onVideoUploadSuccess" :on-error="onVideoUploadError"
+        ref="videoUpload" action="/api/resource/video" accept="video/*" drag :show-file-list="false">
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">
           拖拽到此处上传 或 <em>点击此处选择文件上传</em>
         </div>
-        <template #tip>
-          <div class="el-upload__tip">
-            上传的视频大小上限为1G
-          </div>
-        </template>
       </el-upload>
-      <div class="tip">上传视频，即表示您已同意 <span style="color: #409EFF;">浅时使用协议</span> ，请勿上传色情，反动等违法视频。</div>
+      <div style="margin-top: 5px; margin-left: 0;" class="tip">上传的视频大小上限为1G</div>
+      <div style="margin-left: 0;" class="tip">上传视频，即表示您已同意 <span style="color: #409EFF;">浅时使用协议</span> ，请勿上传色情，反动等违法视频。
+      </div>
     </div>
 
-    <div style="width: 800px;" v-else>
-      <div style="margin-bottom: 10px;">
-        <strong>视频上传进度</strong>
+    <div v-show="store.getUploadItem() === 'video'" class="setting">
+      <div>
+        <span class="notice"><span style="color: red;">*</span>视频：</span>
+        <el-button :disabled="videoUploadPercent !== 0 || video.videoUrl === ''"
+          @click="previewVideo(video.videoUrl)">预览</el-button>
+        <el-button :disabled="videoUploadPercent !== 0" @click="openVideoUpload">重新上传</el-button>
       </div>
-      <el-progress :class="{ pg: !videoHasUpload, pgf: videoHasUpload }" :percentage="videoUploadPercent"
-        :status="videoHasUpload ? 'success' : ''" :indeterminate="!videoHasUpload" :stroke-width="10" />
+      <el-progress v-show="videoUploadPercent !== 0" :percentage="videoUploadPercent" class="prg" :stroke-width="10" />
+      <span class="tip">上传的视频大小上限为1G</span>
+      <br>
+      <span class="tip">上传视频，即表示您已同意 <span style="color: #409EFF;">浅时使用协议</span> ，请勿上传色情，反动等违法视频。</span>
 
-      <div class="setting">
-        <strong>视频详情设置</strong>
-
-        <div>
-          <span class="notice"><span style="color: red;">*</span>封面：</span>
-          <div v-show="coverUrl === ''" @click="openCoverUpload" class="cover upload-cover-div">
-            <span style="font-size: 42px;">+</span>
-            <span>上传封面</span>
-          </div>
-
-          <el-image :style="coverHasUpload ? '' : 'opacity: 0.25;'" @click="openCoverUpload" v-show="coverUrl !== ''"
-            class="cover" :src="coverUrl"></el-image>
-
-          <el-progress v-show="!coverHasUpload && coverUrl !== ''" width="118.125"
-            style="position: absolute; margin-left: 130.9375px;" type="circle" :percentage="coverUploadPercent" />
-
-          <el-upload :on-change="onCoverUploadChange" :before-upload="beforeCoverUpload" :on-remove="onCoverUploadRemove"
-            :on-progress="onCoverUploadProgress" :on-success="onCoverUploadSuccess" :on-error="onCoverUploadError"
-            ref="coverUpload" action="/api/resource/cover" accept="image/*" v-show="false"></el-upload>
-
-          <span class="info">注：推荐使用16:9的图片</span>
-        </div>
-        <span style="margin-left: 85px; font-size: 12px; color: #909399;">上传的图片大小上限为10M</span>
-
-        <div>
-          <span class="notice"><span style="color: red;">*</span>标题：</span>
-          <el-input ref="titleInput" v-model="vu.title" maxlength="50" placeholder="请输入标题" show-word-limit />
+      <div>
+        <span class="notice"><span style="color: red;">*</span>封面：</span>
+        <div v-show="video.coverUrl === ''" @click="openCoverUpload" class="upload-cover-div">
+          <span style="font-size: 42px;">+</span>
+          <span>上传封面</span>
         </div>
 
-        <div>
-          <span class="notice"><span style="color: red;">*</span>分区：</span>
-          <el-select ref="regionSelect" v-model="vu.region" placeholder="请选择分区">
-            <el-option label="番剧" value="anime" />
-            <el-option label="游戏" value="game" />
-            <el-option label="音乐" value="music" />
-            <el-option label="科技" value="tech" />
-            <el-option label="其它" value="other" />
-          </el-select>
-        </div>
+        <el-image v-show="video.coverUrl !== ''" :style="coverUploadPercent === 0 ? '' : 'opacity: 0.25;'"
+          @click="openCoverUpload" class="cover" :src="video.coverUrl"></el-image>
 
-        <div>
-          <span class="notice">标签：</span>
-          <div class="tag-container">
-            <el-tag class="tag" v-for="tag in vu.tags" closable @close="delTag(tag)">
-              {{ tag }}
-            </el-tag>
-            <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
-              @keyup.enter="newTag" @blur="newTag">
-            <el-button class="new-tag-btn" v-else size="small" @click="showNewTagInput">
-              + New Tag
-            </el-button>
-          </div>
-        </div>
+        <el-progress v-show="coverUploadPercent !== 0" :percentage="coverUploadPercent" :width="118.125"
+          style="position: absolute; margin-left: 130.9375px;" type="circle" />
 
-        <div>
-          <span class="notice">简介：</span>
-          <el-input v-model="vu.intro" maxlength="250" rows="3" placeholder="填写更全面的相关信息，让更多的人能找到你的视频吧" type="textarea"
-            show-word-limit />
-        </div>
+        <el-upload :before-upload="beforeCoverUpload" :on-remove="onCoverUploadRemove" :on-change="onCoverUploadChange"
+          :on-progress="onCoverUploadProgress" :on-success="onCoverUploadSuccess" :on-error="onCoverUploadError"
+          ref="coverUpload" action="/api/resource/cover" accept="image/*" v-show="false"></el-upload>
+      </div>
+      <span class="tip">上传的图片大小上限为10M</span>
+      <br>
+      <span class="tip">推荐使用16:9的图片</span>
 
-        <div>
-          <span class="notice">权益声明：</span>
-          <el-checkbox v-model="vu.empower" label="未经作者授权，禁止转载" />
-        </div>
+      <div>
+        <span class="notice"><span style="color: red;">*</span>标题：</span>
+        <el-input ref="titleInput" v-model="video.title" maxlength="50" placeholder="请输入标题" show-word-limit />
+      </div>
 
-        <div style="justify-content: center;">
-          <el-button :disabled="!videoHasUpload" @click="uploadVideo" type="primary" size="large">立即投稿</el-button>
+      <div>
+        <span class="notice"><span style="color: red;">*</span>分区：</span>
+        <el-select ref="regionSelect" v-model="video.region" placeholder="请选择分区">
+          <el-option label="番剧" value="anime" />
+          <el-option label="游戏" value="game" />
+          <el-option label="音乐" value="music" />
+          <el-option label="科技" value="tech" />
+          <el-option label="其它" value="other" />
+        </el-select>
+      </div>
+
+      <div>
+        <span class="notice">标签：</span>
+        <div class="tag-container">
+          <el-tag class="tag" v-for="tag in video.tags" closable @close="delTag(tag)">
+            {{ tag }}
+          </el-tag>
+          <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
+            @keyup.enter="newTag" @blur="newTag">
+          <el-button class="new-tag-btn" v-else size="small" @click="showNewTagInput">
+            + New Tag
+          </el-button>
         </div>
+      </div>
+
+      <div>
+        <span class="notice">简介：</span>
+        <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="填写更全面的相关信息，让更多的人能找到你的视频吧" type="textarea"
+          show-word-limit />
+      </div>
+
+      <div>
+        <span class="notice">权益声明：</span>
+        <el-checkbox v-model="video.empower" label="未经作者授权，禁止转载" />
+      </div>
+      <span class="tip">勾选后该文案会显示在视频播放页中，此选项可以在再次编辑时取消。<span style="color: #FF6699;">一旦取消勾选操作，不可再次勾选。</span></span>
+
+      <div style="justify-content: center;">
+        <el-button
+          :disabled="videoUploadPercent !== 0 || coverUploadPercent !== 0 || video.videoUrl === '' || video.coverUrl === '' || video.title === '' || video.region === ''"
+          @click="uploadVideo" type="primary" size="large">投稿</el-button>
       </div>
     </div>
   </div>
+
+  <el-dialog v-model="previewVideoWindowVisible" :custom-class="'preview-video'" :before-close="beforePVWindowClose"
+    destroy-on-close align-center>
+    <video volume="0.5" controls :src="previewVideoUrl"></video>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { UploadInstance, ElMessage, ElSelect, ElInput } from 'element-plus'
 import { useStore } from "../../../store"
 
-type VideoUpload = {
+type Video = {
+  videoUrl: string,
+  coverUrl: string,
   title: string,
   region: string,
   tags: string[],
@@ -112,84 +120,50 @@ type VideoUpload = {
 const store = useStore()
 
 const coverUpload = ref<UploadInstance>()
+const videoUpload = ref<UploadInstance>()
 const newTagInput = ref<HTMLInputElement>()
 const titleInput = ref<InstanceType<typeof ElInput>>()
-const regionSelect = ref<InstanceType<typeof ElSelect>>()
 
-let vu: VideoUpload = reactive({
+let video: Video = reactive({
+  videoUrl: "",
+  coverUrl: "",
   title: "",
   region: "",
   tags: [],
   intro: "",
   empower: false
 })
-let newTagInputValue = ref("")
-let newTagInputVisible = ref(false)
-let coverUrl = ref("")
 let preCoverId = ref(0)
-let coverHasUpload = ref(false)
-let videoHasUpload = ref(false)
+let preVideoId = ref(0)
+let preCoverUrl = ref("")
+let preVideoUrl = ref("")
 let coverUploadPercent = ref(0)
 let videoUploadPercent = ref(0)
+let newTagInputValue = ref("")
+let newTagInputVisible = ref(false)
+let previewVideoWindowVisible = ref(false)
+let previewVideoUrl = ref("")
+
+function previewVideo(url: string) {
+  previewVideoUrl.value = url
+  previewVideoWindowVisible.value = true
+}
+
+function beforePVWindowClose(done: Function) {
+  previewVideoUrl.value = "" //不清除url会导致在video元素被销毁后仍然可以通过按键播放
+  done()
+}
 
 function openCoverUpload() {
-  if (coverUrl.value !== "" && !coverHasUpload.value) {
+  if (coverUploadPercent.value !== 0) {
     showError("图片上传时禁止修改")
     return
   }
   coverUpload.value?.$el.querySelector('input').click()
 }
 
-function delTag(tag: string) {
-  vu.tags.splice(vu.tags.indexOf(tag), 1)
-}
-
-function showNewTagInput() {
-  newTagInputVisible.value = true
-  nextTick(() => {
-    newTagInput.value!.focus()
-  })
-}
-
-function newTag() {
-  if (newTagInputValue.value) {
-    vu.tags.push(newTagInputValue.value)
-  }
-  newTagInputVisible.value = false
-  newTagInputValue.value = ""
-}
-
-function onCoverUploadChange(file: any) {
-  if (file.uid !== preCoverId.value) {
-    preCoverId.value = file.uid
-    coverUrl.value = URL.createObjectURL(file.raw)
-  }
-}
-
-function beforeCoverUpload(rawFile: any) {
-  if (rawFile.size / 1024 / 1024 > 10) {
-    showError("上传的图片大小不能超过10M")
-    return false
-  }
-  coverHasUpload.value = false
-  return true
-}
-
-function onCoverUploadRemove() {
-  coverUrl.value = ""
-}
-
-function onCoverUploadProgress(event: any) {
-  coverUploadPercent.value = Math.floor(event.percent)
-}
-
-function onCoverUploadSuccess() {
-  coverHasUpload.value = true
-}
-
-function onCoverUploadError() {
-  coverUrl.value = ""
-  showError("图片上传失败")
+function openVideoUpload() {
+  videoUpload.value?.$el.querySelector('input').click()
 }
 
 function beforeVideoUpload(rawFile: any) {
@@ -202,17 +176,69 @@ function beforeVideoUpload(rawFile: any) {
   return true
 }
 
+function beforeCoverUpload(rawFile: any) {
+  if (rawFile.size / 1024 / 1024 > 10) {
+    showError("上传的图片大小不能超过10M")
+    return false
+  }
+  return true
+}
+
+function onVideoUploadRemove() {
+  video.videoUrl = preVideoUrl.value
+}
+
+function onCoverUploadRemove() {
+  video.coverUrl = preCoverUrl.value
+}
+
+function onVideoUploadChange(file: any) {
+  if (file.uid !== preVideoId.value) {
+    preVideoId.value = file.uid
+    video.videoUrl = URL.createObjectURL(file.raw)
+  }
+}
+
+function onCoverUploadChange(file: any) {
+  if (file.uid !== preCoverId.value) {
+    preCoverId.value = file.uid
+    video.coverUrl = URL.createObjectURL(file.raw)
+  }
+}
+
 function onVideoUploadProgress(event: any) {
   videoUploadPercent.value = Math.floor(event.percent)
 }
 
+function onCoverUploadProgress(event: any) {
+  coverUploadPercent.value = Math.floor(event.percent)
+}
+
 function onVideoUploadSuccess() {
-  videoHasUpload.value = true
+  preVideoUrl.value = video.videoUrl
+  videoUploadPercent.value = 0
+  ElMessage({
+    type: 'success',
+    offset: 77,
+    message: "视频上传成功",
+  })
+}
+
+function onCoverUploadSuccess() {
+  preCoverUrl.value = video.coverUrl
+  coverUploadPercent.value = 0
 }
 
 function onVideoUploadError() {
-  store.setUploadItem("")
+  video.videoUrl = preVideoUrl.value
+  videoUploadPercent.value = 0
   showError("视频上传失败")
+}
+
+function onCoverUploadError() {
+  video.coverUrl = preCoverUrl.value
+  coverUploadPercent.value = 0
+  showError("图片上传失败")
 }
 
 function showError(msg: string) {
@@ -223,20 +249,41 @@ function showError(msg: string) {
   })
 }
 
+function delTag(tag: string) {
+  video.tags.splice(video.tags.indexOf(tag), 1)
+}
+
+function showNewTagInput() {
+  newTagInputVisible.value = true
+  nextTick(() => {
+    newTagInput.value!.focus()
+  })
+}
+
+function newTag() {
+  let val = newTagInputValue.value
+  if (val) {
+    if (video.tags.includes(val)) {
+      showError("该标签已存在")
+      newTagInput.value!.focus()
+      return
+    }
+    video.tags.push(val)
+  }
+  newTagInputVisible.value = false
+  newTagInputValue.value = ""
+}
+
 function uploadVideo() {
-  //TODO 还需要检查封面
-  vu.title = vu.title.trim()
-  vu.intro = vu.intro.trim()
-  if (vu.title.length === 0) {
+  video.title = video.title.trim()
+  video.intro = video.intro.trim()
+
+  if (video.title.length === 0) {
     showError("请输入标题")
     titleInput.value?.focus()
     return
   }
-  if (vu.region === "") {
-    showError("请选择分区")
-    regionSelect.value?.focus()
-    return
-  }
+
   ElMessage({
     type: 'success',
     offset: 77,
@@ -250,36 +297,36 @@ function uploadVideo() {
   margin-top: 20px;
 }
 
-.v-container .tip {
-  text-align: center;
-  font-size: 12px;
-  color: #909399;
-}
-
-.v-container .setting {
+.setting {
   margin-top: 20px;
+  width: 800px;
 }
 
-.v-container .setting>div {
+.setting>div {
   display: flex;
   align-items: center;
   margin-top: 10px;
 }
 
-.v-container .notice {
+.v-container .tip {
+  font-size: 12px;
+  color: #909399;
+  margin-left: 85px;
+}
+
+.setting .notice {
   font-size: 14px;
   margin-right: 10px;
   min-width: 75px;
   text-align: right;
 }
 
-.v-container .info {
-  font-size: 14px;
-  margin-left: 10px;
-  color: #909399;
-}
-
-.v-container .upload-cover-div {
+.setting .upload-cover-div {
+  width: 210px;
+  height: 116.125px;
+  /* 这里的高度必须比cover的高度少2px，因为上下的border还占了2px */
+  border-radius: 5px;
+  cursor: pointer;
   border: 1px dashed #909399;
   display: flex;
   flex-direction: column;
@@ -289,64 +336,49 @@ function uploadVideo() {
   font-size: 14px;
 }
 
-.v-container .cover {
+.setting .cover {
   width: 210px;
   height: 118.125px;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.v-container .tag-container {
-  line-height: 35px;
+.setting .tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
-.v-container .tag {
-  margin-right: 5px;
-}
-
-.v-container .tag,
-.v-container .new-tag-btn {
+.setting .tag,
+.setting .new-tag-btn {
+  min-width: 100px;
   height: 30px;
   font-size: 14px;
   border-radius: 5px;
-  min-width: 100px;
 }
 
-.v-container .new-tag-input {
+.setting .new-tag-input {
   width: 78px;
-}
-
-.v-container input {
-  outline: none;
-  border-radius: 5px;
-  border: 1px solid #c8c9cc;
-  padding: 5px 10px;
-  font-size: 14px;
   height: 18px;
-}
-
-.v-container input:hover {
-  border: 1px solid #b1b3b8;
-}
-
-.v-container input:focus {
+  font-size: 14px;
+  border-radius: 5px;
+  outline: none;
   border: 1px solid #409EFF;
+  padding: 5px 10px;
+}
+
+.setting .prg {
+  margin-top: 0 !important;
+  margin-left: 85px;
 }
 </style>
 
 <style>
-.v-container .pg .el-progress__text {
+.setting .prg .el-progress__text {
   font-size: 14px !important;
   display: flex;
   justify-content: right;
   margin-left: -10px;
-}
-
-.v-container .pgf .el-progress__text {
-  font-size: 14px !important;
-  display: flex;
-  justify-content: right;
-  margin-left: -30px;
 }
 
 .v-container .el-tabs__nav {
@@ -359,5 +391,23 @@ function uploadVideo() {
 
 .v-container .el-form-item {
   margin-bottom: 10px;
+}
+
+.v-container .el-image {
+  vertical-align: top;
+}
+
+.preview-video video {
+  width: 100%;
+  border-radius: 10px;
+  vertical-align: top;
+}
+
+.preview-video .el-dialog__header {
+  display: none;
+}
+
+.preview-video .el-dialog__body {
+  padding: 0;
 }
 </style>

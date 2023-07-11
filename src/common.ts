@@ -195,6 +195,19 @@ function checkCookieExists(cookieName: string): boolean {
   return false;
 }
 
+function scrollToTopSmoothly() {
+  const scrollDuration = 300; // 滚动持续时间（以毫秒为单位）
+  const scrollStep = -window.scrollY / (scrollDuration / 15); // 每个步骤滚动的距离
+
+  const scrollInterval = setInterval(function() {
+    if (window.scrollY !== 0) {
+      window.scrollBy(0, scrollStep);
+    } else {
+      clearInterval(scrollInterval);
+    }
+  }, 15);
+}
+
 export {
   isMobile,
   isLogin,
@@ -214,4 +227,5 @@ export {
   ToNewPage,
   ToDeveloper,
   checkCookieExists,
+  scrollToTopSmoothly,
 }

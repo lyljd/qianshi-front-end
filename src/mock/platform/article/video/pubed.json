@@ -2,16 +2,22 @@
   "num": 3,
   "list": [
     {
+      "id": 1,
       "title": "晴天 - 周杰伦",
-      "coverUrl": "../../public/cover/1.jpeg"
+      "coverUrl": "../../public/cover/1.jpeg",
+      "vid": 4
     },
     {
+      "id": 2,
       "title": "Paris",
-      "coverUrl": "../../public/cover/4.jpeg"
+      "coverUrl": "../../public/cover/4.jpeg",
+      "vid": 5
     },
     {
+      "id": 3,
       "title": "明日方舟3.5周年主题曲",
-      "coverUrl": "../../public/cover/5.jpeg"
+      "coverUrl": "../../public/cover/5.jpeg",
+      "vid": 6
     }
   ]
 }

@@ -684,6 +684,8 @@ onMounted(() => {
     videoEle.style.cursor = "default"
   })
 
+  videoEle.addEventListener('mousemove', vFcBarShow1s)
+
   canvas.addEventListener('mousemove', vFcBarShow1s)
 
   canvas.addEventListener('contextmenu', function (event: any) {
@@ -1210,8 +1212,6 @@ function openLoginWindow() {
   margin-top: 10px;
   cursor: pointer;
   margin-top: -59px;
-  margin-left: 1px;
-  margin-right: 1px;
 }
 
 .video-container #video {
@@ -1224,7 +1224,6 @@ function openLoginWindow() {
   position: absolute;
   width: 850px;
   height: 419px;
-  /* 478-50-6-3 */
 }
 
 .video-container .context-menu {
@@ -1628,10 +1627,12 @@ function openLoginWindow() {
 
 .tag-row {
   margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .tag {
-  margin-right: 10px;
   cursor: pointer;
   font-size: 14px;
 }
@@ -1648,5 +1649,10 @@ function openLoginWindow() {
 
 .danmu-input-container .el-input__wrapper {
   box-shadow: none !important;
+}
+
+.video-container .progress .el-progress-bar__outer,
+.video-container .progress .el-progress-bar__inner {
+  border-radius: unset;
 }
 </style>

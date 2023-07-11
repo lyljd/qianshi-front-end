@@ -1,10 +1,35 @@
 {
-  "num": 1,
+  "num": 2,
   "list": [
     {
+      "id": 1,
       "title": "Borrow Your Time",
       "coverUrl": "../../public/cover/2.jpeg",
-      "applyTime": 1685836560156
+      "applyTime": 1685836560156,
+      "isNew": true
+    },
+    {
+      "id": 2,
+      "title": "许嵩-雅俗共赏",
+      "coverUrl": "../../public/cover/8.jpeg",
+      "applyTime": 1688736560156,
+      "isNew": false,
+      "vid": 7,
+      "modifyInfo": {
+        "videoUrl": "../../public/ysgs.mp4",
+        "coverUrl": "../../public/cover/8.jpeg",
+        "title": "许嵩-雅俗共赏",
+        "region": "music",
+        "tags": [
+          "许嵩",
+          "vae",
+          "青年晚报",
+          "雅俗共赏",
+          "音乐"
+        ],
+        "intro": "满纸荒唐中窥见满脸沧桑，触到神经就要懂得鼓掌。",
+        "empower": true
+      }
     }
   ]
 }

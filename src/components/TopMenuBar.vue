@@ -23,7 +23,7 @@
     <div class="flex-grow" />
 
     <div class="search-bar">
-      <el-input id="search" v-model="searchKey" class="search" placeholder="搜索" clearable>
+      <el-input @keyup.enter.native="toSearch" id="search" v-model="searchKey" class="search" placeholder="搜索" clearable>
         <template #prefix><el-icon style="cursor: pointer;">
             <search />
           </el-icon></template>
@@ -293,6 +293,10 @@ function toHome() {
     common.ToUser(parseInt(uid))
   }
 }
+
+function toSearch() {
+  alert(`searchKey: ${searchKey.value}`)
+}
 </script>
 
 <style scoped>
@@ -307,7 +311,7 @@ function toHome() {
   background-color: transparent;
   position: fixed;
   top: 0px;
-  z-index: 99999;
+  z-index: 2008; /* z-index不能大于2008，否则会造成遮罩层内出现顶部菜单栏 */
 }
 
 .el-menu--horizontal>.el-menu-item.is-active,

@@ -76,7 +76,9 @@
           </div>
         </div>
         <div class="tag-row">
-          <span v-for="(item) in userHome.tag" class="iconfont el-icon-tag tag">{{ item }}</span>
+          <div v-for="(item) in userHome.tag" class="tag">
+            <span class="iconfont el-icon-tag"></span>{{ item }}
+          </div>
         </div>
       </el-card>
     </div>
@@ -319,18 +321,16 @@ function toMeSetting() {
 }
 
 .home-container .right .tag-row {
-  margin-top: 10px;
-}
-
-.home-container .right .tag-row .tag:last-child {
-  margin-right: 0;
+  margin-top: 20px;
+  margin-left: -2px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .home-container .right .tag-row .tag {
   font-size: 14px;
-  margin-right: 20px;
-  white-space: nowrap;
-  overflow-wrap: break-word;
+  line-height: 14px;
   color: #73767a;
 }
 </style>

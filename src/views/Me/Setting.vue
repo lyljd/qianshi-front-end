@@ -113,8 +113,14 @@ function showNewTagInput() {
 }
 
 function newTag() {
-  if (newTagInputValue.value) {
-    meSetting.tag.push(newTagInputValue.value)
+  let val = newTagInputValue.value
+  if (val) {
+    if (meSetting.tag.includes(val)) {
+      showError("该标签已存在")
+      newTagInput.value!.focus()
+      return
+    }
+    meSetting.tag.push(val)
   }
   newTagInputVisible.value = false
   newTagInputValue.value = ""
@@ -197,20 +203,18 @@ function saveSetting() {
 }
 
 .set-container .tag-container {
-  line-height: 35px;
   margin-left: -5px;
-}
-
-.set-container .tag {
-  margin-right: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
 .set-container .tag,
 .set-container .new-tag-btn {
+  min-width: 100px;
   height: 30px;
   font-size: 14px;
   border-radius: 5px;
-  min-width: 100px;
 }
 
 .set-container .new-tag-input {
