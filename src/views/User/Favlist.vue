@@ -53,13 +53,14 @@
 
 <script setup lang="ts">
 import VideoCard from "../../components/VideoCard.vue"
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import * as common from "../../common"
 import { useRoute } from 'vue-router'
 import { useStore } from "../../store"
 
 const mockVideo = {
   "vid": 0,
+  "videoUrl": "",
   "coverUrl": "",
   "playNum": 0,
   "danmuNum": 0,
@@ -138,11 +139,7 @@ function beforeNewFavlistWindowClose(action: string, _: any, done: Function) {
     if (!checkInput()) {
       return
     }
-    ElMessage({
-      type: 'success',
-      offset: 77,
-      message: `新收藏夹的名称为：${newName.value}`,
-    })
+    common.showSuccess(`新收藏夹的名称为：${newName.value}`)
   }
   newName.value = ""
   done()
@@ -159,21 +156,13 @@ function deleteFavlist() {
     autofocus: false,
   })
     .then(() => {
-      ElMessage({
-        type: 'success',
-        offset: 77,
-        message: '删除成功',
-      })
+      common.showSuccess('删除成功')
     })
   //TODO 删除后若当前activeId不为0则减1
 }
 
 function deleteItem() {
-  ElMessage({
-    type: 'success',
-    offset: 77,
-    message: "取消收藏成功",
-  })
+  common.showSuccess("取消收藏成功")
   //TODO 若有多的视频，则请求一个补充到最后
 }
 </script>

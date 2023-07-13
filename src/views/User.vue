@@ -178,10 +178,7 @@ function getUser() {
 function saveSignature() {
   user.signature = user.signature.trim()
   if (user.signature.length > 50) {
-    ElMessage({
-      "message": "签名的长度最大为50，超出部分已自动选中",
-      "offset": 77,
-    })
+    common.showInfo("签名的长度最大为50，超出部分已自动选中")
     signatureInput.value!.focus()
     signatureInput.value!.setSelectionRange(50, user.signature.length)
   }
@@ -212,10 +209,7 @@ function focu() {
     return
   }
   if (isMe) {
-    ElMessage({
-      "message": "不能关注自己",
-      "offset": 77,
-    })
+    common.showInfo("不能关注自己")
     return
   }
   if (!user.isFocu) {

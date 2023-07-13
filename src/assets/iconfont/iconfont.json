@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5387519",
+      "name": "对号",
+      "font_class": "dui",
+      "unicode": "eaf1",
+      "unicode_decimal": 60145
+    },
+    {
+      "icon_id": "15995160",
+      "name": "稍后处理",
+      "font_class": "shaohou",
+      "unicode": "e6fb",
+      "unicode_decimal": 59131
+    },
+    {
+      "icon_id": "2154755",
+      "name": "稍后观看_44",
+      "font_class": "shaohouzaikan",
+      "unicode": "e684",
+      "unicode_decimal": 59012
+    },
+    {
+      "icon_id": "2568662",
+      "name": "投诉",
+      "font_class": "jubao",
+      "unicode": "e6dd",
+      "unicode_decimal": 59101
+    },
+    {
       "icon_id": "1388101",
       "name": "cancel",
       "font_class": "cancel",

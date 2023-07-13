@@ -45,6 +45,7 @@ import DeveloperInfo from "../components/DeveloperInfo.vue"
 
 const mockVideo = {
   "vid": 1,
+  "videoUrl": "",
   "coverUrl": "",
   "playNum": 0,
   "danmuNum": 0,

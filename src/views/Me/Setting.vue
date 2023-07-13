@@ -53,7 +53,6 @@
 <script setup lang="ts">
 import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 import mockMeSetting from "../../mock/me/setting.json"
-import { ElMessage } from 'element-plus'
 import * as common from "../../common"
 import { useStore } from "../../store"
 
@@ -116,7 +115,7 @@ function newTag() {
   let val = newTagInputValue.value
   if (val) {
     if (meSetting.tag.includes(val)) {
-      showError("该标签已存在")
+      common.showError("该标签已存在")
       newTagInput.value!.focus()
       return
     }
@@ -126,14 +125,6 @@ function newTag() {
   newTagInputValue.value = ""
 }
 
-function showError(msg: string) {
-  ElMessage({
-      type: 'error',
-      offset: 77,
-      message: msg,
-    })
-}
-
 function saveSetting() {
   if (saveSettingBtn.disabled) {
     return
@@ -141,24 +132,20 @@ function saveSetting() {
   meSetting.nickname = meSetting.nickname.trim()
   meSetting.signature = meSetting.signature.trim()
   if (meSetting.nickname.length === 0) {
-    showError("请输入昵称")
+    common.showError("请输入昵称")
     return
   }
   if (meSetting.nickname.length > 20) {
-    showError("昵称的长度最大为20")
+    common.showError("昵称的长度最大为20")
     return
   }
   if (meSetting.signature.length > 50) {
-    showError("签名的长度最大为50")
+    common.showError("签名的长度最大为50")
     return
   }
   common.btnCD(saveSettingBtn, 5000)
   nnmdy.value = false
-  ElMessage({
-      type: 'success',
-      offset: 77,
-      message: "保存成功",
-    })
+  common.showSuccess("保存成功")
 }
 </script>
 

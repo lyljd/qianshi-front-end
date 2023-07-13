@@ -21,6 +21,18 @@
         <span :title="video.shareNum.toString()" class="iconfont el-icon-fenxiang icon"><span class="num">{{
           common.numFormatterW(video.shareNum)
         }}</span></span>
+
+        <el-popover ref="extraPop" placement="bottom-end">
+          <template #reference>
+            <span class="iconfont el-icon-diandiandianshu icon"></span>
+          </template>
+          <div class="extra-menu">
+            <ul>
+              <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报&emsp;&emsp;</li>
+              <li @click="seeLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
+            </ul>
+          </div>
+        </el-popover>
       </div>
 
       <div class="info">
@@ -260,8 +272,8 @@
 
       <el-card class="intro-tag-container">
         <textarea id="intro-textarea" class="introduction" rows="1" readonly>{{ video.intro || "-" }}</textarea>
-        <div v-show=" !moreStatus && isMore " @click=" setIntroFull " class="more">展开更多</div>
-        <div v-show=" moreStatus " @click=" setIntroUnFull " class="more">收起</div>
+        <div v-show="!moreStatus && isMore" class="more-container"><span @click="setIntroFull" class="more">展开更多</span></div>
+        <div v-show="moreStatus" class="more-container"><span @click="setIntroUnFull" class="more">收起</span></div>
         <div id="tag-row" class="tag-row">
           <el-tag class="tag" v-for="(tag) in video.tags" type="info" round>{{ tag }}</el-tag>
         </div>
@@ -306,19 +318,26 @@
       </div>
 
       <transition name="danmu-list">
-        <el-table v-if=" showDanmuList " class="danmu-list" :data=" video.danmu " max-height="483" size="small"
+        <el-table v-if=" showDanmuList " class="danmu-list" :data="video.danmu" max-height="483" size="small"
           empty-text="暂无弹幕">
           <el-table-column prop="time" label="时间" width="65" sortable :formatter=" danmuTimeFormatter " />
-          <el-table-column prop="value" label="弹幕内容" show-overflow-tooltip width="76" />
+          <el-table-column prop="value" label="弹幕内容" show-overflow-tooltip width="108" />
           <el-table-column prop="date" label="发送时间" show-overflow-tooltip width="97" sortable :formatter="danmuDateFormatter" />
-          <el-table-column width="32" :align=" 'center' ">
-            <template #default=" scope ">
+
+          <el-table-column v-if="isLogin" fixed="right" width="32" :align="'center'">
+            <template #default="scope">
               <el-popconfirm @confirm="delDanmu(scope.row.did)" hide-icon title="你确认要删除该弹幕吗?"
               confirm-button-text="确认" cancel-button-text="取消">
                 <template #reference>
-                  <span v-if="isLogin" class="iconfont el-icon-ashbin danmu-del"></span>
+                  <span class="iconfont el-icon-ashbin danmu-icon"></span>
                 </template>
               </el-popconfirm>
+            </template>
+          </el-table-column>
+
+          <el-table-column v-if="isLogin" fixed="right" width="32" :align="'center'">
+            <template #default="scope">
+              <span @click="reportDanmu(scope.row.did)" class="iconfont el-icon-jubao danmu-icon"></span>
             </template>
           </el-table-column>
         </el-table>
@@ -471,6 +490,7 @@ type Collection = {
 
 type Recommend = {
   vid: number
+  videoUrl: string
   coverUrl: string
   playNum: number
   danmuNum: number
@@ -544,6 +564,7 @@ store.$subscribe((_, state) => {
   }
 })
 
+const extraPop = ref()
 let videoEle: HTMLVideoElement
 let videoContainer: any
 let danmuSendBtns: NodeListOf<HTMLButtonElement>
@@ -583,6 +604,7 @@ let videoQuality = ref("原画")
 let proportion = ref(1)
 let shortcutKeyDescriptionWindowVisible = ref(false)
 let focuBtnInnerText = ref("")
+let hasSeeLater = ref(false)
 
 watch(video, (newVal) => {
   if (!newVal.author.isFocu) {
@@ -1022,11 +1044,7 @@ function delDanmu(did: number) {
   //TODO did === 2应该换成请求api后失败；弹幕可以由发送人和up删除
   // 为了保护弹幕发送人的隐私，后端不会传发送人的信息过来，也就是说如果有删除弹幕的请求，就必须直达后端，前端不会做拦截
   if (did === 2) {
-    ElMessage({
-      "message": "删除失败，此弹幕不属于你！",
-      "offset": 77,
-      "type": "error",
-    })
+    common.showError("删除失败，此弹幕不属于你！")
     return
   }
   video.danmu.forEach((danmu, index) => {
@@ -1034,11 +1052,7 @@ function delDanmu(did: number) {
       video.danmu.splice(index, 1)
     }
   })
-  ElMessage({
-    "message": "删除成功",
-    "offset": 77,
-    "type": "success",
-  })
+  common.showSuccess("删除成功")
 }
 
 function videoDateFormatter(date: number) {
@@ -1069,10 +1083,7 @@ function likeVideo() {
     return
   }
   if (isMe.value) {
-    ElMessage({
-      "message": "不能给自己的视频点赞",
-      "offset": 77,
-    })
+    common.showInfo("不能给自己的视频点赞")
     return
   }
   video.isLike = !video.isLike
@@ -1084,10 +1095,7 @@ function coinVideo() {
     return
   }
   if (isMe.value) {
-    ElMessage({
-      "message": "不能给自己的视频投币",
-      "offset": 77,
-    })
+    common.showInfo("不能给自己的视频投币")
     return
   }
   video.isCoin = !video.isCoin
@@ -1116,10 +1124,7 @@ function focuAuthor() {
     return
   }
   if (isMe.value) {
-    ElMessage({
-      "message": "不能关注自己",
-      "offset": 77,
-    })
+    common.showInfo("不能关注自己")
     return
   }
   video.author.isFocu = !video.author.isFocu
@@ -1133,6 +1138,35 @@ function openLoginWindow() {
     "customClass": "zIndex999",
   })
   store.openLoginWindow()
+}
+
+function reportVideo() {
+  extraPop.value.hide()
+  
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+
+  store.openFSWindow("视频举报", "#", "请输入举报理由", "理由不能为空", "举报成功")
+}
+
+function reportDanmu(did: number) {
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+
+  store.openFSWindow("弹幕举报", did.toString(), "请输入举报理由", "理由不能为空", "举报成功")
+}
+
+function seeLater(vid: number) {
+  if (!hasSeeLater.value) {
+    common.seeLater(vid)
+  } else {
+    common.cancelSeeLater(vid)
+  }
+  hasSeeLater.value = !hasSeeLater.value
 }
 </script>
 
@@ -1185,7 +1219,7 @@ function openLoginWindow() {
 .interaction-bar .icon {
   font-size: 25px;
   cursor: pointer;
-  margin-left: 20px;
+  margin-left: 10px;
 }
 
 .interaction-bar .iconIsDo {
@@ -1200,6 +1234,30 @@ function openLoginWindow() {
 .interaction-bar .icon .num {
   font-size: 20px;
   margin-left: 5px;
+}
+
+.extra-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: -7.5px;
+}
+
+.extra-menu ul li {
+  cursor: pointer;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.extra-menu ul li:hover {
+  background-color: #e9e9eb;
+}
+
+.extra-menu .em-icon {
+  font-size: 25px;
+  margin-right: 5px;
 }
 
 .video-container {
@@ -1378,7 +1436,7 @@ function openLoginWindow() {
   height: 483px;
 }
 
-.danmu-del:hover {
+.danmu-icon:hover {
   cursor: pointer;
   color: #409EFF;
 }
@@ -1609,11 +1667,14 @@ function openLoginWindow() {
   overflow: hidden;
 }
 
+.intro-tag-container .more-container {
+  margin-left: 3px;
+  margin-top: 3px;
+}
+
 .intro-tag-container .more {
   color: #909399;
   font-size: 14px;
-  margin-left: 3px;
-  margin-top: 3px;
   cursor: pointer;
 }
 

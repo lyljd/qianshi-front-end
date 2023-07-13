@@ -11,7 +11,7 @@
   "isLike": false,
   "isCoin": false,
   "isStar": false,
-  "videoUrl": "../../public/byt.mp4",
+  "videoUrl": "../../public/video/2.mp4",
   "intro": "Saturday night what a wild, wild dream\n周六晚上 我做了一个疯狂的梦\n\nThe room feels like a full-screen cinema\n房间看起来像一部全屏的影片\n\nGot you close got you so, so close\n我离你那么近 那么靠近\n\nBut not for long\n但这只有一瞬间",
   "tags": [
     "音乐",
@@ -178,6 +178,7 @@
   "recommend": [
     {
       "vid": 4,
+      "videoUrl": "../../public/video/1.mp4",
       "coverUrl": "../../public/cover/1.jpeg",
       "playNum": 732790,
       "danmuNum": 1563,
@@ -189,6 +190,7 @@
     },
     {
       "vid": 5,
+      "videoUrl": "../../public/video/4.mp4",
       "coverUrl": "../../public/cover/4.jpeg",
       "playNum": 87209,
       "danmuNum": 304,
@@ -200,6 +202,7 @@
     },
     {
       "vid": 6,
+      "videoUrl": "../../public/video/5.mp4",
       "coverUrl": "../../public/cover/5.jpeg",
       "playNum": 7893,
       "danmuNum": 140,

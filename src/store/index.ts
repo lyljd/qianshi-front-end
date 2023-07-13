@@ -7,6 +7,7 @@ export const useStore = defineStore("qianshi", {
 
     isLogin: common.isLogin(),
     openLoginWindow: () => { },
+    openFSWindow: (title: string, bzUrl: string, placeholder?: string, failMsg?: string, succMsg?:string, afterSuccDo?: Function) => { },
     setPlatformCurTitle: (_: string) => { },
     setMeCurTitle: (_: string) => { },
     setUploadItem: (_: string) => { },

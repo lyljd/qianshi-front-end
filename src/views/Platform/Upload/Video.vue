@@ -104,8 +104,9 @@
 </template>
 
 <script setup lang="ts">
-import { UploadInstance, ElMessage, ElSelect, ElInput } from 'element-plus'
+import { UploadInstance, ElSelect, ElInput } from 'element-plus'
 import { useStore } from "../../../store"
+import * as common from "../../../common"
 
 type Video = {
   videoUrl: string,
@@ -156,7 +157,7 @@ function beforePVWindowClose(done: Function) {
 
 function openCoverUpload() {
   if (coverUploadPercent.value !== 0) {
-    showError("图片上传时禁止修改")
+    common.showError("图片上传时禁止修改")
     return
   }
   coverUpload.value?.$el.querySelector('input').click()
@@ -168,7 +169,7 @@ function openVideoUpload() {
 
 function beforeVideoUpload(rawFile: any) {
   if (rawFile.size / 1024 / 1024 / 1024 > 1) {
-    showError("上传的视频大小不能超过1G")
+    common.showError("上传的视频大小不能超过1G")
     return false
   }
   store.setUploadItem("video")
@@ -178,7 +179,7 @@ function beforeVideoUpload(rawFile: any) {
 
 function beforeCoverUpload(rawFile: any) {
   if (rawFile.size / 1024 / 1024 > 10) {
-    showError("上传的图片大小不能超过10M")
+    common.showError("上传的图片大小不能超过10M")
     return false
   }
   return true
@@ -217,11 +218,7 @@ function onCoverUploadProgress(event: any) {
 function onVideoUploadSuccess() {
   preVideoUrl.value = video.videoUrl
   videoUploadPercent.value = 0
-  ElMessage({
-    type: 'success',
-    offset: 77,
-    message: "视频上传成功",
-  })
+  common.showSuccess("视频上传成功")
 }
 
 function onCoverUploadSuccess() {
@@ -232,21 +229,13 @@ function onCoverUploadSuccess() {
 function onVideoUploadError() {
   video.videoUrl = preVideoUrl.value
   videoUploadPercent.value = 0
-  showError("视频上传失败")
+  common.showError("视频上传失败")
 }
 
 function onCoverUploadError() {
   video.coverUrl = preCoverUrl.value
   coverUploadPercent.value = 0
-  showError("图片上传失败")
-}
-
-function showError(msg: string) {
-  ElMessage({
-    type: 'error',
-    offset: 77,
-    message: msg,
-  })
+  common.showError("图片上传失败")
 }
 
 function delTag(tag: string) {
@@ -264,7 +253,7 @@ function newTag() {
   let val = newTagInputValue.value
   if (val) {
     if (video.tags.includes(val)) {
-      showError("该标签已存在")
+      common.showError("该标签已存在")
       newTagInput.value!.focus()
       return
     }
@@ -279,16 +268,12 @@ function uploadVideo() {
   video.intro = video.intro.trim()
 
   if (video.title.length === 0) {
-    showError("请输入标题")
+    common.showError("请输入标题")
     titleInput.value?.focus()
     return
   }
 
-  ElMessage({
-    type: 'success',
-    offset: 77,
-    message: "投稿成功",
-  })
+  common.showSuccess("投稿成功")
 }
 </script>
 

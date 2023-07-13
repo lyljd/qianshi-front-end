@@ -36,7 +36,7 @@
             class="reply-btn">回复</span>
         </span>
 
-        <el-popover trigger="click" placement="bottom-end">
+        <el-popover ref="extraPop" trigger="click" placement="bottom-end">
           <template #reference>
             <span class="iconfont el-icon-diandiandianshu extra"></span>
           </template>
@@ -44,10 +44,10 @@
             <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon title="删除评论后，评论下所有回复都会被删除，是否继续?"
               confirm-button-text="确认" cancel-button-text="取消">
               <template #reference>
-                <div v-if="isMe || isUp" class="comment-detele">删除</div>
+                <div v-if="isMe || isUp" class="comment-detele"><span class="iconfont el-icon-ashbin em-icon"></span>删除</div>
               </template>
             </el-popconfirm>
-            <div class="comment-report">举报</div>
+            <div @click="report" class="comment-report"><span class="iconfont el-icon-jubao em-icon"></span>举报</div>
           </div>
         </el-popover>
       </div>
@@ -122,6 +122,7 @@ store.$subscribe((_, state) => {
   }
 })
 
+const extraPop = ref()
 let commentEle: HTMLTextAreaElement
 
 let isMe = ref(common.isMe(props.data.uid))
@@ -179,10 +180,7 @@ function like() {
     return
   }
   if (isMe.value) {
-    ElMessage({
-      "message": "不能给自己的评论点赞",
-      "offset": 77,
-    })
+    common.showInfo("不能给自己的评论点赞")
     return
   }
   if (!props.data.isLike) {
@@ -204,10 +202,7 @@ function dislike() {
     return
   }
   if (isMe.value) {
-    ElMessage({
-      "message": "不能给自己的评论点踩",
-      "offset": 77,
-    })
+    common.showInfo("不能给自己的评论点踩")
     return
   }
   if (props.data.isLike) {
@@ -226,6 +221,17 @@ function openLoginWindow() {
     "customClass": "zIndex999",
   })
   store.openLoginWindow()
+}
+
+function report() {
+  extraPop.value.hide()
+  
+  if (!isLogin.value) {
+    openLoginWindow()
+    return
+  }
+
+  store.openFSWindow('评论举报', '#', "请输入举报理由", "理由不能为空", "举报成功")
 }
 </script>
 
@@ -322,18 +328,17 @@ export default {
 }
 
 .extra-container {
-  text-align: center;
   font-size: 14px;
-}
-
-.extra-container .comment-detele {
-  margin-bottom: 10px;
+  margin: -7.5px;
 }
 
 .extra-container .comment-detele,
 .extra-container .comment-report {
   padding-top: 10px;
   padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .extra-container .comment-detele:hover,
@@ -341,6 +346,11 @@ export default {
   cursor: pointer;
   color: #409EFF;
   background-color: #f4f4f5;
+}
+
+.extra-container .em-icon {
+  font-size: 20px;
+  margin-right: 5px;
 }
 
 .comment-info .date,

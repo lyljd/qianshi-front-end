@@ -225,7 +225,7 @@ import mockIsPubing from "../../../mock/platform/article/video/is_pubing.json"
 import mockNotPubed from "../../../mock/platform/article/video/not_pubed.json"
 import * as common from "../../../common"
 import { Search } from '@element-plus/icons-vue'
-import { UploadInstance, ElMessage, ElMessageBox, ElSelect, ElInput } from 'element-plus'
+import { UploadInstance, ElMessageBox, ElSelect, ElInput } from 'element-plus'
 import { useStore } from "../../../store"
 
 type ListNum = {
@@ -308,7 +308,6 @@ let notPubed: NotPubed = reactive({
 let viewItem = ref("pubed")
 let searchKey = ref("")
 let appealIdx = ref(-1)
-let appealReason = ref("")
 
 let video: Video = reactive({
   videoUrl: "",
@@ -428,11 +427,7 @@ function deleteItem(idx: number) {
           break
         }
       }
-      ElMessage({
-        type: 'success',
-        offset: 77,
-        message: '删除成功',
-      })
+      common.showSuccess('删除成功')
     })
 }
 
@@ -463,73 +458,17 @@ function cancelModify(idx: number) {
       common.scrollToTopSmoothly()
       pubed = reactive(getPubed())
       viewItem.value = "pubed"
-      ElMessage({
-        type: 'success',
-        offset: 77,
-        message: '取消修改成功',
-      })
+      common.showSuccess('取消修改成功')
     })
 }
 
 function appeal() {
   if (notPubed.list[appealIdx.value].appealStatus) {
-    ElMessage({
-      type: 'info',
-      offset: 77,
-      message: "你已申诉，请耐心等待！管理员会尽快处理的，请留意系统消息",
-    })
+    common.showInfo("你已申诉，请耐心等待！管理员会尽快处理的，请留意系统消息")
     return
   }
 
-  ElMessageBox({
-    title: '申诉',
-    message: h('div', { style: 'margin-right: 10px;' }, [
-      h('div', null, [
-        h('textarea', { id: 'appeal-reason', onInput: onAppealReasonChange, placeholder: '请输入申诉理由' }),
-      ]),
-      h('span', { id: 'check-notice' }, '理由不能为空哦'),
-    ]),
-    showClose: false,
-    showCancelButton: true,
-    confirmButtonText: '提交',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    lockScroll: false,
-    beforeClose: beforeAppealWindowClose,
-  })
-}
-
-function onAppealReasonChange() {
-  appealReason.value = (document.getElementById("appeal-reason") as HTMLTextAreaElement).value;
-  checkAppealReasonInput()
-}
-
-function checkAppealReasonInput() {
-  if (appealReason.value.length > 0) {
-    (document.getElementById("check-notice") as HTMLSpanElement).style.display = "none"
-    return true
-  }
-  (document.getElementById("check-notice") as HTMLSpanElement).style.display = "inline"
-  return false
-}
-
-function beforeAppealWindowClose(action: string, _: any, done: Function) {
-  if (action === "confirm") {
-    appealReason.value = appealReason.value.trim();
-    (document.getElementById("appeal-reason") as HTMLTextAreaElement).value = ""
-    if (!checkAppealReasonInput()) {
-      return
-    }
-    notPubed.list[appealIdx.value].appealStatus = true
-    ElMessage({
-      type: 'success',
-      offset: 77,
-      message: "提交成功！管理员会尽快处理的，请留意系统消息",
-    })
-  }
-  appealReason.value = ""
-  done()
+  store.openFSWindow('申诉', '#', '请输入申诉理由', '理由不能为空', "提交成功！管理员会尽快处理的，请留意系统消息", () => { notPubed.list[appealIdx.value].appealStatus = true })
 }
 
 function pubedCellClick(row: any, column: any) {
@@ -575,7 +514,7 @@ function getVideo(id: number): Video {
   console.log(id, viewItem.value)
 
   return {
-    "videoUrl": "../../public/ysgs.mp4",
+    "videoUrl": "../../public/video/8.mp4",
     "coverUrl": "../../public/cover/8.jpeg",
     "title": "许嵩-雅俗共赏",
     "region": "music",
@@ -665,7 +604,7 @@ function beforePVWindowClose(done: Function) {
 
 function openCoverUpload() {
   if (coverUploadPercent.value !== 0) {
-    showError("图片上传时禁止修改")
+    common.showError("图片上传时禁止修改")
     return
   }
   coverUpload.value?.$el.querySelector('input').click()
@@ -677,7 +616,7 @@ function openVideoUpload() {
 
 function beforeVideoUpload(rawFile: any) {
   if (rawFile.size / 1024 / 1024 / 1024 > 1) {
-    showError("上传的视频大小不能超过1G")
+    common.showError("上传的视频大小不能超过1G")
     return false
   }
   return true
@@ -685,7 +624,7 @@ function beforeVideoUpload(rawFile: any) {
 
 function beforeCoverUpload(rawFile: any) {
   if (rawFile.size / 1024 / 1024 > 10) {
-    showError("上传的图片大小不能超过10M")
+    common.showError("上传的图片大小不能超过10M")
     return false
   }
   return true
@@ -724,11 +663,7 @@ function onCoverUploadProgress(event: any) {
 function onVideoUploadSuccess() {
   preVideoUrl.value = video.videoUrl
   videoUploadPercent.value = 0
-  ElMessage({
-    type: 'success',
-    offset: 77,
-    message: "视频上传成功",
-  })
+  common.showSuccess("视频上传成功")
 }
 
 function onCoverUploadSuccess() {
@@ -739,21 +674,13 @@ function onCoverUploadSuccess() {
 function onVideoUploadError() {
   video.videoUrl = preVideoUrl.value
   videoUploadPercent.value = 0
-  showError("视频上传失败")
+  common.showError("视频上传失败")
 }
 
 function onCoverUploadError() {
   video.coverUrl = preCoverUrl.value
   coverUploadPercent.value = 0
-  showError("图片上传失败")
-}
-
-function showError(msg: string) {
-  ElMessage({
-    type: 'error',
-    offset: 77,
-    message: msg,
-  })
+  common.showError("图片上传失败")
 }
 
 function delTag(tag: string) {
@@ -771,7 +698,7 @@ function newTag() {
   let val = newTagInputValue.value
   if (val) {
     if (video.tags.includes(val)) {
-      showError("该标签已存在")
+      common.showError("该标签已存在")
       newTagInput.value!.focus()
       return
     }
@@ -786,7 +713,7 @@ function modifyVideo() {
   video.intro = video.intro.trim()
 
   if (video.title.length === 0) {
-    showError("请输入标题")
+    common.showError("请输入标题")
     titleInput.value?.focus()
     return
   }
@@ -796,15 +723,11 @@ function modifyVideo() {
   editWindowVisible.value = false
   store.switchAsk = false
 
-  ElMessage({
-    type: 'success',
-    offset: 77,
-    message: "修改成功",
-  })
+  common.showSuccess("修改成功")
 }
 
 function convertRegionName(code: string): string {
-  switch(code) {
+  switch (code) {
     case "anime": {
       return "番剧"
     }

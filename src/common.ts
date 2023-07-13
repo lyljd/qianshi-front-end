@@ -1,3 +1,5 @@
+import { ElMessage } from 'element-plus'
+
 function isMobile(): boolean {
   return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i) === null
 }
@@ -199,13 +201,46 @@ function scrollToTopSmoothly() {
   const scrollDuration = 300; // 滚动持续时间（以毫秒为单位）
   const scrollStep = -window.scrollY / (scrollDuration / 15); // 每个步骤滚动的距离
 
-  const scrollInterval = setInterval(function() {
+  const scrollInterval = setInterval(function () {
     if (window.scrollY !== 0) {
       window.scrollBy(0, scrollStep);
     } else {
       clearInterval(scrollInterval);
     }
   }, 15);
+}
+
+function showError(msg: string) {
+  ElMessage({
+    type: "error",
+    offset: 77,
+    message: msg,
+  })
+}
+
+function showSuccess(msg: string) {
+  ElMessage({
+    type: "success",
+    offset: 77,
+    message: msg,
+  })
+}
+
+function showInfo(msg: string) {
+  ElMessage({
+    offset: 77,
+    message: msg,
+  })
+}
+
+function seeLater(vid: number) {
+  console.log(vid) //TODO api request
+  showSuccess("添加成功")
+}
+
+function cancelSeeLater(vid: number) {
+  console.log(vid) //TODO api request
+  showSuccess("取消成功")
 }
 
 export {
@@ -228,4 +263,9 @@ export {
   ToDeveloper,
   checkCookieExists,
   scrollToTopSmoothly,
+  showError,
+  showSuccess,
+  showInfo,
+  seeLater,
+  cancelSeeLater,
 }

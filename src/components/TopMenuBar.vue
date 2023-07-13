@@ -152,7 +152,6 @@ import TopMenuImg from "./TopMenuImg.vue"
 import LoginWindow from "./LoginWindow.vue"
 import * as common from "../common"
 import { useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { useStore } from "../store"
 import { storeToRefs } from "pinia"
 
@@ -271,20 +270,12 @@ function onAvatarPopShow() {
 
 function signin() {
   if (signinStatus.value) {
-    ElMessage({
-      "message": "今日已签到，请明日再来",
-      "offset": 60,
-      "type": "info"
-    })
+    common.showInfo("今日已签到，请明日再来")
     return
   }
   signinStatus.value = true
   ahi.coin += 5 //TODO
-  ElMessage({
-    "message": "签到成功",
-    "offset": 57,
-    "type": "success"
-  })
+  common.showSuccess("签到成功")
 }
 
 function toHome() {
@@ -311,7 +302,7 @@ function toSearch() {
   background-color: transparent;
   position: fixed;
   top: 0px;
-  z-index: 2008; /* z-index不能大于2008，否则会造成遮罩层内出现顶部菜单栏 */
+  z-index: 2000; /* z-index不能大于2000，否则会造成遮罩层内出现顶部菜单栏 */
 }
 
 .el-menu--horizontal>.el-menu-item.is-active,

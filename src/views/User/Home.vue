@@ -88,7 +88,7 @@
 <script setup lang="ts">
 import * as common from "../../common"
 import SmallVideoCard from '../../components/SmallVideoCard.vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { useRoute } from 'vue-router'
 import { useStore } from "../../store"
 import mockUserHome from "../../mock/user/home.json"
@@ -106,6 +106,7 @@ let userHome: UserHome = reactive(getUserHome())
 
 const mockVideo = {
   "vid": 0,
+  "videoUrl": "",
   "coverUrl": "",
   "playNum": 0,
   "duration": 0,
@@ -144,10 +145,7 @@ function getUserHome() {
 function saveSpaceNotice() {
   userHome.notice = userHome.notice.trim()
   if (userHome.notice.length > 150) {
-    ElMessage({
-      "message": "公告的字数最多为150，超出部分已自动选中",
-      "offset": 77,
-    })
+    common.showInfo("公告的字数最多为150，超出部分已自动选中")
     noticeTextarea.value!.focus()
     noticeTextarea.value!.setSelectionRange(150, userHome.notice.length)
   }
@@ -196,11 +194,7 @@ function beforeNewTitleWindowClose(action: string, _: any, done: Function) {
     if (!checkInput()) {
       return
     }
-    ElMessage({
-      type: 'success',
-      offset: 77,
-      message: "已提交申请",
-    })
+    common.showSuccess("已提交申请")
     userHome.applyTitle = newTitle.value
   }
   newTitle.value = ""
@@ -208,11 +202,7 @@ function beforeNewTitleWindowClose(action: string, _: any, done: Function) {
 }
 
 function cancelApply() {
-  ElMessage({
-    type: 'success',
-    offset: 77,
-    message: "已取消申请",
-  })
+  common.showSuccess("已取消申请")
   userHome.applyTitle = ""
 }
 
