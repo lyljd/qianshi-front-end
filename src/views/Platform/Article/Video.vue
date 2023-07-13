@@ -29,7 +29,13 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <div v-if="listNum.pubedNum > 10" class="page-container">
+          <el-pagination :total="listNum.pubedNum" v-model:current-page="pubedCurPage" hide-on-single-page background
+            layout="prev, pager, next" />
+        </div>
       </el-tab-pane>
+
 
       <el-tab-pane :label="`进行中 ${listNum.isPubingNum}`" name="isPubing">
         <el-table @cell-click="isPubingCellClick" :cell-class-name="isPubingCellClassName" :cell-style="isPubingCellStyle"
@@ -83,7 +89,13 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <div v-if="listNum.isPubingNum > 10" class="page-container">
+          <el-pagination :total="listNum.isPubingNum" v-model:current-page="isPubingCurPage" hide-on-single-page
+            background layout="prev, pager, next" />
+        </div>
       </el-tab-pane>
+
 
       <el-tab-pane :label="`未通过 ${listNum.notPubedNum}`" name="notPubed">
         <el-table border :data="notPubed.list">
@@ -122,6 +134,11 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <div v-if="listNum.notPubedNum > 10" class="page-container">
+          <el-pagination :total="listNum.notPubedNum" v-model:current-page="notPubedCurPage" hide-on-single-page
+            background layout="prev, pager, next" />
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -340,6 +357,9 @@ let previewVideoUrl = ref("")
 let editWindowVisible = ref(false)
 let editEmpowerDisabled = ref(false)
 let hasEdit = ref(false)
+let pubedCurPage = ref(1)
+let isPubingCurPage = ref(1)
+let notPubedCurPage = ref(1)
 
 watch(video, (newV) => {
   if (newV.videoUrl !== videoCopy.videoUrl || newV.coverUrl !== videoCopy.coverUrl || newV.title !== videoCopy.title || newV.region !== videoCopy.region || JSON.stringify(newV.tags) !== JSON.stringify(videoCopy.tags) || newV.intro !== videoCopy.intro || newV.empower !== videoCopy.empower) {
@@ -349,6 +369,15 @@ watch(video, (newV) => {
     hasEdit.value = false
     store.switchAsk = false
   }
+})
+watch(pubedCurPage, (newV) => {
+  console.log(`现在访问的是【已通过】的第${newV}页`)
+})
+watch(isPubingCurPage, (newV) => {
+  console.log(`现在访问的是【进行中】的第${newV}页`)
+})
+watch(notPubedCurPage, (newV) => {
+  console.log(`现在访问的是【未通过】的第${newV}页`)
 })
 
 function tabChange() {
@@ -769,6 +798,12 @@ function convertRegionName(code: string): string {
 
 .v-container .modify-info>div:not(:last-child) {
   margin-bottom: 10px;
+}
+
+.v-container .page-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .setting {

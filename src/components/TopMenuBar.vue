@@ -84,7 +84,7 @@
               <div class="text">动态</div>
             </div>
           </div>
-          <li v-if="ahi.power > 0">后台管理</li>
+          <li @click="common.ToNewPage('/manage')" v-if="ahi.power > 0">后台管理</li>
           <li @click="common.ToNewPage('/me')">个人中心</li>
           <li @click="logout">退出登录</li>
         </ul>
