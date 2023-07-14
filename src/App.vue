@@ -2,13 +2,13 @@
   <div v-if="common.isMobile()">
     <el-backtop :right="50" :bottom="50" />
 
-    <TopMenuBar></TopMenuBar>
+    <TopMenuBar v-if="store.topPath !== 'manage'"></TopMenuBar>
 
-    <div v-if="$route.path !== '/'" class="placeholder"></div>
+    <div v-if="$route.path !== '/' && store.topPath !== 'manage'" class="placeholder"></div>
 
     <router-view></router-view>
 
-    <div class="in-site-message-container">
+    <div v-if="store.topPath !== 'manage'" class="in-site-message-container">
       <span @click="store.openFSWindow('站内留言', '#', '有什么问题都可以直接留言，管理员会在24小时内回复的～', '留言不能为空')" v-if="store.isLogin"
         class="in-site-message">站内留言</span>
     </div>

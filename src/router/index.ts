@@ -85,6 +85,25 @@ const routes: Array<RouteRecordRaw> = [
       title: '创作中心',
     }
   },
+
+  {
+    path: "/manage",
+    component: () => import("../views/Manage.vue"),
+    children: [
+      { path: "/manage", component: () => import("../views/Manage/Home.vue") },
+      { path: "/manage/review", component: () => import("../views/Manage/Review.vue") },
+      { path: "/manage/feedback", component: () => import("../views/Manage/Feedback.vue") },
+      { path: "/manage/content", component: () => import("../views/Manage/Content.vue") },
+      { path: "/manage/user", component: () => import("../views/Manage/User.vue") },
+      { path: "/manage/message", component: () => import("../views/Manage/Message.vue") },
+      { path: "/manage/power", component: () => import("../views/Manage/Power.vue") },
+      { path: "/manage/operation", component: () => import("../views/Manage/Operation.vue") },
+      { path: "/manage/statistic", component: () => import("../views/Manage/Statistic.vue") },
+    ],
+    meta: {
+      title: '后台管理',
+    }
+  },
 ]
 
 const router = createRouter({
@@ -119,6 +138,8 @@ function beforeEach(to: any, from: any, next: Function) {
   } else {
     document.title = "浅时"
   }
+
+  store.topPath = to.path.split('/')[1]
 
   window.scrollTo(0, 0) //设置滚动条位置到顶部
   next()
