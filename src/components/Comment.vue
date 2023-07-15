@@ -26,6 +26,8 @@
         <span>
           <span class="date">{{ common.timestampFormatterRich(data.date) }}</span>
 
+          <span class="ip-location">IP属地：{{ data.ipLocation }}</span>
+
           <span @click="like" :class="{ blue: data.isLike }" :title="data.likeNum.toString()"
             class="iconfont el-icon-zan like-btn">{{ common.numFormatterW(data.likeNum)
             }}</span>
@@ -83,6 +85,7 @@ type Comment = {
   isUpLike: boolean
   content: string
   date: number
+  ipLocation: string
   likeNum: number
   isLike: boolean
   isDislike: boolean
@@ -318,8 +321,10 @@ export default {
 }
 
 .comment-info .date,
+.comment-info .ip-location,
 .comment-info .reply-btn {
   font-size: 13px;
+  cursor: default;
 }
 
 .comment-info .extra:hover {
@@ -354,9 +359,13 @@ export default {
 }
 
 .comment-info .date,
-.comment-info .like-btn,
+.comment-info .ip-location,
 .comment-info .dislike-btn {
-  margin-right: 10px;
+  margin-right: 15px;
+}
+
+.comment-info .like-btn {
+  margin-right: 5px;
 }
 
 .comment-info .reply-btn:hover,
@@ -376,11 +385,13 @@ export default {
   background-color: #fde2e2;
   padding: 3px;
   margin-right: 10px;
+  cursor: default;
 }
 
 .status .up-like {
   color: #909399;
   background-color: #e9e9eb;
   padding: 3px;
+  cursor: default;
 }
 </style>

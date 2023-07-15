@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3977806",
+      "name": "按IP统计",
+      "font_class": "ip",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
       "icon_id": "593330",
       "name": "快捷入口",
       "font_class": "kuaijierukou",

@@ -434,6 +434,7 @@ type Comment = {
   isUpLike: boolean
   content: string
   date: number
+  ipLocation: string
   likeNum: number
   isLike: boolean
   isDislike: boolean

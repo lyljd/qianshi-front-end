@@ -73,6 +73,7 @@ type Comment = {
   isUpLike: boolean
   content: string
   date: number
+  ipLocation: string
   likeNum: number
   isLike: boolean
   isDislike: boolean
@@ -150,7 +151,7 @@ function send(comment: Comment[]) {
   })
 
   props.data.num++
-  //TODO cid应该从后端拿
+  //TODO cid和ipLocation应该从后端拿
   comment.push({
     "cid": props.data.num,
     "uid": 1,
@@ -163,6 +164,7 @@ function send(comment: Comment[]) {
     "isUpLike": false,
     "content": content.value.trim(),
     "date": Date.now(),
+    "ipLocation": "重庆",
     "likeNum": 0,
     "isLike": false,
     "isDislike": false,
@@ -212,7 +214,7 @@ function childSend() {
   })
 
   props.data.num++
-  //TODO cid应该从后端拿
+  //TODO cid和ipLocation应该从后端拿
   let newComment: Comment = {
     "cid": props.data.num,
     "uid": 1,
@@ -225,6 +227,7 @@ function childSend() {
     "isUpLike": false,
     "content": childContent.value.trim(),
     "date": Date.now(),
+    "ipLocation": "重庆",
     "likeNum": 0,
     "isLike": false,
     "isDislike": false,
@@ -283,6 +286,7 @@ function viewMore(comment: Comment) {
     "isUpLike": false,
     "content": "嘻嘻😁",
     "date": 1686358790156,
+    "ipLocation": "上海",
     "likeNum": 0,
     "isLike": false,
     "isDislike": false,

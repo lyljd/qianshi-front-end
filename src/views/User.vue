@@ -45,6 +45,10 @@
             <use :xlink:href="'#el-icon-level_' + user.level"></use>
           </svg>
           <span v-if="user.isVip" class="vip">会员</span>
+          <span class="ip-container">
+            <span class="iconfont el-icon-ip ip"></span>
+            <span>IP属地：{{ user.ipLocation }}</span>
+          </span>
         </div>
         <input ref="signatureInput" @blur="saveSignature" :readonly="isMe ? false : true"
           :class="{ 'signature-row-me': isMe, 'signature-row': !isMe }" :placeholder="isMe ? '编辑个性签名' : ''"
@@ -125,6 +129,7 @@ type User = {
   gender: string
   level: number
   isVip: boolean
+  ipLocation: string
   topImgNo: number
   isFocu: boolean
   focuNum: number
@@ -347,6 +352,19 @@ function openLoginWindow() {
   line-height: 12px;
   margin-left: 5px;
   cursor: pointer;
+}
+
+.info .right .ip-container {
+  color: #dedfe0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  cursor: default;
+}
+
+.info .right .ip {
+  color: #dedfe0;
+  margin-left: 5px;
 }
 
 .info .right .signature-row,

@@ -49,7 +49,6 @@ type LoginInfo = {
   uid: number,
   nickname: string,
   avatarUrl: string,
-  lastIpLocation: string,
   token: string,
   refreshToken: string,
 }
@@ -114,12 +113,13 @@ function showLoginError(msg: string) {
   })
 }
 
-function showLoginSuccess(nickname: string, lastIpLocation: string) {
+function showLoginSuccess(nickname: string) {
   ElNotification.success({
-    title: `欢迎你，${nickname}`,
-    message: `上次登录ip地址：${lastIpLocation}`,
+    title: "登录成功",
+    message: `欢迎你，${nickname}`,
     showClose: false,
     offset: 57,
+    duration: 2000,
   })
 }
 
@@ -128,7 +128,6 @@ function mockLogin() {
     "uid": 1,
     "nickname": "Bonnenult",
     "avatarUrl": "../../public/avatar.jpeg",
-    "lastIpLocation": "重庆",
     "token": "payload.signature-token",
     "refreshToken": "payload.signature-refreshToken",
   }
@@ -162,7 +161,7 @@ function emailLogin() {
   let li = mockLogin()
   CB(li.avatarUrl)
   saveLoginInfo(li)
-  showLoginSuccess(li.nickname, li.lastIpLocation)
+  showLoginSuccess(li.nickname)
   vcode.value = ""
 }
 
@@ -185,7 +184,7 @@ function passwordLogin() {
   let li = mockLogin()
   CB(li.avatarUrl)
   saveLoginInfo(li)
-  showLoginSuccess(li.nickname, li.lastIpLocation)
+  showLoginSuccess(li.nickname)
   password.value = ""
 }
 </script>
