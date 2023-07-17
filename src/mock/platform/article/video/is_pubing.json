@@ -5,15 +5,13 @@
       "id": 1,
       "title": "Borrow Your Time",
       "coverUrl": "../../public/cover/2.jpeg",
-      "applyTime": 1685836560156,
-      "isNew": true
+      "applyTime": 1685836560156
     },
     {
       "id": 2,
       "title": "许嵩-雅俗共赏",
       "coverUrl": "../../public/cover/8.jpeg",
       "applyTime": 1688736560156,
-      "isNew": false,
       "vid": 7,
       "modifyInfo": {
         "videoUrl": "../../public/video/8.mp4",

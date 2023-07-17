@@ -41,26 +41,8 @@
         <el-table @cell-click="isPubingCellClick" :cell-class-name="isPubingCellClassName" :cell-style="isPubingCellStyle"
           border :data="isPubing.list">
           <el-table-column label="修改后信息" :width="100" type="expand">
-            <template #default="props"> <!--props下数据默认懒加载-->
-              <div class="modify-info">
-                <div>
-                  视频：
-                  <el-button @click="previewVideo(props.row.modifyInfo.videoUrl)">预览</el-button>
-                </div>
-                <div>
-                  封面：
-                  <el-image class="cover" :src="props.row.modifyInfo.coverUrl">
-                    <template #error>
-                      <div class="default">封面加载失败</div>
-                    </template>
-                  </el-image>
-                </div>
-                <div>标题：{{ props.row.modifyInfo.title }}</div>
-                <div>分区：{{ convertRegionName(props.row.modifyInfo.region) }}</div>
-                <div>标签：{{ props.row.modifyInfo.tags.join("；") }}</div>
-                <div>简介：{{ props.row.modifyInfo.intro }}</div>
-                <div v-show="props.row.modifyInfo.empower">权益声明：未经作者授权，禁止转载</div>
-              </div>
+            <template #default="props"> <!--数据默认懒加载-->
+              <VideoDescriptions title="" :data="(props.row.modifyInfo)"></VideoDescriptions>
             </template>
           </el-table-column>
           <el-table-column align="center" :width="235" label="封面">
@@ -79,11 +61,11 @@
               <div style="display: flex; flex-direction: column; ">
                 <el-button @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
-                <br v-if="isPubing.list[scope.$index].isNew">
-                <el-button v-if="isPubing.list[scope.$index].isNew" @click="deleteItem(scope.$index)" size="small"
+                <br v-if="!isPubing.list[scope.$index].vid">
+                <el-button v-if="!isPubing.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
                   type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
-                <br v-if="!isPubing.list[scope.$index].isNew">
-                <el-button v-if="!isPubing.list[scope.$index].isNew" @click="cancelModify(scope.$index)" size="small"
+                <br v-if="isPubing.list[scope.$index].vid">
+                <el-button v-if="isPubing.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
                   type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
               </div>
             </template>
@@ -98,7 +80,7 @@
 
 
       <el-tab-pane :label="`未通过 ${listNum.notPubedNum}`" name="notPubed">
-        <el-table border :data="notPubed.list">
+        <el-table @cell-click="notPubedCellClick" :cell-style="notPubedCellStyle" border :data="notPubed.list">
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
               <el-image class="cover" :src="notPubed.list[scope.$index].coverUrl">
@@ -122,9 +104,12 @@
               <div style="display: flex; flex-direction: column; ">
                 <el-button @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
-                <br>
-                <el-button @click="deleteItem(scope.$index)" size="small" type="danger"><span
-                    class="iconfont el-icon-ashbin"></span>删除</el-button>
+                <br v-if="!notPubed.list[scope.$index].vid">
+                <el-button v-if="!notPubed.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
+                  type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
+                <br v-if="notPubed.list[scope.$index].vid">
+                <el-button v-if="notPubed.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
+                  type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
                 <br>
                 <el-button :class="{ appealBtnT: notPubed.list[scope.$index].appealStatus }"
                   @click="appealIdx = scope.$index; appeal()" size="small" type="info"><span
@@ -143,17 +128,12 @@
     </el-tabs>
   </div>
 
-  <el-dialog v-model="previewVideoWindowVisible" :custom-class="'preview-video'" :before-close="beforePVWindowClose"
-    destroy-on-close align-center>
-    <video volume="0.5" controls :src="previewVideoUrl"></video>
-  </el-dialog>
-
   <el-dialog width="75%" v-model="editWindowVisible" :custom-class="'edit-dialog'" :before-close="beforeEditWindowClose"
     title="视频编辑" align-center>
     <div class="setting">
       <div>
         <span class="notice"><span style="color: red;">*</span>视频：</span>
-        <el-button :disabled="videoUploadPercent !== 0" @click="previewVideo(video.videoUrl)">预览</el-button>
+        <el-button :disabled="videoUploadPercent !== 0" @click="store.openPVWindow(video.videoUrl)">预览</el-button>
         <el-button :disabled="videoUploadPercent !== 0" @click="openVideoUpload">上传</el-button>
       </div>
       <el-upload :before-upload="beforeVideoUpload" :on-remove="onVideoUploadRemove" :on-change="onVideoUploadChange"
@@ -244,6 +224,7 @@ import * as common from "../../../common"
 import { Search } from '@element-plus/icons-vue'
 import { UploadInstance, ElMessageBox, ElSelect, ElInput } from 'element-plus'
 import { useStore } from "../../../store"
+import VideoDescriptions from "../../../components/VideoDescriptions.vue"
 
 type ListNum = {
   pubedNum: number,
@@ -268,7 +249,6 @@ type IsPubing = {
     coverUrl: string,
     title: string,
     applyTime: number,
-    isNew: boolean,
     vid?: number,
     modifyInfo?: {
       videoUrl?: string,
@@ -292,6 +272,7 @@ type NotPubed = {
     processTime: number,
     reason: string,
     appealStatus: boolean,
+    vid?: number,
   }[]
 }
 
@@ -352,8 +333,6 @@ let coverUploadPercent = ref(0)
 let videoUploadPercent = ref(0)
 let newTagInputValue = ref("")
 let newTagInputVisible = ref(false)
-let previewVideoWindowVisible = ref(false)
-let previewVideoUrl = ref("")
 let editWindowVisible = ref(false)
 let editEmpowerDisabled = ref(false)
 let hasEdit = ref(false)
@@ -472,20 +451,36 @@ function cancelModify(idx: number) {
   })
     .then(() => {
       //TODO api request
-      pubed.list.push({
-        id: isPubing.list[idx].id,
-        coverUrl: isPubing.list[idx].coverUrl,
-        title: isPubing.list[idx].title,
-        vid: isPubing.list[idx].vid as number
-      })
+      if (viewItem.value === "isPubing") {
+        pubed.list.push({
+          id: isPubing.list[idx].id,
+          coverUrl: isPubing.list[idx].coverUrl,
+          title: isPubing.list[idx].title,
+          vid: isPubing.list[idx].vid as number
+        })
+        isPubing.list.splice(idx, 1)
+        isPubing.num--
+        listNum.isPubingNum--
+      } else if (viewItem.value === "notPubed") {
+        pubed.list.push({
+          id: notPubed.list[idx].id,
+          coverUrl: notPubed.list[idx].coverUrl,
+          title: notPubed.list[idx].title,
+          vid: notPubed.list[idx].vid as number
+        })
+        notPubed.list.splice(idx, 1)
+        notPubed.num--
+        listNum.notPubedNum--
+      }
 
-      isPubing.list.splice(idx, 1)
-      isPubing.num--
-      listNum.isPubingNum--
-      pubed.num++
-      listNum.pubedNum++
       common.scrollToTopSmoothly()
       pubed = reactive(getPubed())
+      pubed.num = pubed.list.length
+      listNum.pubedNum = pubed.list.length
+      //<!--mock
+      pubed.num++
+      listNum.pubedNum++
+      //-->
       viewItem.value = "pubed"
       common.showSuccess('取消修改成功')
     })
@@ -536,6 +531,20 @@ function isPubingCellClassName(cell: any) {
     return "no-vid"
   }
   return ""
+}
+
+function notPubedCellClick(row: any, column: any) {
+  if (row.vid !== undefined && (column.label === "封面" || column.label === "标题")) {
+    common.ToVideo(row.vid)
+  }
+
+}
+
+function notPubedCellStyle(cell: any) {
+  if (notPubed.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
+    return { cursor: "pointer" }
+  }
+  return {}
 }
 
 function getVideo(id: number): Video {
@@ -619,16 +628,6 @@ function beforeEditWindowClose(done: Function) {
   } else {
     done()
   }
-}
-
-function previewVideo(url: string) {
-  previewVideoUrl.value = url
-  previewVideoWindowVisible.value = true
-}
-
-function beforePVWindowClose(done: Function) {
-  previewVideoUrl.value = "" //不清除url会导致在video元素被销毁后仍然可以通过按键播放
-  done()
 }
 
 function openCoverUpload() {
@@ -754,27 +753,6 @@ function modifyVideo() {
 
   common.showSuccess("修改成功")
 }
-
-function convertRegionName(code: string): string {
-  switch (code) {
-    case "anime": {
-      return "番剧"
-    }
-    case "game": {
-      return "游戏"
-    }
-    case "music": {
-      return "音乐"
-    }
-    case "tech": {
-      return "科技"
-    }
-    case "other": {
-      return "其它"
-    }
-  }
-  return "未知"
-}
 </script>
 
 <style scoped>
@@ -788,16 +766,6 @@ function convertRegionName(code: string): string {
   cursor: not-allowed;
   background-color: #c8c9cc;
   border-color: #c8c9cc;
-}
-
-.v-container .modify-info {
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-
-.v-container .modify-info>div:not(:last-child) {
-  margin-bottom: 10px;
 }
 
 .v-container .page-container {
@@ -919,20 +887,6 @@ function convertRegionName(code: string): string {
 
 .v-container .el-image {
   vertical-align: top;
-}
-
-.preview-video video {
-  width: 100%;
-  border-radius: 10px;
-  vertical-align: top;
-}
-
-.preview-video .el-dialog__header {
-  display: none;
-}
-
-.preview-video .el-dialog__body {
-  padding: 0;
 }
 
 .v-container .no-vid .el-table__expand-icon {

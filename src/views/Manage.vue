@@ -14,11 +14,11 @@
           <span class="iconfont el-icon-home"></span>
           <span class="span">首页</span>
         </el-menu-item>
-        <el-menu-item index="/manage/review">
+        <el-menu-item index="/manage/review/video">
           <span class="iconfont el-icon-review"></span>
           <span class="span">审批</span>
         </el-menu-item>
-        <el-menu-item index="/manage/feedback">
+        <el-menu-item index="/manage/feedback/msg">
           <span class="iconfont el-icon-feedback"></span>
           <span class="span">反馈</span>
         </el-menu-item>

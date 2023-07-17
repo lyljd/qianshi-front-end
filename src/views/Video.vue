@@ -274,9 +274,7 @@
         <textarea id="intro-textarea" class="introduction" rows="1" readonly>{{ video.intro || "-" }}</textarea>
         <div v-show="!moreStatus && isMore" class="more-container"><span @click="setIntroFull" class="more">展开更多</span></div>
         <div v-show="moreStatus" class="more-container"><span @click="setIntroUnFull" class="more">收起</span></div>
-        <div id="tag-row" class="tag-row">
-          <el-tag class="tag" v-for="(tag) in video.tags" type="info" round>{{ tag }}</el-tag>
-        </div>
+        <VideoTag :tags="video.tags" style="margin-top: 20px;"></VideoTag>
       </el-card>
 
       <CommentArea :vAuthorUid=" video.author.uid " :vid=" video.vid " :data=" video.comment "></CommentArea>
@@ -390,6 +388,7 @@
 import VideoCard from '../components/VideoCard.vue'
 import Advertisement from '../components/Advertisement.vue'
 import CommentArea from '../components/CommentArea.vue'
+import VideoTag from "../components/VideoTag.vue"
 import * as common from "../common"
 import mockVideo from "../mock/video.json"
 import { ElMessage } from 'element-plus'
@@ -1685,18 +1684,6 @@ function seeLater(vid: number) {
 
 .introduction:focus {
   outline: none;
-}
-
-.tag-row {
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.tag {
-  cursor: pointer;
-  font-size: 14px;
 }
 </style>
 

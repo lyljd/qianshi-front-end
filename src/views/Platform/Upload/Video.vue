@@ -18,7 +18,7 @@
       <div>
         <span class="notice"><span style="color: red;">*</span>视频：</span>
         <el-button :disabled="videoUploadPercent !== 0 || video.videoUrl === ''"
-          @click="previewVideo(video.videoUrl)">预览</el-button>
+          @click="store.openPVWindow(video.videoUrl)">预览</el-button>
         <el-button :disabled="videoUploadPercent !== 0" @click="openVideoUpload">重新上传</el-button>
       </div>
       <el-progress v-show="videoUploadPercent !== 0" :percentage="videoUploadPercent" class="prg" :stroke-width="10" />
@@ -96,11 +96,6 @@
       </div>
     </div>
   </div>
-
-  <el-dialog v-model="previewVideoWindowVisible" :custom-class="'preview-video'" :before-close="beforePVWindowClose"
-    destroy-on-close align-center>
-    <video volume="0.5" controls :src="previewVideoUrl"></video>
-  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -142,18 +137,6 @@ let coverUploadPercent = ref(0)
 let videoUploadPercent = ref(0)
 let newTagInputValue = ref("")
 let newTagInputVisible = ref(false)
-let previewVideoWindowVisible = ref(false)
-let previewVideoUrl = ref("")
-
-function previewVideo(url: string) {
-  previewVideoUrl.value = url
-  previewVideoWindowVisible.value = true
-}
-
-function beforePVWindowClose(done: Function) {
-  previewVideoUrl.value = "" //不清除url会导致在video元素被销毁后仍然可以通过按键播放
-  done()
-}
 
 function openCoverUpload() {
   if (coverUploadPercent.value !== 0) {
@@ -380,19 +363,5 @@ function uploadVideo() {
 
 .v-container .el-image {
   vertical-align: top;
-}
-
-.preview-video video {
-  width: 100%;
-  border-radius: 10px;
-  vertical-align: top;
-}
-
-.preview-video .el-dialog__header {
-  display: none;
-}
-
-.preview-video .el-dialog__body {
-  padding: 0;
 }
 </style>

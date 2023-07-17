@@ -14,6 +14,8 @@
     </div>
 
     <FeedbackSubmissionWindow></FeedbackSubmissionWindow>
+
+    <PreviewVideoWindow></PreviewVideoWindow>
   </div>
 
   <div v-else>
@@ -24,6 +26,7 @@
 <script setup lang="ts">
 import TopMenuBar from "./components/TopMenuBar.vue"
 import FeedbackSubmissionWindow from "./components/FeedbackSubmissionWindow.vue"
+import PreviewVideoWindow from "./components/PreviewVideoWindow.vue"
 import * as common from "./common"
 import { useStore } from "./store"
 

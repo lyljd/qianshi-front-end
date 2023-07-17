@@ -23,11 +23,17 @@
               <span class="iconfont el-icon-review icon"></span>
               审批
             </div>
-            <el-button @click="pushToNewPage('/manage/review')">前往处理</el-button>
+            <el-button v-if="hi.review.video !== 0 || hi.review.read !== 0 || hi.review.title !== 0"
+              @click="processReview">前往处理</el-button>
           </div>
         </template>
-        <div class="row"><span class="highlight">{{ hi.review.video }}</span>个<span class="normallight">视频</span>待处理</div>
-        <div class="row"><span class="highlight">{{ hi.review.read }}</span>个<span class="normallight">专栏</span>待处理</div>
+        <div v-if="hi.review.video !== 0" class="row"><span class="highlight">{{ hi.review.video }}</span>个<span
+            class="normallight">视频</span>待处理</div>
+        <div v-if="hi.review.read !== 0" class="row"><span class="highlight">{{ hi.review.read }}</span>个<span
+            class="normallight">专栏</span>待处理</div>
+        <div v-if="hi.review.title !== 0" class="row"><span class="highlight">{{ hi.review.title }}</span>个<span
+            class="normallight">个人认证</span>待处理</div>
+        <div v-if="hi.review.video === 0 && hi.review.read === 0 && hi.review.title === 0" class="row free">暂无待处理的审批</div>
       </el-card>
 
       <el-card style="width: calc(50% - 10px);">
@@ -37,15 +43,18 @@
               <span class="iconfont el-icon-feedback icon"></span>
               反馈
             </div>
-            <el-button @click="pushToNewPage('/manage/feedback')">前往处理</el-button>
+            <el-button v-if="hi.feedback.msg !== 0 || hi.feedback.appeal !== 0 || hi.feedback.report !== 0"
+              @click="processFeedback">前往处理</el-button>
           </div>
         </template>
-        <div class="row"><span class="highlight">{{ hi.feedback.inSiteMessage }}</span>个<span
-            class="normallight">站内留言</span>待处理</div>
-        <div class="row"><span class="highlight">{{ hi.feedback.videoAppeal }}</span>个<span
-            class="normallight">视频申诉</span>待处理</div>
-        <div class="row"><span class="highlight">{{ hi.feedback.report }}</span>个<span class="normallight">举报</span>待处理
-        </div>
+        <div v-if="hi.feedback.msg !== 0" class="row"><span class="highlight">{{ hi.feedback.msg
+        }}</span>个<span class="normallight">站内留言</span>待处理</div>
+        <div v-if="hi.feedback.appeal !== 0" class="row"><span class="highlight">{{ hi.feedback.appeal
+        }}</span>个<span class="normallight">申诉</span>待处理</div>
+        <div v-if="hi.feedback.report !== 0" class="row"><span class="highlight">{{ hi.feedback.report }}</span>个<span
+            class="normallight">举报</span>待处理</div>
+        <div v-if="hi.feedback.msg === 0 && hi.feedback.appeal === 0 && hi.feedback.report === 0" class="row free">
+          暂无待处理的反馈</div>
       </el-card>
     </div>
 
@@ -91,10 +100,11 @@ type HomeInfo = {
   review: {
     video: number,
     read: number,
+    title: number,
   },
   feedback: {
-    inSiteMessage: number,
-    videoAppeal: number,
+    msg: number,
+    appeal: number,
     report: number,
   },
   statistic: {
@@ -126,12 +136,13 @@ function getCurTimePeriod() {
 function getHomeInfo(): HomeInfo {
   return {
     review: {
-      video: 3,
+      video: 2,
       read: 0,
+      title: 2,
     },
     feedback: {
-      inSiteMessage: 1,
-      videoAppeal: 0,
+      msg: 0,
+      appeal: 0,
       report: 0,
     },
     statistic: {
@@ -145,6 +156,26 @@ function getHomeInfo(): HomeInfo {
 
 function pushToNewPage(url: string) {
   router.push(url)
+}
+
+function processReview() {
+  if (hi.review.video !== 0) {
+    pushToNewPage("/manage/review/video")
+  } else if (hi.review.read !== 0) {
+    pushToNewPage("/manage/review/read")
+  } else if (hi.review.title !== 0) {
+    pushToNewPage("/manage/review/title")
+  }
+}
+
+function processFeedback() {
+  if (hi.feedback.msg !== 0) {
+    pushToNewPage("/manage/feedback/msg")
+  } else if (hi.feedback.appeal !== 0) {
+    pushToNewPage("/manage/feedback/appeal")
+  } else if (hi.feedback.report !== 0) {
+    pushToNewPage("/manage/feedback/report")
+  }
 }
 </script>
 
@@ -187,6 +218,10 @@ function pushToNewPage(url: string) {
 
 .m-container .normallight {
   color: #909399;
+}
+
+.m-container .free {
+  color: #c8c9cc;
 }
 
 .avatar-container {

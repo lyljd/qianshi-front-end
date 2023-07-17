@@ -7,8 +7,9 @@
       "coverUrl": "../../public/cover/7.jpeg",
       "applyTime": 1685836580156,
       "processTime": 1685838580156,
-      "reason": "站内存在相同视频",
-      "appealStatus": false
+      "reason": "修改内容与视频不符",
+      "appealStatus": false,
+      "vid": 8
     },
     {
       "id": 2,
@@ -16,7 +17,7 @@
       "coverUrl": "../../public/cover/6.jpeg",
       "applyTime": 1686846580156,
       "processTime": 1686848580156,
-      "reason": "内含引战内容",
+      "reason": "站内存在相同视频",
       "appealStatus": true
     }
   ]

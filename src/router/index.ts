@@ -91,8 +91,27 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/Manage.vue"),
     children: [
       { path: "/manage", component: () => import("../views/Manage/Home.vue") },
-      { path: "/manage/review", component: () => import("../views/Manage/Review.vue") },
-      { path: "/manage/feedback", component: () => import("../views/Manage/Feedback.vue") },
+
+      {
+        path: "/manage/review/video",
+        component: () => import("../views/Manage/Review.vue"),
+        children: [
+          { path: "/manage/review/video", component: () => import("../views/Manage/Review/Video.vue") },
+          { path: "/manage/review/read", component: () => import("../views/Manage/Review/Read.vue") },
+          { path: "/manage/review/title", component: () => import("../views/Manage/Review/Title.vue") },
+        ]
+      },
+
+      {
+        path: "/manage/feedback/video",
+        component: () => import("../views/Manage/Feedback.vue"),
+        children: [
+          { path: "/manage/feedback/msg", component: () => import("../views/Manage/Feedback/Msg.vue") },
+          { path: "/manage/feedback/appeal", component: () => import("../views/Manage/Feedback/Appeal.vue") },
+          { path: "/manage/feedback/report", component: () => import("../views/Manage/Feedback/Report.vue") },
+        ]
+      },
+
       { path: "/manage/content", component: () => import("../views/Manage/Content.vue") },
       { path: "/manage/user", component: () => import("../views/Manage/User.vue") },
       { path: "/manage/message", component: () => import("../views/Manage/Message.vue") },
