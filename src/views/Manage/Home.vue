@@ -85,9 +85,8 @@
           </div>
         </div>
       </template>
-      <el-button>查看日志</el-button>
-      <el-button>发送系统消息</el-button>
-      <el-button>设置轮播图</el-button>
+      <el-button @click="common.showInfo('敬请期待')">查看日志</el-button>
+      <el-button @click="store.openSMSWindow()">发送系统消息</el-button>
     </el-card>
   </div>
 </template>
@@ -95,6 +94,7 @@
 <script setup lang="ts">
 import { useStore } from "../../store"
 import { useRouter } from "vue-router"
+import * as common from "../../common"
 
 type HomeInfo = {
   review: {

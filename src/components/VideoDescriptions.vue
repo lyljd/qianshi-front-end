@@ -1,16 +1,16 @@
 <template>
   <div class="vd-container">
-    <el-descriptions :title="title" :column="1" border>
+    <el-descriptions v-if="data" :title="title" :column="1" border>
+      <template v-if="data.vid" #extra>
+        <el-button @click="common.ToVideo(data.vid)" type="primary" size="small">打开视频页</el-button>
+      </template>
+
       <el-descriptions-item label="标题">
         {{ data.title }}
       </el-descriptions-item>
 
       <el-descriptions-item label="封面">
-        <el-image class="cover" :src="data.coverUrl">
-          <template #error>
-            <div class="default">封面加载失败</div>
-          </template>
-        </el-image>
+        <Image :url="data.coverUrl" :w="210" :h="118.125" preview></Image>
       </el-descriptions-item>
 
       <el-descriptions-item label="视频">
@@ -33,16 +33,20 @@
         {{ data.empower ? "未经作者授权，禁止转载" : "" }}
       </el-descriptions-item>
     </el-descriptions>
+
+    <div v-else>视频已失效</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useStore } from "../store"
 import VideoTag from "../components/VideoTag.vue"
+import * as common from "../common"
 
 const store = useStore()
 
 type video = {
+  vid?: number,
   videoUrl: string,
   coverUrl: string,
   title: string,
@@ -52,10 +56,12 @@ type video = {
   empower: boolean
 }
 
-defineProps<{
+withDefaults(defineProps<{
   title: string
   data: video
-}>()
+}>(), {
+  title: "",
+})
 
 function convertRegionName(code: string): string {
   switch (code) {
@@ -79,17 +85,16 @@ function convertRegionName(code: string): string {
 }
 </script>
 
-<style scoped>
-.vd-container .cover {
-  width: 210px;
-  height: 118.125px;
-  border-radius: 5px;
-  vertical-align: top;
-}
-</style>
-
 <style>
-.el-descriptions__cell.el-descriptions__label.is-bordered-label {
+.vd-container .el-descriptions__cell.el-descriptions__label.is-bordered-label {
   width: 81px !important;
+}
+
+.vd-container .el-descriptions__header {
+  margin-bottom: 3px;
+}
+
+.vd-container .el-descriptions__title {
+  align-self: flex-end;
 }
 </style>

@@ -1,14 +1,10 @@
 <template>
-  <div v-if="rs.length > 0" class="rv-container">
+  <div v-if="rs.length > 0" class="fav-container">
     <el-card v-for="(r, idx) in rs">
       <template #header>
         <div class="header">
-          <span class="flex-center">作者：<span @click="common.ToUser(r.uid)" class="nickname">{{ r.nickname }}</span></span>
-          <span>申请时间：{{ common.timestampFormatterStandard(r.applyTime) }}</span>
-          <div class="flex-center">
-            <span>操作：{{ r.vid ? "修改" : "新发布" }}</span>
-            <el-button v-if="r.vid" @click="common.ToVideo(r.vid)" class="to-video" type="primary">原视频</el-button>
-          </div>
+          <span class="flex-center">用户：<span @click="common.ToUser(r.uid)" class="nickname">{{ r.nickname }}</span></span>
+          <span>反馈时间：{{ common.timestampFormatterStandard(r.feedbackTime) }}</span>
           <div>
             <el-button @click="pass(idx)" type="success">通过</el-button>
             <el-button @click="deny(idx)" type="danger">驳回</el-button>
@@ -17,23 +13,23 @@
       </template>
 
       <div class="body">
-        <VideoDescriptions class="vd" v-if="r.infoOld" title="原信息" :data="(r.infoOld as video)"></VideoDescriptions>
+        <FeedbackDescriptions :data="r.feedbackInfo" title="申诉信息"></FeedbackDescriptions>
 
-        <VideoDescriptions :class="{ vd: r.infoOld, vdFull: !r.infoOld }" :title="r.infoOld ? '新信息' : ''"
-          :data="(r.info)"></VideoDescriptions>
+        <VideoDescriptions style="margin-top: 20px;" :data="r.videoInfo" title="视频信息"></VideoDescriptions>
       </div>
     </el-card>
 
     <el-pagination :total="totalPageNum" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
       hide-on-single-page background layout="prev, pager, next" />
   </div>
-  <el-empty v-else description="暂无待处理的视频"></el-empty>
+  <el-empty v-else description="暂无待处理的视频申诉"></el-empty>
 </template>
 
 <script setup lang="ts">
-import Records from "../../../mock/manage/review/video.json"
-import * as common from "../../../common"
-import VideoDescriptions from "../../../components/VideoDescriptions.vue"
+import Records from "../../../../mock/manage/feedback/appeal/video.json"
+import * as common from "../../../../common"
+import FeedbackDescriptions from "../../../../components/FeedbackDescriptions.vue"
+import VideoDescriptions from "../../../../components/VideoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
 
 type video = {
@@ -48,16 +44,18 @@ type video = {
 
 type record = {
   id: number,
-  vid: number,
   uid: number,
   nickname: string,
-  applyTime: number,
-  infoOld?: video,
-  info: video
+  feedbackTime: number,
+  feedbackInfo: {
+    content: string,
+    imgs: string[],
+  },
+  videoInfo: video
 }
 
 const timestamp = Date.now()
-console.log(`review/video timestamp: ${timestamp}`)
+console.log(`feedback/appeal/video timestamp: ${timestamp}`)
 
 let rs: record[] = reactive(getRecords())
 
@@ -87,7 +85,7 @@ function pass(formIdx: number) {
 }
 
 function deny(formIdx: number) {
-  ElMessageBox.prompt('请输入驳回理由（可为空）', '视频审批', {
+  ElMessageBox.prompt('请输入驳回理由（可为空）', '视频申诉', {
     confirmButtonText: '提交',
     cancelButtonText: '取消',
     closeOnClickModal: false,
@@ -107,21 +105,21 @@ function deny(formIdx: number) {
 </script>
 
 <style scoped>
-.rv-container {
+.fav-container {
   cursor: default;
 }
 
-.rv-container>.el-card:not(:last-child) {
+.fav-container>.el-card:not(:last-child) {
   margin-bottom: 20px;
 }
 
-.rv-container .header {
+.fav-container .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.rv-container .header .nickname {
+.fav-container .header .nickname {
   color: #409EFF;
   text-decoration: underline;
   cursor: pointer;
@@ -129,22 +127,5 @@ function deny(formIdx: number) {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.rv-container .header .to-video {
-  margin-left: 5px;
-}
-
-.rv-container .body {
-  display: flex;
-  gap: 10px;
-}
-
-.rv-container .body .vd {
-  width: 50%;
-}
-
-.rv-container .body .vdFull {
-  width: 100%;
 }
 </style>

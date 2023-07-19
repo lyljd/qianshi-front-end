@@ -19,7 +19,7 @@
   </el-dialog>
 
   <el-dialog v-model="previewWindowVisible" custom-class="preview" align-center>
-    <img style="width: 100%;" :src="previewImgUrl">
+    <Image :url="previewImgUrl"></Image>
   </el-dialog>
 </template>
 
@@ -90,6 +90,8 @@ function submit() {
   // 1.向后端某一接口获取oss签名上传链接数组和文件名数组
   // 2.遍历该数组，每上传一张图片则修改一次upload的action（上传过程中禁止掉下方的按钮）
   // 3.向bzUrl(实际业务接口)发起post请求上传msg和文件名数组
+
+  console.log(msg.value)
 
   afterSuccDo()
   closeMainWindow()

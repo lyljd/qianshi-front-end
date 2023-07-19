@@ -5,8 +5,8 @@
       <div class="title">反馈</div>
     </div>
     <el-menu-item index="/manage/feedback/msg">站内留言</el-menu-item>
-    <el-menu-item index="/manage/feedback/appeal">申诉</el-menu-item>
-    <el-menu-item index="/manage/feedback/report">举报</el-menu-item>
+    <el-menu-item index="/manage/feedback/appeal/video">申诉</el-menu-item>
+    <el-menu-item index="/manage/feedback/report/video">举报</el-menu-item>
   </el-menu>
 
   <router-view></router-view>

@@ -1,8 +1,6 @@
 <template>
   <div :id="'container-' + data.cid" class="container">
-    <el-avatar @click="common.ToUser(data.uid)" class="avatar" size="40" :src="data.avatarUrl" @error="true">
-      <img src="../../public/default-avatar.png" />
-    </el-avatar>
+    <Image @click="common.ToUser(data.uid)" :url="data.avatarUrl" :w="40" :h="40" class="avatar" circle></Image>
     <div class="right">
       <div class="user-info">
         <span :class="{ nicknameVip: data.isVip }" @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname
@@ -46,7 +44,8 @@
             <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon title="删除评论后，评论下所有回复都会被删除，是否继续?"
               confirm-button-text="确认" cancel-button-text="取消">
               <template #reference>
-                <div v-if="isMe || isUp" class="comment-detele"><span class="iconfont el-icon-ashbin em-icon"></span>删除</div>
+                <div v-if="isMe || isUp" class="comment-detele"><span class="iconfont el-icon-ashbin em-icon"></span>删除
+                </div>
               </template>
             </el-popconfirm>
             <div @click="report" class="comment-report"><span class="iconfont el-icon-jubao em-icon"></span>举报</div>
@@ -228,7 +227,7 @@ function openLoginWindow() {
 
 function report() {
   extraPop.value.hide()
-  
+
   if (!isLogin.value) {
     openLoginWindow()
     return

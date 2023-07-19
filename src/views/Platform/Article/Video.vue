@@ -16,7 +16,9 @@
               </el-image>
             </template>
           </el-table-column>
+
           <el-table-column align="center" prop="title" label="标题" />
+
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div style="display: flex; flex-direction: column; ">
@@ -42,9 +44,10 @@
           border :data="isPubing.list">
           <el-table-column label="修改后信息" :width="100" type="expand">
             <template #default="props"> <!--数据默认懒加载-->
-              <VideoDescriptions title="" :data="(props.row.modifyInfo)"></VideoDescriptions>
+              <VideoDescriptions :data="(props.row.modifyInfo)"></VideoDescriptions>
             </template>
           </el-table-column>
+
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
               <el-image class="cover" :src="isPubing.list[scope.$index].coverUrl">
@@ -54,8 +57,11 @@
               </el-image>
             </template>
           </el-table-column>
+
           <el-table-column align="center" prop="title" label="标题" />
+
           <el-table-column align="center" :width="175" :formatter="tableTimeFormatter" prop="applyTime" label="申请时间" />
+          
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div style="display: flex; flex-direction: column; ">
@@ -90,15 +96,20 @@
               </el-image>
             </template>
           </el-table-column>
+
           <el-table-column align="center" prop="title" label="标题" />
+
           <el-table-column align="center" :width="175" label="申请/处理时间">
+
             <template #default="scope">
               <div>{{ tableTimeFormatter(null, null, notPubed.list[scope.$index].applyTime) }}</div>
               <div>/</div>
               <div>{{ tableTimeFormatter(null, null, notPubed.list[scope.$index].processTime) }}</div>
             </template>
           </el-table-column>
+
           <el-table-column align="center" prop="reason" label="原因" />
+          
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div style="display: flex; flex-direction: column; ">

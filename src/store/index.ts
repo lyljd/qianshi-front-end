@@ -15,6 +15,7 @@ export const useStore = defineStore("qianshi", {
     openLoginWindow: () => { },
     openFSWindow: (title: string, bzUrl: string, placeholder?: string, failMsg?: string, succMsg?: string, afterSuccDo?: Function) => { },
     openPVWindow: (videoUrl: string) => { },
+    openSMSWindow: (openParameter?: { afterSuccDo?: Function, to?: string[] }) => { },
     setPlatformCurTitle: (_: string) => { },
     setMeCurTitle: (_: string) => { },
     setUploadItem: (_: string) => { },

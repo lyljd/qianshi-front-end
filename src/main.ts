@@ -10,6 +10,7 @@ import './assets/iconfont/iconfont.css'
 import './assets/iconfont/iconfont.js'
 import 'animate.css'
 import { useStore } from "./store"
+import Image from "./components/Image.vue"
 
 const app = createApp(App)
 const store = useStore()
@@ -17,6 +18,7 @@ const store = useStore()
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
+app.component('Image', Image)
 app.use(ElementPlus)
 app.use(router)
 app.mount('#app')

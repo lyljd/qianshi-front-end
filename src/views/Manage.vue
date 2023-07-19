@@ -10,38 +10,47 @@
           <div>后台管理</div>
           <div @click="common.ToNewPage('/')" class="open-main-web">打开主站</div>
         </div>
+
         <el-menu-item index="/manage">
           <span class="iconfont el-icon-home"></span>
           <span class="span">首页</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/review/video">
           <span class="iconfont el-icon-review"></span>
           <span class="span">审批</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/feedback/msg">
           <span class="iconfont el-icon-feedback"></span>
           <span class="span">反馈</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/content">
           <span class="iconfont el-icon-content"></span>
           <span class="span">内容</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/user">
           <span class="iconfont el-icon-people"></span>
           <span class="span">用户</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/message">
           <span class="iconfont el-icon-message"></span>
           <span class="span">消息</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/power">
           <span class="iconfont el-icon-key"></span>
           <span class="span">权限</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/operation">
           <span class="iconfont el-icon-yunying"></span>
           <span class="span">运营</span>
         </el-menu-item>
+
         <el-menu-item index="/manage/statistic">
           <span class="iconfont el-icon-statistic"></span>
           <span class="span">统计</span>
@@ -54,7 +63,10 @@
         <router-view></router-view>
       </el-main>
     </el-container>
+
+    <SysMsgSendWindow></SysMsgSendWindow>
   </el-container>
+
   <NotFound v-else></NotFound>
 </template>
 
@@ -62,6 +74,7 @@
 import NotFound from './404.vue'
 import * as common from "../common"
 import { useStore } from "../store"
+import SysMsgSendWindow from "../components/SysMsgSendWindow.vue"
 
 type UserInfo = {
   nickname: string,
@@ -82,11 +95,6 @@ function getCurUserInfo(): UserInfo {
 </script>
 
 <style scoped>
-.container {
-  width: 100vw;
-  height: 100vh;
-}
-
 .container .page-title {
   height: 83px;
   border-bottom: 1px solid #dcdfe6;

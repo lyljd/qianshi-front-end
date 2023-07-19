@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "uid": 1,
+    "nickname": "Bonnenult",
+    "reportTime": 1689576192517,
+    "reportInfo": {
+      "content": "这条弹幕涉及剧透",
+      "imgs": []
+    },
+    "danmuInfo": {
+      "cid": 1,
+      "vid": 7,
+      "uid": 2,
+      "nickname": "惜缘灬冷颜",
+      "time": 1689512390183,
+      "content": "xx会在xx时候死掉"
+    }
+  },
+  {
+    "id": 2,
+    "uid": 1,
+    "nickname": "Bonnenult",
+    "reportTime": 1689578232517,
+    "reportInfo": {
+      "content": "这条弹幕涉及视频作者人身攻击",
+      "imgs": [
+        "../../../壁纸/锁屏2.jpg"
+      ]
+    },
+    "danmuInfo": {
+      "cid": 2,
+      "vid": 8,
+      "uid": 2,
+      "nickname": "惜缘灬冷颜",
+      "time": 1612376396727,
+      "content": "这个视频是做的真烂"
+    }
+  }
+]

@@ -103,12 +103,30 @@ const routes: Array<RouteRecordRaw> = [
       },
 
       {
-        path: "/manage/feedback/video",
+        path: "/manage/feedback/msg",
         component: () => import("../views/Manage/Feedback.vue"),
         children: [
           { path: "/manage/feedback/msg", component: () => import("../views/Manage/Feedback/Msg.vue") },
-          { path: "/manage/feedback/appeal", component: () => import("../views/Manage/Feedback/Appeal.vue") },
-          { path: "/manage/feedback/report", component: () => import("../views/Manage/Feedback/Report.vue") },
+
+          {
+            path: "/manage/feedback/appeal/video",
+            component: () => import("../views/Manage/Feedback/Appeal.vue"),
+            children: [
+              { path: "/manage/feedback/appeal/video", component: () => import("../views/Manage/Feedback/Appeal/Video.vue") },
+              { path: "/manage/feedback/appeal/read", component: () => import("../views/Manage/Feedback/Appeal/Read.vue") },
+            ]
+          },
+
+          {
+            path: "/manage/feedback/report/video",
+            component: () => import("../views/Manage/Feedback/Report.vue"),
+            children: [
+              { path: "/manage/feedback/report/video", component: () => import("../views/Manage/Feedback/Report/Video.vue") },
+              { path: "/manage/feedback/report/read", component: () => import("../views/Manage/Feedback/Report/Read.vue") },
+              { path: "/manage/feedback/report/comment", component: () => import("../views/Manage/Feedback/Report/Comment.vue") },
+              { path: "/manage/feedback/report/danmu", component: () => import("../views/Manage/Feedback/Report/Danmu.vue") },
+            ]
+          },
         ]
       },
 

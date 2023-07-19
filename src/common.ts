@@ -4,6 +4,10 @@ function isMobile(): boolean {
   return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i) === null
 }
 
+function isSafari(): boolean {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+}
+
 function isLogin(): boolean {
   return localStorage.getItem("token") !== null && localStorage.getItem("token") !== ""
 }
@@ -174,6 +178,10 @@ function ToVideo(vid: number) {
   window.open(`/v/${vid}`, "_blank")
 }
 
+function ToRead(vid: number) {
+  window.open(`/r/${vid}`, "_blank")
+}
+
 function ToUser(uid: number) {
   window.open(`/u/${uid}`, "_blank")
 }
@@ -245,6 +253,7 @@ function cancelSeeLater(vid: number) {
 
 export {
   isMobile,
+  isSafari,
   isLogin,
   isMe,
   btnCD,
@@ -258,6 +267,7 @@ export {
   timestampFormatterRich,
   timestampFormatterRichExcludeHM,
   ToVideo,
+  ToRead,
   ToUser,
   ToNewPage,
   ToDeveloper,
