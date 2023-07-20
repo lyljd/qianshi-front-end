@@ -86,7 +86,6 @@
         </div>
       </template>
       <el-button @click="common.showInfo('敬请期待')">查看日志</el-button>
-      <el-button @click="store.openSMSWindow()">发送系统消息</el-button>
     </el-card>
   </div>
 </template>

@@ -1,18 +1,11 @@
 <template>
   <div class="container">
-    <div class="rotation-chart">
-      <Carousel></Carousel>
+    <div v-if="data.carousel.length > 0" class="rotation-chart">
+      <Carousel :data="data.carousel" :height="420"></Carousel>
     </div>
 
-    <div class="recommendation">
-      <div class="row">
-        <VideoCard :data="mockVideo" class="mr10 mb10"></VideoCard>
-        <VideoCard :data="mockVideo" class="ml10 mb10"></VideoCard>
-      </div>
-      <div class="row">
-        <VideoCard :data="mockVideo" class="mr10 mt10"></VideoCard>
-        <VideoCard :data="mockVideo" class="ml10 mt10"></VideoCard>
-      </div>
+    <div :style="{ width: data.carousel.length > 0 ? '560px' : '' }" class="recommendation">
+      <VideoCard v-for=" in data.carousel.length > 0 ? 4 : 8" :data="mockVideo"></VideoCard>
     </div>
 
     <VideoRefreshBtn></VideoRefreshBtn>
@@ -42,6 +35,17 @@ import VideoCard from "../components/VideoCard.vue"
 import VideoRefreshBtn from "../components/VideoRefreshBtn.vue"
 import Advertisement from "../components/Advertisement.vue"
 import DeveloperInfo from "../components/DeveloperInfo.vue"
+import Data from "../mock/index.json"
+
+type carousel = {
+  title?: string,
+  imgUrl: string,
+  linkUrl?: string,
+}
+
+type data = {
+  carousel: carousel[],
+}
 
 const mockVideo = {
   "vid": 1,
@@ -55,6 +59,12 @@ const mockVideo = {
   "nickname": "Bonnenult",
   "date": 1685599556000
 } //TODO
+
+let data = ref(getData())
+
+function getData(): data {
+  return Data
+}
 </script>
 
 <style scoped>
@@ -70,17 +80,14 @@ const mockVideo = {
 .rotation-chart {
   width: 560px;
   height: 100%;
-  margin-right: 10px;
+  margin-right: 20px;
 }
 
 .recommendation {
-  width: 560px;
   height: 100%;
-  margin-left: 10px;
-}
-
-.row {
   display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .advertisement {

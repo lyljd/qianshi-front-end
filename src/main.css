@@ -59,6 +59,12 @@ a {
   align-items: center;
 }
 
+.flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .blue {
   color: #409EFF
 }

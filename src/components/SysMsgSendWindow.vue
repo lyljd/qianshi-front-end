@@ -11,7 +11,7 @@
       <el-color-picker v-model="color" :predefine="predefinedmColors" />
 
       <el-button @click="setLink" id="link" style="margin-left: 20px;">设置链接</el-button>
-      <el-input v-model="link" placeholder="支持但不推荐相对路径；绝对路径请加http(s)前缀" />
+      <el-input v-model="link" placeholder="支持但不推荐相对路径，绝对路径请加http(s)前缀" />
     </div>
     <div class="tip">1.选择颜色或输入链接；2.选中要设置的内容（注意不要将生成的style给选中了）；3.点击设置按钮</div>
 

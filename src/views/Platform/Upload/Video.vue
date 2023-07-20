@@ -28,24 +28,9 @@
 
       <div>
         <span class="notice"><span style="color: red;">*</span>封面：</span>
-        <div v-show="video.coverUrl === ''" @click="openCoverUpload" class="upload-cover-div">
-          <span style="font-size: 42px;">+</span>
-          <span>上传封面</span>
-        </div>
-
-        <el-image v-show="video.coverUrl !== ''" :style="coverUploadPercent === 0 ? '' : 'opacity: 0.25;'"
-          @click="openCoverUpload" class="cover" :src="video.coverUrl"></el-image>
-
-        <el-progress v-show="coverUploadPercent !== 0" :percentage="coverUploadPercent" :width="118.125"
-          style="position: absolute; margin-left: 130.9375px;" type="circle" />
-
-        <el-upload :before-upload="beforeCoverUpload" :on-remove="onCoverUploadRemove" :on-change="onCoverUploadChange"
-          :on-progress="onCoverUploadProgress" :on-success="onCoverUploadSuccess" :on-error="onCoverUploadError"
-          ref="coverUpload" action="/api/resource/cover" accept="image/*" v-show="false"></el-upload>
+        <ImageUpload @recImgUrl="recImgUrl" @recImgUploadPercent="recImgUploadPercent" uploadUrl="/api/resource/cover">
+        </ImageUpload>
       </div>
-      <span class="tip">上传的图片大小上限为10M</span>
-      <br>
-      <span class="tip">推荐使用16:9的图片</span>
 
       <div>
         <span class="notice"><span style="color: red;">*</span>标题：</span>
@@ -102,6 +87,8 @@
 import { UploadInstance, ElSelect, ElInput } from 'element-plus'
 import { useStore } from "../../../store"
 import * as common from "../../../common"
+import ImageUpload from "../../../components/ImageUpload.vue"
+import { useRouter } from "vue-router"
 
 type Video = {
   videoUrl: string,
@@ -114,8 +101,8 @@ type Video = {
 }
 
 const store = useStore()
+const router = useRouter()
 
-const coverUpload = ref<UploadInstance>()
 const videoUpload = ref<UploadInstance>()
 const newTagInput = ref<HTMLInputElement>()
 const titleInput = ref<InstanceType<typeof ElInput>>()
@@ -129,25 +116,23 @@ let video: Video = reactive({
   intro: "",
   empower: false
 })
-let preCoverId = ref(0)
 let preVideoId = ref(0)
-let preCoverUrl = ref("")
 let preVideoUrl = ref("")
-let coverUploadPercent = ref(0)
 let videoUploadPercent = ref(0)
+let coverUploadPercent = ref(0)
 let newTagInputValue = ref("")
 let newTagInputVisible = ref(false)
 
-function openCoverUpload() {
-  if (coverUploadPercent.value !== 0) {
-    common.showError("图片上传时禁止修改")
-    return
-  }
-  coverUpload.value?.$el.querySelector('input').click()
-}
-
 function openVideoUpload() {
   videoUpload.value?.$el.querySelector('input').click()
+}
+
+function recImgUploadPercent(imgUploadPercent: number) {
+  coverUploadPercent.value = imgUploadPercent
+}
+
+function recImgUrl(imgUrl: string) {
+  video.coverUrl = imgUrl
 }
 
 function beforeVideoUpload(rawFile: any) {
@@ -160,20 +145,8 @@ function beforeVideoUpload(rawFile: any) {
   return true
 }
 
-function beforeCoverUpload(rawFile: any) {
-  if (rawFile.size / 1024 / 1024 > 10) {
-    common.showError("上传的图片大小不能超过10M")
-    return false
-  }
-  return true
-}
-
 function onVideoUploadRemove() {
   video.videoUrl = preVideoUrl.value
-}
-
-function onCoverUploadRemove() {
-  video.coverUrl = preCoverUrl.value
 }
 
 function onVideoUploadChange(file: any) {
@@ -183,19 +156,8 @@ function onVideoUploadChange(file: any) {
   }
 }
 
-function onCoverUploadChange(file: any) {
-  if (file.uid !== preCoverId.value) {
-    preCoverId.value = file.uid
-    video.coverUrl = URL.createObjectURL(file.raw)
-  }
-}
-
 function onVideoUploadProgress(event: any) {
   videoUploadPercent.value = Math.floor(event.percent)
-}
-
-function onCoverUploadProgress(event: any) {
-  coverUploadPercent.value = Math.floor(event.percent)
 }
 
 function onVideoUploadSuccess() {
@@ -204,21 +166,10 @@ function onVideoUploadSuccess() {
   common.showSuccess("视频上传成功")
 }
 
-function onCoverUploadSuccess() {
-  preCoverUrl.value = video.coverUrl
-  coverUploadPercent.value = 0
-}
-
 function onVideoUploadError() {
   video.videoUrl = preVideoUrl.value
   videoUploadPercent.value = 0
   common.showError("视频上传失败")
-}
-
-function onCoverUploadError() {
-  video.coverUrl = preCoverUrl.value
-  coverUploadPercent.value = 0
-  common.showError("图片上传失败")
 }
 
 function delTag(tag: string) {
@@ -256,7 +207,12 @@ function uploadVideo() {
     return
   }
 
+  //TODO api请求
+  console.log(video)
+
+  store.switchAsk = false
   common.showSuccess("投稿成功")
+  router.push("../article/video")
 }
 </script>
 
