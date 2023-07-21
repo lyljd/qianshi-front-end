@@ -20,5 +20,10 @@ export const useStore = defineStore("qianshi", {
     setMeCurTitle: (_: string) => { },
     setUploadItem: (_: string) => { },
     getUploadItem: (): string => { return "" },
+    setManegeItemIndex: (idx: number, index: string) => {},
+    setManegeReviewItemIndex: (idx: number, index: string) => {},
+    setManegeFeedbackItemIndex: (idx: number, index: string) => {},
+    feedbackItemIndexPreSetIdx: 0,
+    feedbackItemIndexPreSetValue: "",
   }),
 })

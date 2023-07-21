@@ -1,62 +1,24 @@
 <template>
   <el-container v-if="store.mui.power >= 1" class="container">
-    <el-aside width="150px">
-      <el-menu :default-active=$route.path router="true">
-        <div class="page-title">
-          <div class="logo">
-            <img class="icon" src="../../public/favicon.png">
-            <span>浅时</span>
+    <el-affix>
+      <el-aside width="150px">
+        <el-menu @select="select" :default-active=$route.path router="true">
+          <div class="page-title">
+            <div class="logo">
+              <img class="icon" src="../../public/favicon.png">
+              <span>浅时</span>
+            </div>
+            <div>后台管理</div>
+            <div @click="common.ToNewPage('/')" class="open-main-web">打开主站</div>
           </div>
-          <div>后台管理</div>
-          <div @click="common.ToNewPage('/')" class="open-main-web">打开主站</div>
-        </div>
 
-        <el-menu-item index="/manage">
-          <span class="iconfont el-icon-home"></span>
-          <span class="span">首页</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/review/video">
-          <span class="iconfont el-icon-review"></span>
-          <span class="span">审批</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/feedback/msg">
-          <span class="iconfont el-icon-feedback"></span>
-          <span class="span">反馈</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/content">
-          <span class="iconfont el-icon-content"></span>
-          <span class="span">内容</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/user">
-          <span class="iconfont el-icon-people"></span>
-          <span class="span">用户</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/message">
-          <span class="iconfont el-icon-message"></span>
-          <span class="span">消息</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/power">
-          <span class="iconfont el-icon-key"></span>
-          <span class="span">权限</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/operation">
-          <span class="iconfont el-icon-yunying"></span>
-          <span class="span">运营</span>
-        </el-menu-item>
-
-        <el-menu-item index="/manage/statistic">
-          <span class="iconfont el-icon-statistic"></span>
-          <span class="span">统计</span>
-        </el-menu-item>
-      </el-menu>
-    </el-aside>
+          <el-menu-item v-for="i in item" :index="i.index">
+            <span :class="`el-icon-${i.icon}`" class="iconfont"></span>
+            <span class="span">{{ i.content }}</span>
+          </el-menu-item>
+        </el-menu>
+      </el-aside>
+    </el-affix>
 
     <el-container>
       <el-main>
@@ -84,6 +46,37 @@ type UserInfo = {
 
 const store = useStore()
 store.mui = getCurUserInfo()
+store.setManegeItemIndex = setItemIndex
+
+let item = reactive([
+  { index: "/manage", content: "首页", icon: "home" },
+  { index: "/manage/review/video", content: "审批", icon: "review" },
+  { index: "/manage/feedback/msg", content: "反馈", icon: "feedback" },
+  { index: "/manage/user", content: "用户", icon: "people" },
+  { index: "/manage/power", content: "权限", icon: "key" },
+  { index: "/manage/statistic", content: "统计", icon: "statistic" }
+])
+
+function select(index: string) {
+  let si = index.split("/")
+  let cIdx = 0
+  switch (si[si.length - 2]) {
+    case "appeal": {
+      cIdx = 1
+      break
+    }
+    case "report": {
+      cIdx = 2
+      break
+    }
+  }
+  store.feedbackItemIndexPreSetIdx = cIdx
+  store.feedbackItemIndexPreSetValue = index
+}
+
+function setItemIndex(idx: number, index: string) {
+  item[idx].index = index
+}
 
 function getCurUserInfo(): UserInfo {
   return {
@@ -160,5 +153,6 @@ function getCurUserInfo(): UserInfo {
 
 .container .el-aside {
   border-right: 1px solid #dcdfe6;
+  height: 100vh;
 }
 </style>

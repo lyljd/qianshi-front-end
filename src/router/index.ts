@@ -78,8 +78,6 @@ const routes: Array<RouteRecordRaw> = [
           { path: "/platform/article/read", component: () => import("../views/Platform/Article/Read.vue") },
         ]
       },
-
-      { path: "/platform/appeal", component: () => import("../views/Platform/Appeal.vue") },
     ],
     meta: {
       title: '创作中心',
@@ -130,11 +128,8 @@ const routes: Array<RouteRecordRaw> = [
         ]
       },
 
-      { path: "/manage/content", component: () => import("../views/Manage/Content.vue") },
       { path: "/manage/user", component: () => import("../views/Manage/User.vue") },
-      { path: "/manage/message", component: () => import("../views/Manage/Message.vue") },
       { path: "/manage/power", component: () => import("../views/Manage/Power.vue") },
-      { path: "/manage/operation", component: () => import("../views/Manage/Operation.vue") },
       { path: "/manage/statistic", component: () => import("../views/Manage/Statistic.vue") },
     ],
     meta: {

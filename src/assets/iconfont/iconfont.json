@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "435944",
+      "name": "日志",
+      "font_class": "log",
+      "unicode": "e7c3",
+      "unicode_decimal": 59331
+    },
+    {
+      "icon_id": "12343297",
+      "name": "view_carousel_24px_rounded",
+      "font_class": "carousel",
+      "unicode": "ed45",
+      "unicode_decimal": 60741
+    },
+    {
       "icon_id": "3977806",
       "name": "按IP统计",
       "font_class": "ip",
@@ -32,13 +46,6 @@
       "font_class": "statistic",
       "unicode": "e626",
       "unicode_decimal": 58918
-    },
-    {
-      "icon_id": "1382581",
-      "name": "运营",
-      "font_class": "yunying",
-      "unicode": "e657",
-      "unicode_decimal": 58967
     },
     {
       "icon_id": "528264",

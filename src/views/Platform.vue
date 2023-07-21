@@ -15,10 +15,6 @@
           <span class="iconfont el-icon-article"></span>
           <span class="span">稿件管理</span>
         </el-menu-item>
-        <el-menu-item index="/platform/appeal">
-          <span class="iconfont el-icon-appeal"></span>
-          <span class="span">申诉管理</span>
-        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>

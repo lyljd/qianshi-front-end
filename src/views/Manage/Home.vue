@@ -85,8 +85,23 @@
           </div>
         </div>
       </template>
-      <el-button @click="common.showInfo('敬请期待')">查看日志</el-button>
+      <el-button @click="common.showInfo('敬请期待')">
+        <span class="iconfont el-icon-log"></span>
+        <span>查看日志</span>
+      </el-button>
+
+      <el-button @click="store.openSMSWindow()">
+        <span class="iconfont el-icon-message"></span>
+        <span>发送系统消息</span>
+      </el-button>
+
+      <el-button @click="openSCWWindow">
+        <span class="iconfont el-icon-carousel"></span>
+        <span>设置轮播图</span>
+      </el-button>
     </el-card>
+
+    <SetCarouselWindow @rec="rfc"></SetCarouselWindow>
   </div>
 </template>
 
@@ -94,6 +109,7 @@
 import { useStore } from "../../store"
 import { useRouter } from "vue-router"
 import * as common from "../../common"
+import SetCarouselWindow from "../../components/SetCarouselWindow.vue"
 
 type HomeInfo = {
   review: {
@@ -118,6 +134,11 @@ const store = useStore()
 const router = useRouter()
 
 let hi: HomeInfo = reactive(getHomeInfo())
+let openSCWWindow = ref<Function>()
+
+function rfc(f: Function) {
+  openSCWWindow.value = f
+}
 
 function getCurTimePeriod() {
   let curHour = new Date().getHours()

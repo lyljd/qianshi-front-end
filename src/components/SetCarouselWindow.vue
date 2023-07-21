@@ -60,7 +60,7 @@
 import Carousel from "../components/Carousel.vue"
 import ImageUpload from "../components/ImageUpload.vue"
 import * as common from "../common"
-import Data from "../mock/manage/operation.json"
+import Data from "../mock/manage/carousel.json"
 import { useStore } from "../store"
 import { ElMessageBox } from 'element-plus'
 
