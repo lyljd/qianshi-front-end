@@ -120,6 +120,11 @@ function timestampFormatterStandardExcludeSecondOrAndYear(timestamp: number): st
   return ret
 } //返回日期格式：月-日 时:分；若时间戳不为今年，则为：年-月-日 时:分
 
+function timestampFormatterYMD(timestamp: number): string {
+  let d = timestampFormatter(timestamp)
+  return `${d.year}-${add0(d.month)}-${add0(d.day)}`
+} //返回日期格式：年-月-日
+
 function timestampFormatterAgo(timestamp: number): string {
   let dts = timestamp
   let dnts = Date.now()
@@ -251,6 +256,25 @@ function cancelSeeLater(vid: number) {
   showSuccess("取消成功")
 }
 
+function expToLevel(exp: number): number {
+  if (exp < 350) {
+    return 1
+  }
+  if (exp < 1500) {
+    return 2
+  }
+  if (exp < 4500) {
+    return 3
+  }
+  if (exp < 9000) {
+    return 4
+  }
+  if (exp < 18000) {
+    return 5
+  }
+  return 6
+}
+
 export {
   isMobile,
   isSafari,
@@ -263,6 +287,7 @@ export {
   timestampFormatter,
   timestampFormatterStandard,
   timestampFormatterStandardExcludeSecondOrAndYear,
+  timestampFormatterYMD,
   timestampFormatterAgo,
   timestampFormatterRich,
   timestampFormatterRichExcludeHM,
@@ -278,4 +303,5 @@ export {
   showInfo,
   seeLater,
   cancelSeeLater,
+  expToLevel,
 }

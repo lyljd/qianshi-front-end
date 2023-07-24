@@ -102,6 +102,7 @@ type Video = {
 
 const store = useStore()
 const router = useRouter()
+store.setPlatformItemIndex(1, location.pathname)
 
 const videoUpload = ref<UploadInstance>()
 const newTagInput = ref<HTMLInputElement>()

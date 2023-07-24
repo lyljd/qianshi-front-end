@@ -3,7 +3,11 @@
 </template>
 
 <script setup lang="ts">
+import { useStore } from "../../../../store"
 
+const store = useStore()
+store.setManegeItemIndex(2, location.pathname)
+store.setManegeFeedbackItemIndex(2, location.pathname)
 </script>
 
 <style scoped>

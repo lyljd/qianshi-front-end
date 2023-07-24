@@ -19,15 +19,12 @@ import { useStore } from "../../../store"
 
 const router = useRouter()
 const store = useStore()
+store.setManegeItemIndex(2, location.pathname)
 
 let viewItem = ref(location.href.split('/').pop())
 
 function tabChange(tbn: string) {
   router.push(tbn)
-
-  let index = location.pathname.substring(0, location.pathname.lastIndexOf('/')+1)+tbn
-  store.setManegeFeedbackItemIndex(2, index)
-  store.setManegeItemIndex(2, index)
 }
 </script>
 

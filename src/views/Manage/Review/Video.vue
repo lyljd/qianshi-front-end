@@ -35,6 +35,7 @@ import Records from "../../../mock/manage/review/video.json"
 import * as common from "../../../common"
 import VideoDescriptions from "../../../components/VideoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
+import { useStore } from "../../../store"
 
 type video = {
   videoUrl: string,
@@ -48,7 +49,7 @@ type video = {
 
 type record = {
   id: number,
-  vid: number,
+  vid?: number,
   uid: number,
   nickname: string,
   applyTime: number,
@@ -58,6 +59,9 @@ type record = {
 
 const timestamp = Date.now()
 console.log(`review/video timestamp: ${timestamp}`)
+
+const store = useStore()
+store.setManegeItemIndex(1, location.pathname)
 
 let rs: record[] = reactive(getRecords())
 

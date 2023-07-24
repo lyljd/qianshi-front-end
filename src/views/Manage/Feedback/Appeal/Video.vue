@@ -31,6 +31,7 @@ import * as common from "../../../../common"
 import FeedbackDescriptions from "../../../../components/FeedbackDescriptions.vue"
 import VideoDescriptions from "../../../../components/VideoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
+import { useStore } from "../../../../store"
 
 type video = {
   videoUrl: string,
@@ -56,6 +57,10 @@ type record = {
 
 const timestamp = Date.now()
 console.log(`feedback/appeal/video timestamp: ${timestamp}`)
+
+const store = useStore()
+store.setManegeItemIndex(2, location.pathname)
+store.setManegeFeedbackItemIndex(1, location.pathname)
 
 let rs: record[] = reactive(getRecords())
 

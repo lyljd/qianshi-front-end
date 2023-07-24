@@ -25,6 +25,7 @@
 import Form from "../../../mock/manage/review/title.json"
 import * as common from "../../../common"
 import { ElMessageBox } from 'element-plus'
+import { useStore } from "../../../store"
 
 type record = {
   id: number,
@@ -37,6 +38,9 @@ type record = {
 
 const timestamp = Date.now()
 console.log(`review/title timestamp: ${timestamp}`)
+
+const store = useStore()
+store.setManegeItemIndex(1, location.pathname)
 
 let form: record[] = reactive(getForm())
 

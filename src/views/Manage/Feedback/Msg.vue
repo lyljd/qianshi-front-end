@@ -41,6 +41,7 @@ type record = {
 }
 
 const store = useStore()
+store.setManegeItemIndex(2, location.pathname)
 
 const timestamp = Date.now()
 console.log(`feedback/msg timestamp: ${timestamp}`)

@@ -3,20 +3,14 @@
     <el-aside width="150px">
       <el-menu :default-active=$route.path router="true">
         <div class="page-title">创作中心</div>
-        <el-menu-item index="/platform">
-          <span class="iconfont el-icon-home"></span>
-          <span class="span">首页</span>
-        </el-menu-item>
-        <el-menu-item index="/platform/upload/video">
-          <span class="iconfont el-icon-upload"></span>
-          <span class="span">投稿</span>
-        </el-menu-item>
-        <el-menu-item index="/platform/article/video">
-          <span class="iconfont el-icon-article"></span>
-          <span class="span">稿件管理</span>
+
+        <el-menu-item v-for="i in item" :index="i.index">
+          <span :class="`el-icon-${i.icon}`" class="iconfont"></span>
+          <span class="span">{{ i.content }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
+
     <el-container>
       <el-header>{{ curTitle }}</el-header>
       <el-main>
@@ -24,6 +18,7 @@
       </el-main>
     </el-container>
   </el-container>
+
   <NotFound v-else></NotFound>
 </template>
 
@@ -31,10 +26,22 @@
 import { useStore } from "../store"
 import NotFound from './404.vue'
 
+let item = ref([
+  { index: "/platform", content: "首页", icon: "home" },
+  { index: "/platform/upload/video", content: "投稿", icon: "upload" },
+  { index: "/platform/article/video", content: "稿件管理", icon: "article" },
+])
+
 const store = useStore()
 store.setPlatformCurTitle = setCurTitle
+store.setPlatformItemIndex = setItemIndex
 
 let curTitle = ref("")
+
+function setItemIndex(idx: number, index: string) {
+  item.value[idx].index = index
+  console.log(idx, index, item)
+}
 
 function setCurTitle(title: string) {
   curTitle.value = title

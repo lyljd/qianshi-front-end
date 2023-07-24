@@ -1,5 +1,5 @@
 <template>
-  <el-menu @select="select" class="menu" mode="horizontal" :default-active="$route.path" :ellipsis="false" router="true">
+  <el-menu class="menu" mode="horizontal" :default-active="$route.path" :ellipsis="false" router="true">
     <div class="logo">
       <span v-if="icon !== ''" :class="`el-icon-${icon}`" class="iconfont icon"></span>
       <div class="title">{{ title }}</div>
@@ -11,29 +11,17 @@
 </template>
 
 <script lang="ts" setup>
-import { useStore } from "../store"
-
-const store = useStore()
-
-const data = withDefaults(defineProps<{
+withDefaults(defineProps<{
   title: string,
   icon: string,
   item: {
     index: string,
     content: string,
   }[],
-  menuIdx: number
 }>(), {
   icon: "",
   item: <any>[],
-  menuIdx: -1,
 })
-
-function select(index: string) {
-  if (data.menuIdx > -1) {
-    store.setManegeItemIndex(data.menuIdx, index)
-  }
-}
 </script>
 
 <style>

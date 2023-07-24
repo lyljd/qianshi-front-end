@@ -1,0 +1,137 @@
+<template>
+  <el-dialog v-model="mainWindowVisible" title="IP封禁" custom-class="ipb" :close-on-click-modal="false"
+    :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
+
+    <div class="body">
+      <el-card style="max-height: 50vh; overflow: scroll;">
+        <div v-if="data.length > 0" v-for="(_, idx) in data" class="row">
+          <el-input :id="`ip-input-${idx}`" v-model="data[idx]" />
+          <el-button @click="delItem(idx)" type="danger" tabindex="-1"><span
+              class="iconfont el-icon-ashbin"></span></el-button>
+        </div>
+        <div v-else class="flex-center" style="color: #909399;">暂无ip</div>
+      </el-card>
+    </div>
+
+    <template #footer>
+      <div style="float: left;">
+        <el-button @click="newItem" type="success" tabindex="-1">新增一项</el-button>
+      </div>
+      <el-button @click="closeMainWindow" tabindex="-1">取消</el-button>
+      <el-button @click="save" type="primary" tabindex="-1">保存</el-button>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import * as common from "../common"
+import Data from "../mock/manage/ipban.json"
+import { useStore } from "../store"
+import { ElMessageBox } from 'element-plus'
+
+const stf = defineEmits<{
+  (cen: "open", f: Function): void
+}>()
+stf('open', openMainWindow)
+
+const store = useStore()
+
+const ipRegex = /^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+
+let mainWindowVisible = ref(false)
+let data: string[] = reactive([])
+let dataCopy: string[] = reactive([])
+
+function setData() {
+  //TODO api请求
+  data = reactive([...Data])
+  dataCopy = reactive([...Data])
+}
+
+function openMainWindow() {
+  setData()
+  mainWindowVisible.value = true
+
+  watch(data, newVal => {
+    if (newVal !== dataCopy) {
+      store.switchAsk = true
+    } else {
+      store.switchAsk = false
+    }
+  })
+}
+
+function closeMainWindow() {
+  if (store.switchAsk) {
+    ElMessageBox.confirm(
+      '你所做的更改可能未保存',
+      '关闭窗口？',
+      {
+        confirmButtonText: '关闭',
+        cancelButtonText: '取消',
+        type: 'warning',
+        autofocus: false,
+        showClose: false,
+      }
+    ).then(() => {
+      store.switchAsk = false
+      mainWindowVisible.value = false
+    }).catch(() => { })
+  } else {
+    mainWindowVisible.value = false
+  }
+}
+
+function save() {
+  for (let i = 0; i < data.length; i++) {
+    if (!ipRegex.test(data[i])) {
+      (document.getElementById(`ip-input-${i}`) as HTMLElement).focus()
+      common.showError(`"${data[i]}"不符合ip格式`)
+      return
+    }
+  }
+
+  //api请求
+  console.log(data)
+
+  store.switchAsk = false
+  closeMainWindow()
+  common.showSuccess("保存成功")
+}
+
+function newItem() {
+  data.push("")
+  setTimeout(() => {
+    const iis = document.getElementsByClassName("el-input__inner")
+    const e = iis[iis.length - 1] as HTMLElement
+    e.focus()
+  }, 0) //这里0是有意义的
+}
+
+function delItem(idx: number) {
+  data.splice(idx, 1)
+}
+</script>
+
+<style scoped>
+.row {
+  display: flex;
+}
+
+.row:not(:last-child) {
+  margin-bottom: 10px;
+}
+</style>
+
+<style>
+.ipb .el-dialog__header,
+.ipb .el-dialog__footer {
+  padding: 20px;
+  margin: 0;
+}
+
+.ipb .el-dialog__body {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+</style>

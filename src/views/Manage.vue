@@ -2,7 +2,7 @@
   <el-container v-if="store.mui.power >= 1" class="container">
     <el-affix>
       <el-aside width="150px">
-        <el-menu @select="select" :default-active=$route.path router="true">
+        <el-menu :default-active=$route.path router="true">
           <div class="page-title">
             <div class="logo">
               <img class="icon" src="../../public/favicon.png">
@@ -56,23 +56,6 @@ let item = reactive([
   { index: "/manage/power", content: "权限", icon: "key" },
   { index: "/manage/statistic", content: "统计", icon: "statistic" }
 ])
-
-function select(index: string) {
-  let si = index.split("/")
-  let cIdx = 0
-  switch (si[si.length - 2]) {
-    case "appeal": {
-      cIdx = 1
-      break
-    }
-    case "report": {
-      cIdx = 2
-      break
-    }
-  }
-  store.feedbackItemIndexPreSetIdx = cIdx
-  store.feedbackItemIndexPreSetValue = index
-}
 
 function setItemIndex(idx: number, index: string) {
   item[idx].index = index

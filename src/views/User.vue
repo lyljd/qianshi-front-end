@@ -29,12 +29,7 @@
     </el-drawer>
 
     <div class="info">
-      <div id="avatar-container">
-        <div id="replace-avatar" @click="replaceAvatar" class="replace-avatar">更换头像</div>
-        <el-avatar :size="60" :src="user.avatarUrl" @error="true">
-          <img src="../../public/default-avatar.png" />
-        </el-avatar>
-      </div>
+      <Image @recImgUrl="recImgUrl" uploadUrl="/api/resource/avatar" :url="user.avatarUrl" w="60" h="60" circle></Image>
 
       <div class="right">
         <div class="head-row">
@@ -155,8 +150,6 @@ store.$subscribe((_, state) => {
 })
 
 const signatureInput = ref<HTMLInputElement>()
-let avatarContainer: HTMLDivElement
-let replaceAvatarEle: HTMLDivElement
 
 let isMe = ref(common.isMe(user.uid))
 let searchKey = ref("")
@@ -164,20 +157,13 @@ let oldTopImgNo = ref(1)
 let replaceTopImgDrawerShow = ref(false)
 let focuBtnInnerText = ref(!user.isFocu ? "关注" : "已关注")
 
-onMounted(() => {
-  avatarContainer = document.getElementById("avatar-container") as HTMLDivElement
-  replaceAvatarEle = document.getElementById("replace-avatar") as HTMLDivElement
-
-  avatarContainer.addEventListener("mouseenter", function () {
-    replaceAvatarEle.style.display = "flex"
-  })
-  avatarContainer.addEventListener("mouseleave", function () {
-    replaceAvatarEle.style.display = "none"
-  })
-})
-
 function getUser() {
   return mockUser //TODO
+}
+
+function recImgUrl(imgUrl: string) {
+  //TODO api请求
+  console.log(imgUrl)
 }
 
 function saveSignature() {
@@ -187,10 +173,6 @@ function saveSignature() {
     signatureInput.value!.focus()
     signatureInput.value!.setSelectionRange(50, user.signature.length)
   }
-}
-
-function replaceAvatar() {
-  alert("更换头像")
 }
 
 function replaceTopImg() {
@@ -276,21 +258,6 @@ function openLoginWindow() {
   width: calc(50% - 16px);
   border: 3px solid #909399;
   border-radius: 10px;
-}
-
-.replace-avatar {
-  width: 60px;
-  height: 60px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border-radius: 50%;
-  position: absolute;
-  z-index: 99999;
-  font-size: 12px;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  display: none;
 }
 
 .info {

@@ -285,6 +285,7 @@ type Video = {
 }
 
 const store = useStore()
+store.setPlatformItemIndex(2, location.pathname)
 
 const videoUpload = ref<UploadInstance>()
 const newTagInput = ref<HTMLInputElement>()

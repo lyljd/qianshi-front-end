@@ -71,9 +71,9 @@ type carousel = {
 }
 
 const stf = defineEmits<{
-  (cen: "rec", f: Function): void
+  (cen: "open", f: Function): void
 }>()
-stf('rec', openMainWindow)
+stf('open', openMainWindow)
 
 const store = useStore()
 

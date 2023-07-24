@@ -85,11 +85,6 @@
           </div>
         </div>
       </template>
-      <el-button @click="common.showInfo('敬请期待')">
-        <span class="iconfont el-icon-log"></span>
-        <span>查看日志</span>
-      </el-button>
-
       <el-button @click="store.openSMSWindow()">
         <span class="iconfont el-icon-message"></span>
         <span>发送系统消息</span>
@@ -99,9 +94,21 @@
         <span class="iconfont el-icon-carousel"></span>
         <span>设置轮播图</span>
       </el-button>
+
+      <el-button @click="openIPBanWindow">
+        <span class="iconfont el-icon-ip"></span>
+        <span>IP封禁</span>
+      </el-button>
+
+      <el-button @click="common.showInfo('敬请期待')">
+        <span class="iconfont el-icon-log"></span>
+        <span>查看日志</span>
+      </el-button>
     </el-card>
 
-    <SetCarouselWindow @rec="rfc"></SetCarouselWindow>
+    <SetCarouselWindow @open="getOpenSCWWindow"></SetCarouselWindow>
+
+    <IPBanlWindow @open="getIPBanWindow"></IPBanlWindow>
   </div>
 </template>
 
@@ -110,6 +117,7 @@ import { useStore } from "../../store"
 import { useRouter } from "vue-router"
 import * as common from "../../common"
 import SetCarouselWindow from "../../components/SetCarouselWindow.vue"
+import IPBanlWindow from "../../components/IPBanWindow.vue"
 
 type HomeInfo = {
   review: {
@@ -135,9 +143,14 @@ const router = useRouter()
 
 let hi: HomeInfo = reactive(getHomeInfo())
 let openSCWWindow = ref<Function>()
+let openIPBanWindow = ref<Function>()
 
-function rfc(f: Function) {
+function getOpenSCWWindow(f: Function) {
   openSCWWindow.value = f
+}
+
+function getIPBanWindow(f: Function) {
+  openIPBanWindow.value = f
 }
 
 function getCurTimePeriod() {

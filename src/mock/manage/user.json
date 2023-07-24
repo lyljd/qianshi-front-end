@@ -1,0 +1,23 @@
+{
+  "total": 2,
+  "data": [
+    {
+      "id": 1,
+      "nickname": "Bonnenult",
+      "isRestrict": false,
+      "isBan": false,
+      "coinNum": 233,
+      "exp": 20131,
+      "vipExpireDate": "20230823"
+    },
+    {
+      "id": 2,
+      "nickname": "惜缘灬冷颜",
+      "isRestrict": true,
+      "isBan": false,
+      "coinNum": 14,
+      "exp": 2345,
+      "vipExpireDate": ""
+    }
+  ]
+}
