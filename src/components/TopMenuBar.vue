@@ -188,7 +188,7 @@ let ahi: AvatarHoverInfo = reactive({
   "focuNum": 0,
   "fanNum": 0,
   "trendNum": 0,
-  "power": 5,
+  "power": 6,
 })
 let signinStatus = ref(true)
 
@@ -253,6 +253,7 @@ function logout() {
   avatarPop.value.hide()
   clearLoginStorage()
   store.isLogin = false
+  location.href = `/401?from=${location.pathname}`
 }
 
 function onAvatarPopShow() {
@@ -302,7 +303,8 @@ function toSearch() {
   background-color: transparent;
   position: fixed;
   top: 0px;
-  z-index: 2000; /* z-index不能大于2000，否则会造成遮罩层内出现顶部菜单栏 */
+  z-index: 2000;
+  /* z-index不能大于2000，否则会造成遮罩层内出现顶部菜单栏 */
 }
 
 .el-menu--horizontal>.el-menu-item.is-active,

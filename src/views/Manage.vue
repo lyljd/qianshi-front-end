@@ -1,5 +1,5 @@
 <template>
-  <el-container v-if="store.mui.power >= 1" class="container">
+  <el-container class="container">
     <el-affix>
       <el-aside width="150px">
         <el-menu :default-active=$route.path router="true">
@@ -12,7 +12,7 @@
             <div @click="common.ToNewPage('/')" class="open-main-web">打开主站</div>
           </div>
 
-          <el-menu-item v-for="i in item" :index="i.index">
+          <el-menu-item v-for="i in item.filter(i => store.mui.power >= i.power)" :index="i.index">
             <span :class="`el-icon-${i.icon}`" class="iconfont"></span>
             <span class="span">{{ i.content }}</span>
           </el-menu-item>
@@ -28,45 +28,27 @@
 
     <SysMsgSendWindow></SysMsgSendWindow>
   </el-container>
-
-  <NotFound v-else></NotFound>
 </template>
 
 <script setup lang="ts">
-import NotFound from './404.vue'
 import * as common from "../common"
 import { useStore } from "../store"
 import SysMsgSendWindow from "../components/SysMsgSendWindow.vue"
 
-type UserInfo = {
-  nickname: string,
-  coverUrl: string,
-  power: number
-}
-
 const store = useStore()
-store.mui = getCurUserInfo()
 store.setManegeItemIndex = setItemIndex
 
 let item = reactive([
-  { index: "/manage", content: "首页", icon: "home" },
-  { index: "/manage/review/video", content: "审批", icon: "review" },
-  { index: "/manage/feedback/msg", content: "反馈", icon: "feedback" },
-  { index: "/manage/user", content: "用户", icon: "people" },
-  { index: "/manage/power", content: "权限", icon: "key" },
-  { index: "/manage/statistic", content: "统计", icon: "statistic" }
+  { index: "/manage", content: "首页", icon: "home", power: 1 },
+  { index: "/manage/review/video", content: "审批", icon: "review", power: 1 },
+  { index: "/manage/feedback/appeal/video", content: "反馈", icon: "feedback", power: 1 },
+  { index: "/manage/user", content: "用户", icon: "people", power: 4 },
+  { index: "/manage/power", content: "权限", icon: "key", power: 3 },
+  { index: "/manage/statistic", content: "统计", icon: "statistic", power: 5 }
 ])
 
 function setItemIndex(idx: number, index: string) {
   item[idx].index = index
-}
-
-function getCurUserInfo(): UserInfo {
-  return {
-    nickname: "Bonnenult",
-    coverUrl: "../../public/avatar.jpeg",
-    power: 5,
-  }
 }
 </script>
 

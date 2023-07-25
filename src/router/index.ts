@@ -20,7 +20,25 @@ const routes: Array<RouteRecordRaw> = [
 
   {
     path: "/:pathMatch(.*)",
-    component: () => import("../views/404.vue")
+    component: () => import("../views/Error.vue")
+  },
+
+  {
+    path: "/401",
+    component: () => import("../views/Error.vue"),
+    meta: {
+      code: 401,
+      msg: "未登录",
+    }
+  },
+
+  {
+    path: "/403",
+    component: () => import("../views/Error.vue"),
+    meta: {
+      code: 403,
+      msg: "拒绝服务",
+    }
   },
 
   {
@@ -52,6 +70,7 @@ const routes: Array<RouteRecordRaw> = [
     ],
     meta: {
       title: '个人中心',
+      needLogin: true,
     }
   },
 
@@ -81,6 +100,7 @@ const routes: Array<RouteRecordRaw> = [
     ],
     meta: {
       title: '创作中心',
+      needLogin: true,
     }
   },
 
@@ -94,18 +114,16 @@ const routes: Array<RouteRecordRaw> = [
         path: "/manage/review/video",
         component: () => import("../views/Manage/Review.vue"),
         children: [
-          { path: "/manage/review/video", component: () => import("../views/Manage/Review/Video.vue") },
-          { path: "/manage/review/read", component: () => import("../views/Manage/Review/Read.vue") },
-          { path: "/manage/review/title", component: () => import("../views/Manage/Review/Title.vue") },
+          { path: "/manage/review/video", component: () => import("../views/Manage/Review/Video.vue"), meta: { power: 1 } },
+          { path: "/manage/review/read", component: () => import("../views/Manage/Review/Read.vue"), meta: { power: 1 } },
+          { path: "/manage/review/title", component: () => import("../views/Manage/Review/Title.vue"), meta: { power: 2 } },
         ]
       },
 
       {
-        path: "/manage/feedback/msg",
+        path: "/manage/feedback/appeal/video",
         component: () => import("../views/Manage/Feedback.vue"),
         children: [
-          { path: "/manage/feedback/msg", component: () => import("../views/Manage/Feedback/Msg.vue") },
-
           {
             path: "/manage/feedback/appeal/video",
             component: () => import("../views/Manage/Feedback/Appeal.vue"),
@@ -115,6 +133,8 @@ const routes: Array<RouteRecordRaw> = [
             ]
           },
 
+          { path: "/manage/feedback/msg", component: () => import("../views/Manage/Feedback/Msg.vue"), meta: { power: 2 } },
+
           {
             path: "/manage/feedback/report/video",
             component: () => import("../views/Manage/Feedback/Report.vue"),
@@ -123,17 +143,35 @@ const routes: Array<RouteRecordRaw> = [
               { path: "/manage/feedback/report/read", component: () => import("../views/Manage/Feedback/Report/Read.vue") },
               { path: "/manage/feedback/report/comment", component: () => import("../views/Manage/Feedback/Report/Comment.vue") },
               { path: "/manage/feedback/report/danmu", component: () => import("../views/Manage/Feedback/Report/Danmu.vue") },
-            ]
+            ],
+            meta: {
+              power: 3,
+            }
           },
         ]
       },
 
-      { path: "/manage/user", component: () => import("../views/Manage/User.vue") },
-      { path: "/manage/power", component: () => import("../views/Manage/Power.vue") },
-      { path: "/manage/statistic", component: () => import("../views/Manage/Statistic.vue") },
+      { path: "/manage/user", component: () => import("../views/Manage/User.vue"), meta: { power: 4 } },
+
+      {
+        path: "/manage/power",
+        component: () => import("../views/Manage/Power.vue"),
+        children: [
+          { path: "/manage/power", component: () => import("../views/Manage/Power/All.vue") },
+          { path: "/manage/power/admin", component: () => import("../views/Manage/Power/Admin.vue") },
+          { path: "/manage/power/table", component: () => import("../views/Manage/Power/Table.vue") },
+        ],
+        meta: {
+          power: 3,
+        }
+      },
+
+      { path: "/manage/statistic", component: () => import("../views/Manage/Statistic.vue"), meta: { power: 5 } },
     ],
     meta: {
       title: '后台管理',
+      needLogin: true,
+      power: 1,
     }
   },
 ]
@@ -164,7 +202,36 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+type UserInfo = {
+  id: number,
+  nickname: string,
+  coverUrl: string,
+  power: number
+}
+function getCurUserInfo(): UserInfo {
+  return {
+    id: 1,
+    nickname: "Bonnenult",
+    coverUrl: "../../public/avatar.jpeg",
+    power: 6,
+  }
+}
+
 function beforeEach(to: any, from: any, next: Function) {
+  if (store.mui.power === -1) {
+    store.mui = getCurUserInfo()
+  }
+
+  if (to.meta.needLogin && !store.isLogin) {
+    next(`/401?from=${to.href}`)
+    return
+  }
+
+  if (to.meta.power && store.mui.power < to.meta.power) {
+    next("/403")
+    return
+  }
+
   if (to.meta.title) {
     document.title = to.meta.title + " - 浅时"
   } else {

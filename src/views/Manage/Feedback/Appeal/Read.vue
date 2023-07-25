@@ -7,7 +7,7 @@ import { useStore } from "../../../../store"
 
 const store = useStore()
 store.setManegeItemIndex(2, location.pathname)
-store.setManegeFeedbackItemIndex(1, location.pathname)
+store.setManegeFeedbackItemIndex(0, location.pathname)
 </script>
 
 <style scoped>

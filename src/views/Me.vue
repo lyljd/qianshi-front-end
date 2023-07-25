@@ -1,5 +1,5 @@
 <template>
-  <el-container v-if="store.isLogin" class="container">
+  <el-container class="container">
     <el-aside width="150px">
       <el-menu :default-active=$route.path router="true">
         <div class="page-title">个人中心</div>
@@ -28,12 +28,10 @@
       </el-main>
     </el-container>
   </el-container>
-  <NotFound v-else></NotFound>
 </template>
 
 <script setup lang="ts">
 import { useStore } from "../store"
-import NotFound from './404.vue'
 
 const store = useStore()
 store.setMeCurTitle = setCurTitle

@@ -281,6 +281,7 @@ export {
   isLogin,
   isMe,
   btnCD,
+  toFixed,
   numFormatterW,
   videoTimeFormatterHMS,
   add0,

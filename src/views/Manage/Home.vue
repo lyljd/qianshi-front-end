@@ -47,10 +47,10 @@
               @click="processFeedback">前往处理</el-button>
           </div>
         </template>
-        <div v-if="hi.feedback.msg !== 0" class="row"><span class="highlight">{{ hi.feedback.msg
-        }}</span>个<span class="normallight">站内留言</span>待处理</div>
         <div v-if="hi.feedback.appeal !== 0" class="row"><span class="highlight">{{ hi.feedback.appeal
         }}</span>个<span class="normallight">申诉</span>待处理</div>
+        <div v-if="hi.feedback.msg !== 0" class="row"><span class="highlight">{{ hi.feedback.msg
+        }}</span>个<span class="normallight">站内留言</span>待处理</div>
         <div v-if="hi.feedback.report !== 0" class="row"><span class="highlight">{{ hi.feedback.report }}</span>个<span
             class="normallight">举报</span>待处理</div>
         <div v-if="hi.feedback.msg === 0 && hi.feedback.appeal === 0 && hi.feedback.report === 0" class="row free">
@@ -58,7 +58,7 @@
       </el-card>
     </div>
 
-    <el-card>
+    <el-card v-if="store.mui.power >= 5">
       <template #header>
         <div class="card-header">
           <div class="title">
@@ -68,15 +68,16 @@
           <el-button @click="pushToNewPage('/manage/statistic')">查看更多</el-button>
         </div>
       </template>
-      <div class="row">总访问量：<span class="highlight">{{ hi.statistic.total }}</span></div>
-      <div class="row">独立访问量：<span class="highlight">{{ hi.statistic.unique }}</span>（用户：<span
+      <div class="row">总访问量：<span class="highlight">{{ hi.statistic!.total }}</span></div>
+      <div class="row">独立访问量：<span class="highlight">{{ hi.statistic!.unique }}</span>（用户：<span
           class="highlight">49</span>，游客：<span class="highlight">8</span>）</div>
-      <div class="row"><span class="normallight">视频</span>投稿量：<span class="highlight">{{ hi.statistic.video }}</span>
+      <div class="row"><span class="normallight">视频</span>投稿量：<span class="highlight">{{ hi.statistic!.video }}</span>
       </div>
-      <div class="row"><span class="normallight">专栏</span>投稿量：<span class="highlight">{{ hi.statistic.read }}</span></div>
+      <div class="row"><span class="normallight">专栏</span>投稿量：<span class="highlight">{{ hi.statistic!.read }}</span>
+      </div>
     </el-card>
 
-    <el-card>
+    <el-card v-if="store.mui.power >= 4">
       <template #header>
         <div class="card-header">
           <div class="title">
@@ -100,7 +101,7 @@
         <span>IP封禁</span>
       </el-button>
 
-      <el-button @click="common.showInfo('敬请期待')">
+      <el-button v-if="store.mui.power >= 5" @click="common.showInfo('敬请期待')">
         <span class="iconfont el-icon-log"></span>
         <span>查看日志</span>
       </el-button>
@@ -123,14 +124,14 @@ type HomeInfo = {
   review: {
     video: number,
     read: number,
-    title: number,
+    title?: number,
   },
   feedback: {
-    msg: number,
     appeal: number,
-    report: number,
+    msg?: number,
+    report?: number,
   },
-  statistic: {
+  statistic?: {
     total: number,
     unique: number,
     video: number,
@@ -174,8 +175,8 @@ function getHomeInfo(): HomeInfo {
       title: 2,
     },
     feedback: {
-      msg: 0,
       appeal: 0,
+      msg: 0,
       report: 0,
     },
     statistic: {
@@ -202,12 +203,12 @@ function processReview() {
 }
 
 function processFeedback() {
-  if (hi.feedback.msg !== 0) {
+  if (hi.feedback.appeal !== 0) {
+    pushToNewPage("/manage/feedback/appeal/video")
+  } else if (hi.feedback.msg !== 0) {
     pushToNewPage("/manage/feedback/msg")
-  } else if (hi.feedback.appeal !== 0) {
-    pushToNewPage("/manage/feedback/appeal")
   } else if (hi.feedback.report !== 0) {
-    pushToNewPage("/manage/feedback/report")
+    pushToNewPage("/manage/feedback/report/video")
   }
 }
 </script>

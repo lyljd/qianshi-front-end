@@ -44,6 +44,7 @@
 import * as common from "../common"
 import { ElMessage, ElNotification } from 'element-plus'
 import { useStore } from "../store"
+import { useRouter } from "vue-router"
 
 type LoginInfo = {
   uid: number,
@@ -58,6 +59,7 @@ defineExpose({
 })
 
 const store = useStore()
+const router = useRouter()
 
 const el = ref()
 const pl = ref()
@@ -161,6 +163,12 @@ function emailLogin() {
   let li = mockLogin()
   CB(li.avatarUrl)
   saveLoginInfo(li)
+
+  let index = location.href.lastIndexOf("from=")
+  if (index !== -1) {
+    router.replace(location.href.slice(index + 5))
+  }
+
   showLoginSuccess(li.nickname)
   vcode.value = ""
 }
@@ -184,6 +192,12 @@ function passwordLogin() {
   let li = mockLogin()
   CB(li.avatarUrl)
   saveLoginInfo(li)
+
+  let index = location.href.lastIndexOf("from=")
+  if (index !== -1) {
+    router.replace(location.href.slice(index + 5))
+  }
+
   showLoginSuccess(li.nickname)
   password.value = ""
 }

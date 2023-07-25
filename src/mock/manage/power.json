@@ -1,0 +1,29 @@
+{
+  "total": 3,
+  "data": [
+    {
+      "id": 1,
+      "nickname": "Bonnenult",
+      "power": 6
+    },
+    {
+      "id": 2,
+      "nickname": "惜缘灬冷颜",
+      "power": 0
+    },
+    {
+      "id": 3,
+      "nickname": "浅时",
+      "power": 5,
+      "initUser": {
+        "id": 1,
+        "nickname": "Bonnenult"
+      },
+      "adjustedUser": {
+        "id": 1,
+        "nickname": "Bonnenult"
+      },
+      "adjustedTime": 1690161998271
+    }
+  ]
+}

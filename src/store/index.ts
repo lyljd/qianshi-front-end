@@ -6,9 +6,10 @@ export const useStore = defineStore("qianshi", {
     switchAsk: false,
     topPath: '',
     mui: {
+      id: -1,
       nickname: '',
       coverUrl: '',
-      power: 0,
+      power: -1,
     }, //manage user info
 
     isLogin: common.isLogin(),

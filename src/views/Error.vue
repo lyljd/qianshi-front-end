@@ -1,17 +1,19 @@
 <template>
-  <div class="nf-container">
+  <div class="error-container">
     <span class="iconfont el-icon-cry ico"></span>
-    <span class="code">404</span>
-    <span class="msg">未找到页面</span>
+    <span class="code">{{ route.meta.code ? route.meta.code : 404 }}</span>
+    <span class="msg">{{ route.meta.msg ? route.meta.msg : "未找到页面" }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRoute } from "vue-router"
 
+const route = useRoute()
 </script>
 
 <style scoped>
-.nf-container {
+.error-container {
   width: 100%;
   height: calc(100vh - 93px);
   min-height: 480px;
@@ -21,16 +23,16 @@
   flex-direction: column;
 }
 
-.nf-container .ico {
+.error-container .ico {
   font-size: 250px;
   margin-bottom: -20px;
 }
 
-.nf-container .code {
+.error-container .code {
   font-size: 100px;
 }
 
-.nf-container .msg {
+.error-container .msg {
   font-size: 25px;
   color: #909399;
 }

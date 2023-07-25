@@ -1,0 +1,38 @@
+{
+  "total": 11451419,
+  "items": [
+    {
+      "label": "今日",
+      "total": 10,
+      "unique": {
+        "sum": 5176,
+        "user": 4302,
+        "guest": 874
+      },
+      "video": 23,
+      "read": 0
+    },
+    {
+      "label": "昨日",
+      "total": 1,
+      "unique": {
+        "sum": 4479,
+        "user": 3831,
+        "guest": 648
+      },
+      "video": 16,
+      "read": 0
+    },
+    {
+      "label": "本周",
+      "total": 67321,
+      "unique": {
+        "sum": 54197,
+        "user": 45762,
+        "guest": 8435
+      },
+      "video": 120,
+      "read": 0
+    }
+  ]
+}

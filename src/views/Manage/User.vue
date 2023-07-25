@@ -40,7 +40,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :width="330" label="操作">
+      <el-table-column :width="330" label="操作" align="center">
         <template #default="scope">
           <div class="flex-center" style="flex-wrap: wrap; gap: 5px;">
             <el-popconfirm @confirm="() => { restrict(scope.$index) }"
