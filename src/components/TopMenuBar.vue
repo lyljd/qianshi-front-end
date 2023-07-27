@@ -24,7 +24,7 @@
 
     <div class="search-bar">
       <el-input @keyup.enter.native="toSearch" id="search" v-model="searchKey" class="search" placeholder="搜索" clearable>
-        <template #prefix><el-icon style="cursor: pointer;">
+        <template #prefix><el-icon @click="toSearch" style="cursor: pointer;">
             <search />
           </el-icon></template>
       </el-input>
@@ -253,7 +253,9 @@ function logout() {
   avatarPop.value.hide()
   clearLoginStorage()
   store.isLogin = false
-  location.href = `/401?from=${location.pathname}`
+  if (route.meta.needLogin) {
+    location.href = `/401?from=${location.pathname}`
+  }
 }
 
 function onAvatarPopShow() {

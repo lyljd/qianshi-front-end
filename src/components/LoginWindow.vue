@@ -1,50 +1,52 @@
 <template>
-  <el-dialog v-model="dialogVisible" :width="480" :close-on-press-escape=false :close-on-click-modal=false
-    :align-center=true>
-    <div class="window">
+  <div class="lw-container">
+    <el-dialog @close="clearInput" v-model="dialogVisible" :width="480" :close-on-press-escape=false
+      :close-on-click-modal=false :align-center=true>
+      <el-tabs @tab-change="tabChange" v-model="option">
+        <el-tab-pane label="邮箱登录/注册" name="vcode">
+          <div class="input-box">
+            <div class="row">
+              <span class="tag">邮箱</span>
+              <el-input style="width: calc(100% - 57px - 135px);" v-model="email" placeholder="请输入邮箱" />
+              <el-button :disabled="!checkEmailValid()" @click="openCaptchaWindow" id="get-captcha-btn"
+                class="get-captcha-btn">获取验证码</el-button>
+            </div>
+            <div class="row">
+              <span class="tag">验证码</span>
+              <el-input @keyup.enter.native="login" class="input" maxlength="6" v-model="vcode" placeholder="请输入验证码" />
+            </div>
+          </div>
+        </el-tab-pane>
 
-      <div class="option-raw">
-        <strong ref="el" @click="switchEmailLogin" style="color: #409EFF; cursor: not-allowed;"
-          class="option">邮箱登录/注册</strong>
-        <span class="option-hr">｜</span>
-        <strong ref="pl" @click="switchPasswordLogin" class="option">密码登录</strong>
-      </div>
+        <el-tab-pane label="密码登录" name="password">
+          <div class="input-box">
+            <div class="row">
+              <span class="tag">邮箱</span>
+              <el-input class="input" v-model="email" placeholder="请输入邮箱" />
+            </div>
+            <div class="row">
+              <span class="tag">密码</span>
+              <el-input @keyup.enter.native="login" class="input" maxlength="20" type="password" show-password
+                v-model="password" placeholder="请输入密码" />
+            </div>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+      <template #footer>
+        <el-button @click="login" :disabled="!loginBtnCheck()" class="btn" type="primary">{{ btnText }}</el-button>
+      </template>
+    </el-dialog>
+  </div>
 
-      <div v-show="option" class="email-login">
-        <div class="input-container">
-          <span class="info">邮箱</span>
-          <span class="send-vcode-hr">｜</span>
-          <span class="send-vcode-span">获取验证码</span>
-          <el-input v-model="email" class="email" placeholder="请输入邮箱" />
-          <div style="border-top: 1px solid #c8c9cc;"></div>
-          <span class="info">验证码</span>
-          <el-input @keyup.enter.native="emailLogin" maxlength="6" v-model="vcode" class="vcode" placeholder="请输入验证码" />
-        </div>
-        <el-button id="emailLoginBtn" @click="emailLogin" :class="{ loginBtnDisable: email === '' || vcode === '' }"
-          class="login-btn" type="primary">登录/注册</el-button>
-      </div>
-
-      <div v-show="!option" class="password-login">
-        <div class="input-container">
-          <span class="info">邮箱</span>
-          <el-input v-model="email" class="email" placeholder="请输入邮箱" />
-          <div style="border-top: 1px solid #c8c9cc;"></div>
-          <span class="info">密码</span>
-          <el-input @keyup.enter.native="passwordLogin" v-model="password" class="password" type="password" show-password
-            placeholder="请输入密码" />
-        </div>
-        <el-button id="passwordLoginBtn" @click="passwordLogin"
-          :class="{ loginBtnDisable: email === '' || password === '' }" class="login-btn" type="primary">登录</el-button>
-      </div>
-    </div>
-  </el-dialog>
+  <CaptchaWindow ref="captchaWindow"></CaptchaWindow>
 </template>
 
 <script setup lang="ts">
 import * as common from "../common"
-import { ElMessage, ElNotification } from 'element-plus'
+import CaptchaWindow from "./CaptchaWindow.vue"
 import { useStore } from "../store"
 import { useRouter } from "vue-router"
+import { ElNotification } from 'element-plus'
 
 type LoginInfo = {
   uid: number,
@@ -61,74 +63,85 @@ defineExpose({
 const store = useStore()
 const router = useRouter()
 
-const el = ref()
-const pl = ref()
+const captchaWindow = ref<InstanceType<typeof CaptchaWindow>>()
 
-let CB: Function
 let dialogVisible = ref(false)
+let afterSuccDo: Function
+let option = ref("vcode")
+let btnText = ref("登录/注册")
 let email = ref("")
 let vcode = ref("")
 let password = ref("")
-let option = ref(true)
+let hasVerify = ref(false)
 
-function show(cb: Function) {
+function show(afterSuccDoP: Function) {
   dialogVisible.value = true
-  CB = cb
+  afterSuccDo = afterSuccDoP
 }
 
-function switchEmailLogin() {
-  option.value = true
-  el.value.style.color = "#409EFF"
-  pl.value.style.color = "#303133"
-  el.value.style.cursor = "not-allowed"
-  pl.value.style.cursor = "pointer"
+function tabChange(newTabName: string) {
+  switch (newTabName) {
+    case "vcode": {
+      btnText.value = "登录/注册"
+      break
+    }
+    case "password": {
+      btnText.value = "登录"
+      break
+    }
+  }
 }
 
-function switchPasswordLogin() {
-  option.value = false
-  pl.value.style.color = "#409EFF"
-  el.value.style.color = "#303133"
-  pl.value.style.cursor = "not-allowed"
-  el.value.style.cursor = "pointer"
+function openCaptchaWindow() {
+  captchaWindow.value?.show((cdTime: number) => {
+    let btn = document.getElementById("get-captcha-btn") as HTMLButtonElement
+    common.btnCD(btn, cdTime)
+    hasVerify.value = true
+    common.showSuccess("验证码已发送")
+  })
 }
 
-function verifyEmail() {
+function clearInput() {
+  vcode.value = ""
+  password.value = ""
+}
+
+function checkEmailValid(): boolean {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
   return emailRegex.test(email.value)
 }
 
-function verifyVcode() {
-  const vcodeRegex = /^\d{6}$/
+function checkVcodeValid(): boolean {
+  const vcodeRegex = /^[0-9]{6}$/
   return vcodeRegex.test(vcode.value)
 }
 
-function verifyPassword() {
-  return password.value.length >= 6
+function checkPasswordValid(): boolean {
+  return password.value.length >= 6 && password.value.length <= 20
 }
 
-function showLoginError(msg: string) {
-  ElMessage({
-    "message": msg,
-    "offset": 60,
-    "customClass": "zIndex999",
-    "type": "error",
-  })
+function loginBtnCheck(): boolean {
+  switch (option.value) {
+    case "vcode": {
+      if (hasVerify.value && checkVcodeValid()) {
+        return true
+      }
+      break
+    }
+    case "password": {
+      if (checkEmailValid() && checkPasswordValid()) {
+        return true
+      }
+      break
+    }
+  }
+  return false
 }
 
-function showLoginSuccess(nickname: string) {
-  ElNotification.success({
-    title: "登录成功",
-    message: `欢迎你，${nickname}`,
-    showClose: false,
-    offset: 57,
-    duration: 2000,
-  })
-}
-
-function mockLogin() {
+function mockLogin(): LoginInfo {
   let li: LoginInfo = {
     "uid": 1,
-    "nickname": "Bonnenult",
+    "nickname": "ljd",
     "avatarUrl": "../../public/avatar.jpeg",
     "token": "payload.signature-token",
     "refreshToken": "payload.signature-refreshToken",
@@ -144,25 +157,17 @@ function saveLoginInfo(li: LoginInfo) {
   localStorage.setItem("refreshToken", li.refreshToken)
 }
 
-function emailLogin() {
-  let emailLoginBtn = document.getElementById("emailLoginBtn") as HTMLButtonElement
-  if (emailLoginBtn.disabled) {
+function login() {
+  if (!loginBtnCheck()) {
     return
   }
-  common.btnCD(emailLoginBtn, 2000)
-  if (!verifyEmail()) {
-    showLoginError("邮箱格式有误")
-    return
-  }
-  if (!verifyVcode()) {
-    showLoginError("验证码为6位数字")
-    return
-  }
+
+  let li = mockLogin()
+  afterSuccDo(li.avatarUrl, li.nickname)
+  saveLoginInfo(li)
+
   dialogVisible.value = false
   store.isLogin = true
-  let li = mockLogin()
-  CB(li.avatarUrl)
-  saveLoginInfo(li)
 
   let index = location.href.lastIndexOf("from=")
   if (index !== -1) {
@@ -170,158 +175,109 @@ function emailLogin() {
   }
 
   showLoginSuccess(li.nickname)
-  vcode.value = ""
 }
 
-function passwordLogin() {
-  let passwordLoginBtn = document.getElementById("passwordLoginBtn") as HTMLButtonElement
-  if (passwordLoginBtn.disabled) {
-    return
-  }
-  common.btnCD(passwordLoginBtn, 5000)
-  if (!verifyEmail()) {
-    showLoginError("邮箱格式有误")
-    return
-  }
-  if (!verifyPassword()) {
-    showLoginError("密码至少6位")
-    return
-  }
-  dialogVisible.value = false
-  store.isLogin = true
-  let li = mockLogin()
-  CB(li.avatarUrl)
-  saveLoginInfo(li)
-
-  let index = location.href.lastIndexOf("from=")
-  if (index !== -1) {
-    router.replace(location.href.slice(index + 5))
-  }
-
-  showLoginSuccess(li.nickname)
-  password.value = ""
+function showLoginSuccess(nickname: string) {
+  ElNotification.success({
+    title: "登录成功",
+    message: `欢迎你，${nickname}`,
+    showClose: false,
+    offset: 57,
+    duration: 2000,
+  })
 }
 </script>
 
 <style scoped>
-.window {
-  width: 420px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 10px;
-}
-
-.option-raw {
-  margin-bottom: 20px;
-}
-
-.option {
-  font-size: 18px;
-}
-
-.option:hover {
-  cursor: pointer;
-}
-
-.option-hr {
-  color: #c8c9cc;
-  margin-left: 10px;
-  margin-right: 10px;
-  cursor: default;
-}
-
-.email-login,
-.password-login {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-.email-login .input-container,
-.password-login .input-container {
+.lw-container .input-box {
   border: 1px solid #c8c9cc;
   border-radius: 5px;
+}
+
+.lw-container .input-box .row {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  height: 14px;
+}
+
+.lw-container .input-box .row .tag {
+  width: 42px;
+  color: black;
+  margin-right: 15px;
+  text-align: right;
+}
+
+.lw-container .input-box .row .input {
+  width: calc(100% - 57px);
+}
+
+.lw-container .input-box .row .get-captcha-btn {
+  width: 120px;
+  margin-left: 15px;
+}
+
+.lw-container .input-box .row:not(:last-child) {
+  border-bottom: 1px solid #c8c9cc;
+}
+
+.lw-container .btn {
   width: 100%;
-  margin-bottom: 20px;
-}
-
-.input-container .info {
-  position: absolute;
-  margin-left: 24px;
-  margin-top: 12px;
-  z-index: 1;
-  cursor: default;
-}
-
-.email-login .input-container .send-vcode-hr {
-  position: absolute;
-  margin-left: 296px;
-  margin-top: 12px;
-  z-index: 1;
-  cursor: default;
-  color: #c8c9cc;
-}
-
-.email-login .input-container .send-vcode-span {
-  position: absolute;
-  margin-left: 326px;
-  margin-top: 12px;
-  z-index: 1;
-  cursor: default;
-}
-
-.email-login .input-container .send-vcode-span:hover {
-  color: #409EFF;
-  cursor: pointer;
-}
-
-.input-container .email,
-.input-container .vcode,
-.input-container .password,
-.login-btn {
-  width: 100%;
-  height: 40px;
-}
-
-.email-login .input-container .email,
-.email-login .input-container .vcode {
-  padding-left: 74px;
-  padding-right: 132px;
-}
-
-.password-login .input-container .email,
-.password-login .input-container .password {
-  padding-left: 62px;
-  padding-right: 16px;
-}
-
-.login-btn {
-  border-radius: 5px;
-}
-
-.loginBtnDisable {
-  pointer-events: none;
-  background-color: #c8c9cc;
-  border: none;
+  height: 37px;
 }
 </style>
 
 <style>
-.zIndex999 {
-  z-index: 99999 !important;
-}
-
-.window .el-input__wrapper {
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0px;
-}
-
-.el-dialog.is-align-center {
+.lw-container .el-dialog.is-align-center {
   border-radius: 10px;
+}
+
+.lw-container .el-dialog__header,
+.lw-container .el-dialog__footer {
+  padding: 20px;
+  margin: 0;
+}
+
+.lw-container .el-dialog__body {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.lw-container .el-tabs__nav-wrap::after,
+.lw-container .el-tabs__active-bar {
+  display: none;
+}
+
+.lw-container .el-tabs__item {
+  padding: 0;
+  font-size: 18px;
+}
+
+.lw-container .el-tabs__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* right: .el-tabs__nav gap的一半 */
+  right: -20px;
+  width: 1px;
+  background-color: #c8c9cc;
+}
+
+.lw-container .el-tabs__nav {
+  float: unset;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  height: 18px;
+}
+
+.lw-container .el-tabs__header {
+  margin: 0 0 20px;
+}
+
+.lw-container .el-input__wrapper {
+  box-shadow: unset !important;
+  padding: 0;
 }
 </style>

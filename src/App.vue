@@ -1,5 +1,5 @@
 <template>
-  <div v-if="common.isMobile()">
+  <div v-if="!common.isMobile()">
     <el-backtop :right="50" :bottom="50" />
 
     <TopMenuBar v-if="store.topPath !== 'manage'"></TopMenuBar>
