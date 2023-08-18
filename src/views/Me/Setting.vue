@@ -143,7 +143,7 @@ function saveSetting() {
     common.showError("签名的长度最大为50")
     return
   }
-  common.btnCD(saveSettingBtn, 5000)
+  common.btnCD(saveSettingBtn, 5)
   nnmdy.value = false
   common.showSuccess("保存成功")
 }

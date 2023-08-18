@@ -147,7 +147,7 @@ function send(comment: Comment[]) {
   }
 
   sendBtns.forEach((ele) => {
-    common.btnCD(ele, 10000)
+    common.btnCD(ele, 10)
   })
 
   props.data.num++
@@ -210,7 +210,7 @@ function childSend() {
   }
 
   sendBtns.forEach((ele) => {
-    common.btnCD(ele, 10000)
+    common.btnCD(ele, 10)
   })
 
   props.data.num++

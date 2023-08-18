@@ -26,6 +26,10 @@ function beforePVWindowClose(done: Function) {
 </script>
 
 <style>
+.preview-video {
+  border-radius: 10px !important;
+}
+
 .preview-video video {
   width: 100%;
   border-radius: 10px;

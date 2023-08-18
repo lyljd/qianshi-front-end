@@ -20,18 +20,17 @@ function isMe(uid: number): boolean {
   return false
 }
 
-function btnCD(btn: HTMLButtonElement, cd: number) {
-  let time = cd / 1000
+function btnCD(btn: HTMLButtonElement, cdTime: number) {
   let text = btn.innerText
 
   btn.disabled = true
   btn.classList.add('is-disabled')
-  btn.innerText = text + "(" + time + ")"
+  btn.innerText = text + "(" + cdTime + ")"
 
   let dec = setInterval(() => {
-    time--
-    btn.innerText = text + "(" + time + ")"
-    if (time === 0) {
+    cdTime--
+    btn.innerText = text + "(" + cdTime + ")"
+    if (cdTime === 0) {
       clearInterval(dec);
       btn.innerText = text
       btn.classList.remove('is-disabled')
@@ -120,6 +119,19 @@ function timestampFormatterStandardExcludeSecondOrAndYear(timestamp: number): st
   return ret
 } //返回日期格式：月-日 时:分；若时间戳不为今年，则为：年-月-日 时:分
 
+function timestampFormatterStandardExcludeHMSOrAndYear(timestamp: number): string {
+  let d = timestampFormatter(timestamp)
+  let dn = timestampFormatter(Date.now())
+
+  let ret = `${add0(d.month)}-${add0(d.day)}`
+
+  if (d.year < dn.year) {
+    ret = `${d.year}-` + ret
+  }
+
+  return ret
+} //返回日期格式：月-日；若时间戳不为今年，则为：年-月-日
+
 function timestampFormatterYMD(timestamp: number): string {
   let d = timestampFormatter(timestamp)
   return `${d.year}-${add0(d.month)}-${add0(d.day)}`
@@ -163,17 +175,8 @@ function timestampFormatterRichExcludeHM(timestamp: number): string {
   let d = timestampFormatter(timestamp)
   let dn = timestampFormatter(Date.now())
 
-  if (d.year < dn.year || d.month < dn.month || d.day < d.day) {
-    let d = timestampFormatter(timestamp)
-    let dn = timestampFormatter(Date.now())
-
-    let ret = `${add0(d.month)}-${add0(d.day)}`
-
-    if (d.year < dn.year) {
-      ret = `${d.year}-` + ret
-    }
-
-    return ret
+  if (d.year < dn.year || d.month < dn.month || d.day < dn.day) {
+    return timestampFormatterStandardExcludeHMSOrAndYear(timestamp)
   }
 
   return timestampFormatterAgo(timestamp)
@@ -211,16 +214,10 @@ function checkCookieExists(cookieName: string): boolean {
 }
 
 function scrollToTopSmoothly() {
-  const scrollDuration = 300; // 滚动持续时间（以毫秒为单位）
-  const scrollStep = -window.scrollY / (scrollDuration / 15); // 每个步骤滚动的距离
-
-  const scrollInterval = setInterval(function () {
-    if (window.scrollY !== 0) {
-      window.scrollBy(0, scrollStep);
-    } else {
-      clearInterval(scrollInterval);
-    }
-  }, 15);
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
 }
 
 function showError(msg: string) {
@@ -288,6 +285,7 @@ export {
   timestampFormatter,
   timestampFormatterStandard,
   timestampFormatterStandardExcludeSecondOrAndYear,
+  timestampFormatterStandardExcludeHMSOrAndYear,
   timestampFormatterYMD,
   timestampFormatterAgo,
   timestampFormatterRich,

@@ -1023,7 +1023,7 @@ function sendDanmu() {
     return
   }
   danmuSendBtns.forEach((ele) => {
-    common.btnCD(ele, 5000)
+    common.btnCD(ele, 5)
   })
   //TODO 这里did应该从后端返回的值取得
   video.danmu.push({

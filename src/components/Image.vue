@@ -2,19 +2,18 @@
   <div
     :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', border: border ? '1px solid #dcdfe6' : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '' }"
     class="Image-container" :class="customClass" @click="openImgUpload">
-    <el-image :src="imgUrl" :preview-src-list="preview && uploadUrl === '' ? [imgUrl] : []"
-      :fit="contain ? 'contain' : ''"
+    <el-image :src="url" :preview-src-list="preview && uploadUrl === '' ? [url] : []" :fit="contain ? 'contain' : ''"
       :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '', cursor: uploadUrl !== '' ? 'pointer' : 'default', opacity: imgUploadPercent !== 0 ? 0.5 : 1 }"
-      class="img">
+      :class="customClass" class="img">
       <template #error>
-        <div :style="{ borderRadius: round ? '5px' : '' }" class="default">加载失败</div>
+        <div :style="{ borderRadius: round ? '5px' : '' }" class="default">{{ loadFailInfo }}</div>
       </template>
     </el-image>
   </div>
 
   <el-upload v-if="uploadUrl !== ''" :before-upload="beforeImgUpload" :on-remove="onImgUploadRemove"
     :on-change="onImgUploadChange" :on-progress="onImgUploadProgress" :on-success="onImgUploadSuccess"
-    :on-error="onImgUploadError" ref="imgUpload" :action="uploadUrl" accept="image/*" v-show="false"></el-upload>
+    :on-error="onImgUploadError" ref="imgUpload" :method="uploadMethod" :action="uploadUrl" accept="image/*" v-show="false"></el-upload>
 </template>
 
 <script setup lang="ts">
@@ -37,7 +36,9 @@ const data = withDefaults(defineProps<{
   circle: boolean,
   customClass: string,
   uploadUrl: string,
+  uploadMethod: string,
   uploadMaxSize: number, //单位：MB
+  loadFailInfo: string,
 }>(), {
   w: undefined,
   h: undefined,
@@ -48,7 +49,9 @@ const data = withDefaults(defineProps<{
   circle: false,
   customClass: "",
   uploadUrl: "",
+  uploadMethod: "post",
   uploadMaxSize: 10,
+  loadFailInfo: "加载失败",
 })
 
 const imgUpload = ref<UploadInstance>()

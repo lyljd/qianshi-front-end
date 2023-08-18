@@ -148,7 +148,7 @@ onMounted(() => {
   let sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
   let lastSendBtn = sendBtns[sendBtns.length - 1]
   if (!lastSendBtn.disabled) {
-    common.btnCD(lastSendBtn, 10000)
+    common.btnCD(lastSendBtn, 10)
   }
   //-->
 })
