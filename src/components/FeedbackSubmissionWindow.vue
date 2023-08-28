@@ -19,7 +19,7 @@
   </el-dialog>
 
   <el-dialog v-model="previewWindowVisible" custom-class="preview" align-center>
-    <Image :url="previewImgUrl"></Image>
+    <Image :round="false" :url="previewImgUrl"></Image>
   </el-dialog>
 </template>
 

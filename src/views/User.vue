@@ -29,7 +29,7 @@
     </el-drawer>
 
     <div class="info">
-      <Image @recImgUrl="recImgUrl" uploadUrl="/api/resource/avatar" :url="user.avatarUrl" w="60" h="60" circle></Image>
+      <Image @recImgUrl="recImgUrl" uploadUrl="/api/resource/avatar" :url="user.avatarUrl" w="60" h="60" avatar></Image>
 
       <div class="right">
         <div class="head-row">
@@ -162,8 +162,7 @@ function getUser() {
 }
 
 function recImgUrl(imgUrl: string) {
-  //TODO api请求
-  console.log(imgUrl)
+  user.avatarUrl = imgUrl
 }
 
 function saveSignature() {

@@ -49,7 +49,7 @@ function verify() {
     common.showError("请输入4位数字")
   }
   dialogVisible.value = false
-  afterSuccDo(180000)
+  afterSuccDo(180)
 }
 </script>
 

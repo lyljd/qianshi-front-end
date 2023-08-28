@@ -30,9 +30,9 @@
           :scrollId="scrollId" :data="item">
         </Comment>
 
-        <div @click="viewMore(item)"
-          v-if="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">共{{
-            item.reply?.num }}条回复，<span class="view">点击查看</span></div>
+        <div v-if="item.reply !== undefined && item.reply.num > 2 && item.reply.isOpen === undefined" class="reply-num">
+          共{{
+            item.reply?.num }}条回复，<span @click="viewMore(item)" class="view">点击查看</span></div>
 
         <el-pagination @click="getChildCommentByPage(item.cid)"
           @current-change="(page: number) => { curPage = page; isClickPage = true }"

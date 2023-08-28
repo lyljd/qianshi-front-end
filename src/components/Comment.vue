@@ -1,6 +1,8 @@
 <template>
   <div :id="'container-' + data.cid" class="container">
-    <Image @click="common.ToUser(data.uid)" :url="data.avatarUrl" :w="40" :h="40" class="avatar" circle></Image>
+    <Image :customClick="() => { common.ToUser(data.uid) }" :url="data.avatarUrl" :w="40" :h="40" customClass="avatar"
+      avatar>
+    </Image>
     <div class="right">
       <div class="user-info">
         <span :class="{ nicknameVip: data.isVip }" @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname
@@ -10,7 +12,7 @@
           <use :xlink:href="'#el-icon-level_' + data.level"></use>
         </svg>
 
-        <svg v-if="data.isUp" style="font-size: 30px;" class="icon-symbol" aria-hidden="true">
+        <svg v-if="data.isUp" style="font-size: 25px;" class="icon-symbol" aria-hidden="true">
           <use xlink:href="#el-icon-UPzhu-copy"></use>
         </svg>
       </div>
@@ -41,13 +43,19 @@
             <span class="iconfont el-icon-diandiandianshu extra"></span>
           </template>
           <div class="extra-container">
-            <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon title="删除评论后，评论下所有回复都会被删除，是否继续?"
-              confirm-button-text="确认" cancel-button-text="取消">
+            <div v-if="isUp" @click="setTop" class="comment-top"><span
+                :class="!data.isTop ? 'el-icon-zhiding' : 'el-icon-quxiaozhiding'" class="iconfont em-icon"></span>{{
+                  !data.isTop ? '置顶' : '取消置顶' }}</div>
+
+            <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon
+              :title="!data.isChild ? '删除评论后，评论下所有回复都会被删除，是否继续?' : '你确认要删除该评论吗？'" confirm-button-text="确认"
+              cancel-button-text="取消">
               <template #reference>
                 <div v-if="isMe || isUp" class="comment-detele"><span class="iconfont el-icon-ashbin em-icon"></span>删除
                 </div>
               </template>
             </el-popconfirm>
+
             <div @click="report" class="comment-report"><span class="iconfont el-icon-jubao em-icon"></span>举报</div>
           </div>
         </el-popover>
@@ -235,6 +243,12 @@ function report() {
 
   store.openFSWindow('评论举报', '#', "请输入举报理由", "理由不能为空", "举报成功")
 }
+
+function setTop() {
+  extraPop.value.hide()
+  props.data.isTop = !props.data.isTop
+  common.showSuccess(props.data.isTop ? '置顶成功' : '取消置顶成功')
+}
 </script>
 
 <script lang="ts">
@@ -248,11 +262,6 @@ export default {
   display: flex;
   margin-top: 20px;
   width: 100%;
-}
-
-.container .avatar {
-  cursor: pointer;
-  margin-right: 10px;
 }
 
 .container .right {
@@ -336,6 +345,7 @@ export default {
   margin: -7.5px;
 }
 
+.extra-container .comment-top,
 .extra-container .comment-detele,
 .extra-container .comment-report {
   padding-top: 10px;
@@ -345,6 +355,7 @@ export default {
   align-items: center;
 }
 
+.extra-container .comment-top:hover,
 .extra-container .comment-detele:hover,
 .extra-container .comment-report:hover {
   cursor: pointer;
@@ -392,5 +403,11 @@ export default {
   background-color: #e9e9eb;
   padding: 3px;
   cursor: default;
+}
+</style>
+
+<style>
+.container .avatar {
+  margin-right: 10px;
 }
 </style>

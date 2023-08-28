@@ -6,7 +6,7 @@
       <div>
         <div class="span">头像：</div>
         <Image @recImgUploadPercent="recImgUploadPercent" @recImgUrl="recImgUrl" uploadUrl="/api/resource/avatar"
-          :url="data.coverUrl" w="40" h="40" circle></Image>
+          :url="data.coverUrl" w="40" h="40" avatar></Image>
       </div>
 
       <div>

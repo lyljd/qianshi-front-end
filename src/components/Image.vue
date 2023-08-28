@@ -1,19 +1,25 @@
 <template>
   <div
-    :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', border: border ? '1px solid #dcdfe6' : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '' }"
-    class="Image-container" :class="customClass" @click="openImgUpload">
-    <el-image :src="url" :preview-src-list="preview && uploadUrl === '' ? [url] : []" :fit="contain ? 'contain' : ''"
-      :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '', cursor: uploadUrl !== '' ? 'pointer' : 'default', opacity: imgUploadPercent !== 0 ? 0.5 : 1 }"
-      :class="customClass" class="img">
+    :style="{ border: border ? '1px solid #dcdfe6' : '', borderRadius: (round || circle || avatar) ? (circle || avatar ? '50%' : '5px') : '' }"
+    :class="customClass" class="Image-container" @click="openImgUpload">
+    <el-image :src="imgUrl" :preview-src-list="preview && uploadUrl === '' ? [url] : []" :fit="contain ? 'contain' : ''"
+      :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle || avatar) ? (circle || avatar ? '50%' : '5px') : '', cursor: customClick || uploadUrl !== '' ? 'pointer' : 'default', opacity: imgUploadPercent !== 0 ? 0.5 : 1 }"
+      class="img">
       <template #error>
-        <div :style="{ borderRadius: round ? '5px' : '' }" class="default">{{ loadFailInfo }}</div>
+        <div v-if="!data.avatar" class="default">{{ loadFailInfo }}</div>
+
+        <el-image v-else src="/default-avatar.png" :fit="contain ? 'contain' : ''"
+          :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle || avatar) ? (circle || avatar ? '50%' : '5px') : '', cursor: customClick || uploadUrl !== '' ? 'pointer' : 'default', opacity: imgUploadPercent !== 0 ? 0.5 : 1 }"
+          class="img">
+        </el-image>
       </template>
     </el-image>
   </div>
 
   <el-upload v-if="uploadUrl !== ''" :before-upload="beforeImgUpload" :on-remove="onImgUploadRemove"
     :on-change="onImgUploadChange" :on-progress="onImgUploadProgress" :on-success="onImgUploadSuccess"
-    :on-error="onImgUploadError" ref="imgUpload" :method="uploadMethod" :action="uploadUrl" accept="image/*" v-show="false"></el-upload>
+    :on-error="onImgUploadError" ref="imgUpload" :method="uploadMethod" :action="uploadUrl" accept="image/*"
+    v-show="false"></el-upload>
 </template>
 
 <script setup lang="ts">
@@ -29,24 +35,25 @@ const data = withDefaults(defineProps<{
   url: string,
   w: number,
   h: number,
+  customClick: Function,
   preview: boolean,
   contain: boolean,
   border: boolean,
   round: boolean,
   circle: boolean,
-  customClass: string,
+  avatar: boolean, //相当于circle，但在图片加载失败时会显示为默认头像
+  customClass: string, //class不能写在scoped下的style中
   uploadUrl: string,
   uploadMethod: string,
   uploadMaxSize: number, //单位：MB
   loadFailInfo: string,
 }>(), {
-  w: undefined,
-  h: undefined,
   preview: false,
   contain: false,
   border: false,
   round: true,
   circle: false,
+  avatar: false,
   customClass: "",
   uploadUrl: "",
   uploadMethod: "post",
@@ -62,6 +69,10 @@ let preImgId = ref(0)
 let imgUploadPercent = ref(0)
 
 function openImgUpload() {
+  if (data.customClick) {
+    data.customClick()
+  }
+
   if (data.uploadUrl !== "") {
     if (imgUploadPercent.value !== 0) {
       common.showError("图片上传时禁止修改")
@@ -112,6 +123,10 @@ function onImgUploadError() {
 </script>
 
 <style scoped>
+.Image-container {
+  height: 100%;
+}
+
 .Image-container .img {
   width: 100%;
   height: 100%;
