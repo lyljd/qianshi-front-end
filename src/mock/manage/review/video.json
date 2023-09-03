@@ -6,8 +6,8 @@
     "nickname": "Bonnenult",
     "applyTime": 1688736560156,
     "infoOld": {
-      "videoUrl": "../../public/video/8.mp4",
-      "coverUrl": "../../public/cover/8.jpeg",
+      "videoUrl": "/resource/video/8.mp4",
+      "coverUrl": "/resource/cover/8.jpeg",
       "title": "雅俗共赏",
       "region": "music",
       "tags": [
@@ -18,8 +18,8 @@
       "empower": true
     },
     "info": {
-      "videoUrl": "../../public/video/8.mp4",
-      "coverUrl": "../../public/cover/8.jpeg",
+      "videoUrl": "/resource/video/8.mp4",
+      "coverUrl": "/resource/cover/8.jpeg",
       "title": "许嵩-雅俗共赏",
       "region": "music",
       "tags": [
@@ -39,8 +39,8 @@
     "nickname": "Bonnenult",
     "applyTime": 1688846560156,
     "info": {
-      "videoUrl": "../../public/video/7.mp4",
-      "coverUrl": "../../public/cover/7.jpeg",
+      "videoUrl": "/resource/video/7.mp4",
+      "coverUrl": "/resource/cover/7.jpeg",
       "title": "Closer",
       "region": "music",
       "tags": [

@@ -7,16 +7,16 @@
     "reportInfo": {
       "content": "我就不说什么了，看图片吧",
       "imgs": [
-        "../../../壁纸/灵梦.png",
-        "../../../壁纸/砂狼城子.jpg",
-        "../../../壁纸/b站22娘.png",
-        "../../../壁纸/The Journey of Elaina.jpg"
+        "/resource/壁纸/灵梦.png",
+        "/resource/壁纸/砂狼城子.jpg",
+        "/resource/壁纸/b站22娘.png",
+        "/resource/壁纸/The Journey of Elaina.jpg"
       ]
     },
     "videoInfo": {
       "vid": 7,
-      "videoUrl": "../../../public/video/8.mp4",
-      "coverUrl": "../../../public/cover/8.jpeg",
+      "videoUrl": "/resource/video/8.mp4",
+      "coverUrl": "/resource/cover/8.jpeg",
       "title": "许嵩-雅俗共赏",
       "region": "music",
       "tags": [
@@ -41,8 +41,8 @@
     },
     "videoInfo": {
       "vid": 8,
-      "videoUrl": "../../../public/video/7.mp4",
-      "coverUrl": "../../../public/cover/7.jpeg",
+      "videoUrl": "/resource/video/7.mp4",
+      "coverUrl": "/resource/cover/7.jpeg",
       "title": "Closer",
       "region": "music",
       "tags": [

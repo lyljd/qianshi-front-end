@@ -5,7 +5,7 @@
         <el-menu :default-active=$route.path router="true">
           <div class="page-title">
             <div class="logo">
-              <img class="icon" src="../../public/favicon.png">
+              <img class="icon" src="/favicon.png">
               <span>浅时</span>
             </div>
             <div>后台管理</div>

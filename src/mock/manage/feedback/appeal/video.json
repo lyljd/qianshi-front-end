@@ -7,20 +7,20 @@
     "feedbackInfo": {
       "content": "啊嘞，我的视频为什么没通过审批？",
       "imgs": [
-        "../../../壁纸/背景1.jpg",
-        "../../../壁纸/灵梦.png",
-        "../../../壁纸/砂狼城子.jpg",
-        "../../../壁纸/锁屏1.jpg",
-        "../../../壁纸/锁屏2.jpg",
-        "../../../壁纸/b站22娘.png",
-        "../../../壁纸/Destiny 2.jpg",
-        "../../../壁纸/Everlasting Summer Room.jpg",
-        "../../../壁纸/The Journey of Elaina.jpg"
+        "/resource/壁纸/背景1.jpg",
+        "/resource/壁纸/灵梦.png",
+        "/resource/壁纸/砂狼城子.jpg",
+        "/resource/壁纸/锁屏1.jpg",
+        "/resource/壁纸/锁屏2.jpg",
+        "/resource/壁纸/b站22娘.png",
+        "/resource/壁纸/Destiny 2.jpg",
+        "/resource/壁纸/Everlasting Summer Room.jpg",
+        "/resource/壁纸/The Journey of Elaina.jpg"
       ]
     },
     "videoInfo": {
-      "videoUrl": "../../../public/video/8.mp4",
-      "coverUrl": "../../../public/cover/8.jpeg",
+      "videoUrl": "/resource/video/8.mp4",
+      "coverUrl": "/resource/cover/8.jpeg",
       "title": "许嵩-雅俗共赏",
       "region": "music",
       "tags": [
@@ -44,8 +44,8 @@
       "imgs": []
     },
     "videoInfo": {
-      "videoUrl": "../../../public/video/7.mp4",
-      "coverUrl": "../../../public/cover/7.jpeg",
+      "videoUrl": "/resource/video/7.mp4",
+      "coverUrl": "/resource/cover/7.jpeg",
       "title": "Closer",
       "region": "music",
       "tags": [

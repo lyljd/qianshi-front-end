@@ -155,7 +155,7 @@ function send(comment: Comment[]) {
   comment.push({
     "cid": props.data.num,
     "uid": 1,
-    "avatarUrl": "../../public/avatar.jpeg",
+    "avatarUrl": "/resource/avatar.jpeg",
     "nickname": "Bonnenult",
     "level": 6,
     "isVip": true,
@@ -218,7 +218,7 @@ function childSend() {
   let newComment: Comment = {
     "cid": props.data.num,
     "uid": 1,
-    "avatarUrl": "../../public/avatar.jpeg",
+    "avatarUrl": "/resource/avatar.jpeg",
     "nickname": "Bonnenult",
     "level": 6,
     "isVip": true,
@@ -277,7 +277,7 @@ function viewMore(comment: Comment) {
   comment.reply?.value.push({
     "cid": props.data.num,
     "uid": 3,
-    "avatarUrl": "../../public/avatar2.jpg",
+    "avatarUrl": "/resource/avatar2.jpg",
     "nickname": "惜缘灬冷颜",
     "level": 3,
     "isVip": false,

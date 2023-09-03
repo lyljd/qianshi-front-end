@@ -548,8 +548,8 @@ function getVideo(id: number): Video {
   console.log(id, viewItem.value)
 
   return {
-    "videoUrl": "../../public/video/8.mp4",
-    "coverUrl": "../../public/cover/8.jpeg",
+    "videoUrl": "/resource/video/8.mp4",
+    "coverUrl": "/resource/cover/8.jpeg",
     "title": "许嵩-雅俗共赏",
     "region": "music",
     "tags": [

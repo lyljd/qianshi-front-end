@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <img style="width: 1140px; height: 180px;" :src="`../../public/userhome-top-img/${user.topImgNo}.png`">
+    <img style="width: 1140px; height: 180px;" :src="`/userhome-top-img/${user.topImgNo}.png`">
 
     <div v-if="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
@@ -10,15 +10,15 @@
         <div class="top-img-container">
           <div style="text-align: center;">
             <img :style="{ cursor: user.topImgNo === 1 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 1"
-              class="top-img mr10 mb10" src="../../public/userhome-top-img/1.png">
+              class="top-img mr10 mb10" src="/userhome-top-img/1.png">
             <img :style="{ cursor: user.topImgNo === 2 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 2"
-              class="top-img ml10 mb10" src="../../public/userhome-top-img/2.png">
+              class="top-img ml10 mb10" src="/userhome-top-img/2.png">
           </div>
           <div style="text-align: center;">
             <img :style="{ cursor: user.topImgNo === 3 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 3"
-              class="top-img mr10 mt10" src="../../public/userhome-top-img/3.png">
+              class="top-img mr10 mt10" src="/userhome-top-img/3.png">
             <img :style="{ cursor: user.topImgNo === 4 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 4"
-              class="top-img ml10 mt10" src="../../public/userhome-top-img/4.png">
+              class="top-img ml10 mt10" src="/userhome-top-img/4.png">
           </div>
         </div>
       </template>

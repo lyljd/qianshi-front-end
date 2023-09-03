@@ -3,7 +3,7 @@
 
   <el-menu id="menu" class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
     <div class="logo">
-      <img class="icon" src="../../public/favicon.png">
+      <img class="icon" src="/favicon.png">
       <span class="notice">浅时</span>
     </div>
 
@@ -52,7 +52,7 @@
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
           <el-avatar @click="toHome" class="avatar" :src="avatarUrl" @error="true">
-            <img @click="toHome" src="../../public/default-avatar.png" />
+            <img @click="toHome" src="/default-avatar.png" />
           </el-avatar>
         </template>
         <el-button @click="signin" :type="!signinStatus ? 'success' : 'info'"

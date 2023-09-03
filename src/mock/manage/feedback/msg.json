@@ -7,15 +7,15 @@
     "feedbackInfo": {
       "content": "Ciallo～(∠・ω< )⌒★",
       "imgs": [
-        "../../../壁纸/背景1.jpg",
-        "../../../壁纸/灵梦.png",
-        "../../../壁纸/砂狼城子.jpg",
-        "../../../壁纸/锁屏1.jpg",
-        "../../../壁纸/锁屏2.jpg",
-        "../../../壁纸/b站22娘.png",
-        "../../../壁纸/Destiny 2.jpg",
-        "../../../壁纸/Everlasting Summer Room.jpg",
-        "../../../壁纸/The Journey of Elaina.jpg"
+        "/resource/壁纸/背景1.jpg",
+        "/resource/壁纸/灵梦.png",
+        "/resource/壁纸/砂狼城子.jpg",
+        "/resource/壁纸/锁屏1.jpg",
+        "/resource/壁纸/锁屏2.jpg",
+        "/resource/壁纸/b站22娘.png",
+        "/resource/壁纸/Destiny 2.jpg",
+        "/resource/壁纸/Everlasting Summer Room.jpg",
+        "/resource/壁纸/The Journey of Elaina.jpg"
       ]
     }
   },

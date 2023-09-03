@@ -32,12 +32,13 @@ import SmallVideoCard from '../../components/SmallVideoCard.vue'
 const mockVideo = {
   "vid": 0,
   "coverUrl": "",
+  "videoUrl": "",
   "playNum": 0,
   "duration": 0,
   "title": "标题",
   "date": 1686799558000
 }
-const mockVideoNum = 25
+let mockVideoNum = 25
 const mockVideoTotalNum = 35
 const mockReadNum = 25
 const mockReadTotalNum = 35

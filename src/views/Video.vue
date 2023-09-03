@@ -64,47 +64,47 @@
           <video @click="playStatus ? videoEle.pause() : videoEle.play(); playStatus = !playStatus" id="video"
             :src="video.videoUrl"></video>
 
-          <canvas @click=" playStatus ? videoEle.pause() : videoEle.play(); playStatus = !playStatus " width="1700"
+          <canvas @click="playStatus ? videoEle.pause() : videoEle.play(); playStatus = !playStatus" width="1700"
             height="838" id="canvas"></canvas>
         </div>
 
         <div id="contextMenu" class="context-menu">
           <ul>
             <li>弹幕视频播放器 v1.0.0</li>
-            <li @click=" copyVideoUrl ">复制视频地址（精准空降）</li>
-            <li @click=" shortcutKeyDescriptionWindowVisible = true ">快捷键说明</li>
-            <li @click=" common.ToDeveloper ">关于作者</li>
+            <li @click="copyVideoUrl">复制视频地址（精准空降）</li>
+            <li @click="shortcutKeyDescriptionWindowVisible = true">快捷键说明</li>
+            <li @click="common.ToDeveloper">关于作者</li>
           </ul>
         </div>
 
-        <el-dialog v-model=" shortcutKeyDescriptionWindowVisible " title="快捷键说明" :center=" true " :align-center=" true "
-          :width=" 300 ">
-          <el-table :data=" shortcutKeyDesc " :show-header=" false ">
-            <el-table-column prop="key" label="快捷键" :align=" 'center' " />
-            <el-table-column prop="desc" label="说明" :align=" 'center' " />
+        <el-dialog v-model="shortcutKeyDescriptionWindowVisible" title="快捷键说明" :center="true" :align-center="true"
+          :width="300">
+          <el-table :data="shortcutKeyDesc" :show-header="false">
+            <el-table-column prop="key" label="快捷键" :align="'center'" />
+            <el-table-column prop="desc" label="说明" :align="'center'" />
           </el-table>
         </el-dialog>
 
         <transition leaveActiveClass="animate__animated animate__fadeOut"
           enterActiveClass="animate__animated animate__fadeIn">
-          <div id="vfcbar-container" v-show=" videoFuncBarShow ">
-            <el-progress @click=" handleProgressClick " class="progress" :percentage=" videoHasPercentage "
-              :show-text=" false " />
+          <div id="vfcbar-container" v-show="videoFuncBarShow">
+            <el-progress @click="handleProgressClick" class="progress" :percentage="videoHasPercentage"
+              :show-text="false" />
 
             <div id="function-bar" class="function-bar">
               <div class="left-bar">
-                <span v-show=" !playStatus " @click=" videoEle.play(); playStatus = true "
+                <span v-show="!playStatus" @click="videoEle.play(); playStatus = true"
                   class="iconfont el-icon-bofang play"></span>
 
-                <span v-show=" playStatus " @click=" videoEle.pause(); playStatus = false "
+                <span v-show="playStatus" @click="videoEle.pause(); playStatus = false"
                   class="iconfont el-icon-zanting pause"></span>
 
                 <span style="cursor: default;">{{ videoCurrent }} / {{ videoDuration }}</span>
               </div>
 
-              <div v-show=" fullScreenStatus " style="width: 450px; background: none;" class="danmu-bar">
+              <div v-show="fullScreenStatus" style="width: 450px; background: none;" class="danmu-bar">
                 <div class="danmu-input-container">
-                  <el-popover :teleported=" false " :width=" 260 " trigger="hover" placement="top">
+                  <el-popover :teleported="false" :width="260" trigger="hover" placement="top">
                     <template #reference>
                       <span style="color: black; font-size: 25px;" class="iconfont el-icon-shezhi icon dmsz"></span>
                     </template>
@@ -113,22 +113,21 @@
                       <div class="option">
                         <div>字号</div>
                         <div>
-                          <el-slider :min=" 20 " :max=" 25 " v-model=" dmSize " />
+                          <el-slider :min="20" :max="25" v-model="dmSize" />
                         </div>
                       </div>
 
                       <div class="option">
                         <div style="margin-bottom: 5px;">颜色</div>
                         <div>
-                          <el-color-picker :append-to=" videoContainer " v-model=" dmColor "
-                            :predefine=" predefinedmColors " />
+                          <el-color-picker :append-to="videoContainer" v-model="dmColor" :predefine="predefinedmColors" />
                         </div>
                       </div>
 
                       <div class="option">
                         <div style="margin-bottom: 5px; margin-top: 10px;">速度</div>
                         <div>
-                          <el-radio-group v-model=" dmSpeed ">
+                          <el-radio-group v-model="dmSpeed">
                             <el-radio label="3" border>较慢</el-radio>
                             <el-radio label="4" border>适中</el-radio>
                             <el-radio label="5" border>较快</el-radio>
@@ -138,76 +137,75 @@
                     </div>
                   </el-popover>
 
-                  <el-input @keyup.enter.native=" sendDanmu " class="danmu-input" v-model=" danmuInput "
+                  <el-input @keyup.enter.native="sendDanmu" class="danmu-input" v-model="danmuInput"
                     placeholder="发个友善的弹幕见证当下" />
                 </div>
 
-                <el-button @click=" sendDanmu " class="danmu-send-btn" type="primary">发送</el-button>
+                <el-button @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
               </div>
 
 
               <div class="right-bar">
-                <el-popover :teleported=" false " trigger="hover" placement="top">
+                <el-popover :teleported="false" trigger="hover" placement="top">
                   <template #reference>
                     <span class="quality">{{ videoQuality }}</span>
                   </template>
-                  <el-radio-group @change=" setVideoQuality " v-model=" videoQuality "
+                  <el-radio-group @change="setVideoQuality" v-model="videoQuality"
                     style="display: flex;justify-content: center; margin: 0;">
                     <el-radio-button style="margin: 0;" label="原画" />
                     <el-radio-button style="margin: 0;" label="普清" />
                   </el-radio-group>
                 </el-popover>
 
-                <el-popover :teleported=" false " trigger="hover" placement="top">
+                <el-popover :teleported="false" trigger="hover" placement="top">
                   <template #reference>
                     <span class="speed">倍速</span>
                   </template>
-                  <el-radio-group @change=" setPlaySpeed " v-model=" playSpeed ">
-                    <el-radio :label=" 2 ">2.0x</el-radio>
-                    <el-radio :label=" 1.5 ">1.5x</el-radio>
-                    <el-radio :label=" 1.25 ">1.25x</el-radio>
-                    <el-radio :label=" 1 ">1.0x</el-radio>
-                    <el-radio :label=" 0.75 ">0.75x</el-radio>
-                    <el-radio :label=" 0.5 ">0.5x</el-radio>
+                  <el-radio-group @change="setPlaySpeed" v-model="playSpeed">
+                    <el-radio :label="2">2.0x</el-radio>
+                    <el-radio :label="1.5">1.5x</el-radio>
+                    <el-radio :label="1.25">1.25x</el-radio>
+                    <el-radio :label="1">1.0x</el-radio>
+                    <el-radio :label="0.75">0.75x</el-radio>
+                    <el-radio :label="0.5">0.5x</el-radio>
                   </el-radio-group>
                 </el-popover>
 
-                <el-popover :teleported=" false " :width=" 250 " trigger="hover" placement="top">
+                <el-popover :teleported="false" :width="250" trigger="hover" placement="top">
                   <template #reference>
-                    <span v-show=" !mutedStatus " @click=" setMutedStatus " class="iconfont el-icon-yinliang icon"></span>
+                    <span v-show="!mutedStatus" @click="setMutedStatus" class="iconfont el-icon-yinliang icon"></span>
                   </template>
                   <div style="display:flex; justify-content:center; align-items: center; margin: 0;">
                     <span style="margin: 0;">{{ volume }}</span>
-                    <div><el-slider @input=" volumeChange " style="width: 185px; margin: 0;" v-model=" volume "
-                        :show-tooltip=" false " /></div>
+                    <div><el-slider @input="volumeChange" style="width: 185px; margin: 0;" v-model="volume"
+                        :show-tooltip="false" /></div>
                   </div>
                 </el-popover>
 
-                <el-tooltip content="关闭静音(m)" placement="top" effect="light" :enterable=" false ">
-                  <span v-show=" mutedStatus " @click=" setMutedStatus " class="iconfont el-icon-jingyin icon"></span>
+                <el-tooltip content="关闭静音(m)" placement="top" effect="light" :enterable="false">
+                  <span v-show="mutedStatus" @click="setMutedStatus" class="iconfont el-icon-jingyin icon"></span>
                 </el-tooltip>
 
-                <el-popover :teleported=" false " :width=" 175 " trigger="hover" placement="top">
+                <el-popover :teleported="false" :width="175" trigger="hover" placement="top">
                   <template #reference>
                     <span class="iconfont el-icon-shezhi icon"></span>
                   </template>
-                  <div @click=" setAutoplay "
-                    style="display:flex; justify-content:center; align-items: center; margin: 0;">
-                    静音自动开播<el-switch style="margin-left: 5px;" v-model=" autoplay " /></div>
+                  <div @click="setAutoplay" style="display:flex; justify-content:center; align-items: center; margin: 0;">
+                    静音自动开播<el-switch style="margin-left: 5px;" v-model="autoplay" /></div>
                 </el-popover>
 
-                <el-tooltip :content=" pipTip " placement="top" effect="light" :enterable=" false "
-                  :append-to=" videoContainer ">
-                  <span @click=" pip " class="iconfont el-icon-huazhonghua icon"></span>
+                <el-tooltip :content="pipTip" placement="top" effect="light" :enterable="false"
+                  :append-to="videoContainer">
+                  <span @click="pip" class="iconfont el-icon-huazhonghua icon"></span>
                 </el-tooltip>
 
-                <el-tooltip content="进入全屏(f)" placement="top-end" effect="light" :enterable=" false ">
-                  <span @click=" fullScreen " v-show=" !fullScreenStatus " class="iconfont el-icon-quanping icon"></span>
+                <el-tooltip content="进入全屏(f)" placement="top-end" effect="light" :enterable="false">
+                  <span @click="fullScreen" v-show="!fullScreenStatus" class="iconfont el-icon-quanping icon"></span>
                 </el-tooltip>
 
-                <el-tooltip content="退出全屏(f)" placement="top-end" effect="light" :enterable=" false "
-                  :append-to=" videoContainer ">
-                  <span @click=" cancelFullScreen " v-show=" fullScreenStatus "
+                <el-tooltip content="退出全屏(f)" placement="top-end" effect="light" :enterable="false"
+                  :append-to="videoContainer">
+                  <span @click="cancelFullScreen" v-show="fullScreenStatus"
                     class="iconfont el-icon-quxiaoquanping icon"></span>
                 </el-tooltip>
               </div>
@@ -218,19 +216,18 @@
 
       <div class="danmu-bar">
         <span class="watch-danmu-num">1人正在看，已装填{{ common.numFormatterW(video.danmu.length) }}条弹幕</span>
-        <el-tooltip content="关闭弹幕(d)" placement="top" effect="light" :enterable=" false ">
-          <span @click=" setDanmuStatus " v-show=" danmuStatus "
-            class="iconfont el-icon-bofangqi-danmukai icon dmkg"></span>
+        <el-tooltip content="关闭弹幕(d)" placement="top" effect="light" :enterable="false">
+          <span @click="setDanmuStatus" v-show="danmuStatus" class="iconfont el-icon-bofangqi-danmukai icon dmkg"></span>
         </el-tooltip>
-        <el-tooltip content="开启弹幕(d)" placement="top" effect="light" :enterable=" false ">
-          <span @click=" setDanmuStatus " v-show=" !danmuStatus "
+        <el-tooltip content="开启弹幕(d)" placement="top" effect="light" :enterable="false">
+          <span @click="setDanmuStatus" v-show="!danmuStatus"
             class="iconfont el-icon-bofangqi-danmuguan icon dmkg"></span>
         </el-tooltip>
 
         <div class="flex-grow" />
 
         <div class="danmu-input-container">
-          <el-popover :width=" 260 " trigger="hover" placement="top">
+          <el-popover :width="260" trigger="hover" placement="top">
             <template #reference>
               <span class="iconfont el-icon-shezhi icon dmsz"></span>
             </template>
@@ -239,21 +236,21 @@
               <div class="option">
                 <div>字号</div>
                 <div>
-                  <el-slider :min=" 20 " :max=" 25 " v-model=" dmSize " />
+                  <el-slider :min="20" :max="25" v-model="dmSize" />
                 </div>
               </div>
 
               <div class="option">
                 <div style="margin-bottom: 5px;">颜色</div>
                 <div>
-                  <el-color-picker v-model=" dmColor " :predefine=" predefinedmColors " />
+                  <el-color-picker v-model="dmColor" :predefine="predefinedmColors" />
                 </div>
               </div>
 
               <div class="option">
                 <div style="margin-bottom: 5px; margin-top: 10px;">速度</div>
                 <div>
-                  <el-radio-group v-model=" dmSpeed ">
+                  <el-radio-group v-model="dmSpeed">
                     <el-radio label="3" border>较慢</el-radio>
                     <el-radio label="4" border>适中</el-radio>
                     <el-radio label="5" border>较快</el-radio>
@@ -263,69 +260,68 @@
             </div>
           </el-popover>
 
-          <el-input @keyup.enter.native=" sendDanmu " class="danmu-input" v-model=" danmuInput "
-            placeholder="发个友善的弹幕见证当下" />
+          <el-input @keyup.enter.native="sendDanmu" class="danmu-input" v-model="danmuInput" placeholder="发个友善的弹幕见证当下" />
         </div>
 
-        <el-button @click=" sendDanmu " class="danmu-send-btn" type="primary">发送</el-button>
+        <el-button @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
       </div>
 
       <el-card class="intro-tag-container">
         <textarea id="intro-textarea" class="introduction" rows="1" readonly>{{ video.intro || "-" }}</textarea>
-        <div v-show="!moreStatus && isMore" class="more-container"><span @click="setIntroFull" class="more">展开更多</span></div>
+        <div v-show="!moreStatus && isMore" class="more-container"><span @click="setIntroFull" class="more">展开更多</span>
+        </div>
         <div v-show="moreStatus" class="more-container"><span @click="setIntroUnFull" class="more">收起</span></div>
         <VideoTag :tags="video.tags" style="margin-top: 20px;"></VideoTag>
       </el-card>
 
-      <CommentArea :vAuthorUid=" video.author.uid " :vid=" video.vid " :data=" video.comment "></CommentArea>
+      <CommentArea :vAuthorUid="video.author.uid" :vid="video.vid" :data="video.comment"></CommentArea>
     </div>
 
 
 
     <div class="right">
       <div class="avatar-container">
-        <el-avatar @click=" common.ToUser(video.author.uid) " class="avatar" :src=" video.author.avatarUrl "
-          @error=" true ">
-          <img @click=" common.ToUser(video.author.uid) " src="../../public/default-avatar.png" />
+        <el-avatar @click="common.ToUser(video.author.uid)" class="avatar" :src="video.author.avatarUrl" @error=" true">
+          <img @click="common.ToUser(video.author.uid)" src="/default-avatar.png" />
         </el-avatar>
 
         <div class="info">
           <div class="nickname-row">
-            <div :title=" video.author.nickname " @click=" common.ToUser(video.author.uid) " class="nickname">{{
+            <div :title="video.author.nickname" @click="common.ToUser(video.author.uid)" class="nickname">{{
               video.author.nickname }}</div>
             <span class="iconfont el-icon-sixin send-msg">发消息</span>
           </div>
 
-          <div :title=" video.author.signature " class="signature">{{ video.author.signature || "-" }}</div>
+          <div :title="video.author.signature" class="signature">{{ video.author.signature || "-" }}</div>
 
-          <el-button id="focu-btn" @click=" focuAuthor " class="focus"
-            :type=" !video.author.isFocu ? 'primary' : 'info' ">{{
+          <el-button id="focu-btn" @click="focuAuthor" class="focus" :type="!video.author.isFocu ? 'primary' : 'info'">{{
             focuBtnInnerText }}</el-button>
         </div>
       </div>
 
-      <div @click=" showDanmuList = !showDanmuList " class="danmu-list-span">
+      <div @click="showDanmuList = !showDanmuList" class="danmu-list-span">
         <span>弹幕列表</span>
 
-        <el-icon v-show=" !showDanmuList ">
+        <el-icon v-show="!showDanmuList">
           <ArrowDown />
         </el-icon>
-        <el-icon v-show=" showDanmuList ">
+        <el-icon v-show="showDanmuList">
           <ArrowUp />
         </el-icon>
       </div>
 
       <transition name="danmu-list">
-        <el-table v-if=" showDanmuList " class="danmu-list" :data="video.danmu" max-height="483" size="small"
+        <el-table v-if="showDanmuList" class="danmu-list" :data="video.danmu" max-height="483" size="small"
           empty-text="暂无弹幕">
-          <el-table-column prop="time" label="时间" width="65" sortable :formatter=" danmuTimeFormatter " />
+          <el-table-column prop="time" label="时间" width="65" sortable :formatter="danmuTimeFormatter" />
           <el-table-column prop="value" label="弹幕内容" show-overflow-tooltip width="108" />
-          <el-table-column prop="date" label="发送时间" show-overflow-tooltip width="97" sortable :formatter="danmuDateFormatter" />
+          <el-table-column prop="date" label="发送时间" show-overflow-tooltip width="97" sortable
+            :formatter="danmuDateFormatter" />
 
           <el-table-column v-if="isLogin" fixed="right" width="32" :align="'center'">
             <template #default="scope">
-              <el-popconfirm @confirm="delDanmu(scope.row.did)" hide-icon title="你确认要删除该弹幕吗?"
-              confirm-button-text="确认" cancel-button-text="取消">
+              <el-popconfirm @confirm="delDanmu(scope.row.did)" hide-icon title="你确认要删除该弹幕吗?" confirm-button-text="确认"
+                cancel-button-text="取消">
                 <template #reference>
                   <span class="iconfont el-icon-ashbin danmu-icon"></span>
                 </template>
@@ -341,17 +337,17 @@
         </el-table>
       </transition>
 
-      <el-card v-if=" video.collection " class="collection-container" shadow="never">
+      <el-card v-if="video.collection" class="collection-container" shadow="never">
         <template #header>
           <div class="header">
-            <span class="name" :title=" video.collection.name ">{{ video.collection.name }}</span>
-            <div style="font-size: 13px;" class="autoStreaming">自动连播<el-switch @click=" setAutoStreaming "
-                v-model=" autoStreaming " /></div>
+            <span class="name" :title="video.collection.name">{{ video.collection.name }}</span>
+            <div style="font-size: 13px;" class="autoStreaming">自动连播<el-switch @click="setAutoStreaming"
+                v-model="autoStreaming" /></div>
           </div>
           <div class="info-row">
             <span class="collection-video-num">共{{ video.collection.videos.length }}个视频</span>
             <span class="collection-play-num">{{ common.numFormatterW(video.collection.playNum) }}播放</span>
-            <el-tooltip effect="light" :content=" video.collection.introduction || '-' " placement="bottom">
+            <el-tooltip effect="light" :content="video.collection.introduction || '-'" placement="bottom">
               <span style="font-size: 13px;" class="iconfont el-icon-browse">简介</span>
             </el-tooltip>
           </div>
@@ -359,8 +355,9 @@
         </template>
         <div class="collection-list">
           <ul>
-            <li :class=" { collectionItemHighlight: item.vid === video.vid } " v-for="( item ) in  video.collection.videos ">
-              <span @click=" video.vid = item.vid " class="title">{{ item.title }}</span>
+            <li :class="{ collectionItemHighlight: item.vid === video.vid }"
+              v-for="( item ) in  video.collection.videos ">
+              <span @click="video.vid = item.vid" class="title">{{ item.title }}</span>
               <span class="duration">{{ common.videoTimeFormatterHMS(item.duration) }}</span>
             </li>
           </ul>
@@ -371,13 +368,13 @@
         <Advertisement></Advertisement>
       </div>
 
-      <div v-if=" !video.collection && video.recommend.length > 0 " class="autoStreaming-row">
+      <div v-if="!video.collection && video.recommend.length > 0" class="autoStreaming-row">
         <div>接下来播放</div>
-        <div class="autoStreaming">自动连播<el-switch @click=" setAutoStreaming " v-model=" autoStreaming " /></div>
+        <div class="autoStreaming">自动连播<el-switch @click="setAutoStreaming" v-model="autoStreaming" /></div>
       </div>
 
       <div>
-        <VideoCard :class=" { cardFCA: !video.collection && video.recommend.length > 1 } " :data=" item " class="card"
+        <VideoCard :class="{ cardFCA: !video.collection && video.recommend.length > 1 }" :data="item" class="card"
           v-for="( item ) in  video.recommend "></VideoCard>
       </div>
     </div>
@@ -1142,7 +1139,7 @@ function openLoginWindow() {
 
 function reportVideo() {
   extraPop.value.hide()
-  
+
   if (!isLogin.value) {
     openLoginWindow()
     return

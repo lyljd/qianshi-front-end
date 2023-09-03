@@ -11,7 +11,7 @@
   "isLike": false,
   "isCoin": false,
   "isStar": false,
-  "videoUrl": "../../public/video/2.mp4",
+  "videoUrl": "/resource/video/2.mp4",
   "intro": "Saturday night what a wild, wild dream\n周六晚上 我做了一个疯狂的梦\n\nThe room feels like a full-screen cinema\n房间看起来像一部全屏的影片\n\nGot you close got you so, so close\n我离你那么近 那么靠近\n\nBut not for long\n但这只有一瞬间",
   "tags": [
     "音乐",
@@ -24,7 +24,7 @@
       {
         "cid": 1,
         "uid": 1,
-        "avatarUrl": "../../public/avatar.jpeg",
+        "avatarUrl": "/resource/avatar.jpeg",
         "nickname": "Bonnenult",
         "level": 6,
         "isVip": true,
@@ -45,7 +45,7 @@
             {
               "cid": 3,
               "uid": 3,
-              "avatarUrl": "../../public/avatar2.jpg",
+              "avatarUrl": "/resource/avatar2.jpg",
               "nickname": "惜缘灬冷颜",
               "level": 3,
               "isVip": false,
@@ -64,7 +64,7 @@
             {
               "cid": 4,
               "uid": 1,
-              "avatarUrl": "../../public/avatar.jpeg",
+              "avatarUrl": "/resource/avatar.jpeg",
               "nickname": "Bonnenult",
               "level": 6,
               "isVip": true,
@@ -90,7 +90,7 @@
       {
         "cid": 2,
         "uid": 1,
-        "avatarUrl": "../../public/avatar.jpeg",
+        "avatarUrl": "/resource/avatar.jpeg",
         "nickname": "Bonnenult",
         "level": 6,
         "isVip": true,
@@ -114,7 +114,7 @@
   },
   "author": {
     "uid": 1,
-    "avatarUrl": "../../public/avatar.jpeg",
+    "avatarUrl": "/resource/avatar.jpeg",
     "nickname": "Bonnenult",
     "signature": "要么庸俗，要么孤独。",
     "focuNum": 2377801,
@@ -182,8 +182,8 @@
   "recommend": [
     {
       "vid": 4,
-      "videoUrl": "../../public/video/1.mp4",
-      "coverUrl": "../../public/cover/1.jpeg",
+      "videoUrl": "/resource/video/1.mp4",
+      "coverUrl": "/resource/cover/1.jpeg",
       "playNum": 732790,
       "danmuNum": 1563,
       "duration": 320,
@@ -194,8 +194,8 @@
     },
     {
       "vid": 5,
-      "videoUrl": "../../public/video/4.mp4",
-      "coverUrl": "../../public/cover/4.jpeg",
+      "videoUrl": "/resource/video/4.mp4",
+      "coverUrl": "/resource/cover/4.jpeg",
       "playNum": 87209,
       "danmuNum": 304,
       "duration": 273,
@@ -206,8 +206,8 @@
     },
     {
       "vid": 6,
-      "videoUrl": "../../public/video/5.mp4",
-      "coverUrl": "../../public/cover/5.jpeg",
+      "videoUrl": "/resource/video/5.mp4",
+      "coverUrl": "/resource/cover/5.jpeg",
       "playNum": 7893,
       "danmuNum": 140,
       "duration": 90,

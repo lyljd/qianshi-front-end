@@ -2,7 +2,7 @@
   <div class="avatar-container">
     <div class="left">
       <el-avatar size="large" class="avatar" :src="meHome.avatarUrl" @error="true">
-        <img src="../../public/default-avatar.png" />
+        <img src="/default-avatar.png" />
       </el-avatar>
     </div>
     <div class="right">

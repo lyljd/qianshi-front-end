@@ -212,7 +212,7 @@ function getCurUserInfo(): UserInfo {
   return {
     id: 1,
     nickname: "Bonnenult",
-    coverUrl: "../../public/avatar.jpeg",
+    coverUrl: "/resource/avatar.jpeg",
     power: 6,
   }
 }

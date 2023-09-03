@@ -142,7 +142,7 @@ function mockLogin(): LoginInfo {
   let li: LoginInfo = {
     "uid": 1,
     "nickname": "ljd",
-    "avatarUrl": "../../public/avatar.jpeg",
+    "avatarUrl": "/resource/avatar.jpeg",
     "token": "payload.signature-token",
     "refreshToken": "payload.signature-refreshToken",
   }
