@@ -4,69 +4,71 @@
       avatar>
     </Image>
     <div class="right">
-      <div class="user-info">
-        <span :class="{ nicknameVip: data.isVip }" @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname
-        }}</span>
+      <div class="main">
+        <div class="user-info">
+          <span :class="{ nicknameVip: data.isVip }" @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname
+          }}</span>
 
-        <svg class="icon-symbol level" aria-hidden="true">
-          <use :xlink:href="'#el-icon-level_' + data.level"></use>
-        </svg>
+          <svg class="icon-symbol level" aria-hidden="true">
+            <use :xlink:href="'#el-icon-level_' + data.level"></use>
+          </svg>
 
-        <svg v-if="data.isUp" style="font-size: 25px;" class="icon-symbol" aria-hidden="true">
-          <use xlink:href="#el-icon-UPzhu-copy"></use>
-        </svg>
+          <svg v-if="data.isUp" style="font-size: 25px;" class="icon-symbol" aria-hidden="true">
+            <use xlink:href="#el-icon-UPzhu-copy"></use>
+          </svg>
+        </div>
+
+        <div class="to" v-if="data.to !== undefined">回复 @<span @click="common.ToUser(data.to.uid)" class="nickname">{{
+          data.to?.nickname }}</span>：</div>
+
+        <textarea :id="'comment-' + data.cid" class="comment" rows="1" readonly>{{ data.content }}</textarea>
+
+        <div class="comment-info">
+          <span>
+            <span class="date">{{ common.timestampFormatterRich(data.date) }}</span>
+
+            <span class="ip-location">IP属地：{{ data.ipLocation }}</span>
+
+            <span @click="like" :class="{ blue: data.isLike }" :title="data.likeNum.toString()"
+              class="iconfont el-icon-zan like-btn">{{ common.numFormatterW(data.likeNum)
+              }}</span>
+
+            <span @click="dislike" :class="{ blue: data.isDislike }" class="iconfont el-icon-cai dislike-btn"></span>
+
+            <span @click="openChildSendArea(data.parentCid, data.cid, data.nickname, data.isChild)"
+              class="reply-btn">回复</span>
+          </span>
+
+          <el-popover ref="extraPop" trigger="click" placement="bottom-end">
+            <template #reference>
+              <span class="iconfont el-icon-diandiandianshu extra"></span>
+            </template>
+            <div class="extra-container">
+              <div v-if="isUp" @click="setTop" class="comment-top"><span
+                  :class="!data.isTop ? 'el-icon-zhiding' : 'el-icon-quxiaozhiding'" class="iconfont em-icon"></span>{{
+                    !data.isTop ? '置顶' : '取消置顶' }}</div>
+
+              <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon
+                :title="!data.isChild ? '删除评论后，评论下所有回复都会被删除，是否继续?' : '你确认要删除该评论吗？'" confirm-button-text="确认"
+                cancel-button-text="取消">
+                <template #reference>
+                  <div v-if="isMe || isUp" class="comment-detele"><span class="iconfont el-icon-ashbin em-icon"></span>删除
+                  </div>
+                </template>
+              </el-popconfirm>
+
+              <div @click="report" class="comment-report"><span class="iconfont el-icon-jubao em-icon"></span>举报</div>
+            </div>
+          </el-popover>
+        </div>
+
+        <div v-if="data.isTop || data.isUpLike" class="status">
+          <span v-if="data.isTop" class="top">置顶</span>
+          <span v-if="data.isUpLike" class="up-like">UP主觉得很赞</span>
+        </div>
       </div>
 
-      <div class="to" v-if="data.to !== undefined">回复 @<span @click="common.ToUser(data.to.uid)" class="nickname">{{
-        data.to?.nickname }}</span>：</div>
-
-      <textarea :id="'comment-' + data.cid" class="comment" rows="1" readonly>{{ data.content }}</textarea>
-
-      <div class="comment-info">
-        <span>
-          <span class="date">{{ common.timestampFormatterRich(data.date) }}</span>
-
-          <span class="ip-location">IP属地：{{ data.ipLocation }}</span>
-
-          <span @click="like" :class="{ blue: data.isLike }" :title="data.likeNum.toString()"
-            class="iconfont el-icon-zan like-btn">{{ common.numFormatterW(data.likeNum)
-            }}</span>
-
-          <span @click="dislike" :class="{ blue: data.isDislike }" class="iconfont el-icon-cai dislike-btn"></span>
-
-          <span @click="openChildSendArea(data.parentCid, data.cid, data.nickname, data.isChild)"
-            class="reply-btn">回复</span>
-        </span>
-
-        <el-popover ref="extraPop" trigger="click" placement="bottom-end">
-          <template #reference>
-            <span class="iconfont el-icon-diandiandianshu extra"></span>
-          </template>
-          <div class="extra-container">
-            <div v-if="isUp" @click="setTop" class="comment-top"><span
-                :class="!data.isTop ? 'el-icon-zhiding' : 'el-icon-quxiaozhiding'" class="iconfont em-icon"></span>{{
-                  !data.isTop ? '置顶' : '取消置顶' }}</div>
-
-            <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon
-              :title="!data.isChild ? '删除评论后，评论下所有回复都会被删除，是否继续?' : '你确认要删除该评论吗？'" confirm-button-text="确认"
-              cancel-button-text="取消">
-              <template #reference>
-                <div v-if="isMe || isUp" class="comment-detele"><span class="iconfont el-icon-ashbin em-icon"></span>删除
-                </div>
-              </template>
-            </el-popconfirm>
-
-            <div @click="report" class="comment-report"><span class="iconfont el-icon-jubao em-icon"></span>举报</div>
-          </div>
-        </el-popover>
-      </div>
-
-      <div v-if="data.isTop || data.isUpLike" class="status">
-        <span v-if="data.isTop" class="top">置顶</span>
-        <span v-if="data.isUpLike" class="up-like">UP主觉得很赞</span>
-      </div>
-
-      <div v-for="(  item  ) in   data.reply?.value  ">
+      <div v-for="(item) in data.reply?.value">
         <ChildComment :vAuthorUid="vAuthorUid" :openChildSendArea="openChildSendArea" :deleteComment="deleteChildComment"
           :scrollId="scrollId" :data="item"></ChildComment>
       </div>
@@ -333,6 +335,14 @@ export default {
 .comment-info .reply-btn {
   font-size: 13px;
   cursor: default;
+}
+
+.main:hover .extra {
+  display: inline;
+}
+
+.comment-info .extra {
+  display: none;
 }
 
 .comment-info .extra:hover {

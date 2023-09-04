@@ -60,9 +60,9 @@
       <el-menu class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
         <el-menu-item :index="`/u/${$route.params.uid}`">主页</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/dynamic`">动态</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/video`">投稿</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏</el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/post`">投稿<span class="n">{{ user.postNum }}</span></el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集<span class="n">{{ user.collectionNum }}</span></el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏<span class="n">{{ user.favlistNum }}</span></el-menu-item>
         <el-menu-item v-if="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
 
         <div class="search-container">
@@ -127,6 +127,9 @@ type User = {
   ipLocation: string
   topImgNo: number
   isFocu: boolean
+  postNum: number
+  collectionNum: number
+  favlistNum: number
   focuNum: number
   fanNum: number
   likeNum: number
@@ -134,54 +137,57 @@ type User = {
   readNum: number
 }
 
-let user: User = reactive(getUser())
-document.title = user.nickname + "的个人空间 - 浅时"
+let user = ref<User>(getUser())
+document.title = user.value.nickname + "的个人空间 - 浅时"
 
 const store = useStore()
 let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(user.uid)
-    user = getUser()
+    isMe.value = common.isMe(user.value.uid)
+    user.value = getUser()
   } else {
     isMe.value = false
-    user = getUser()
+    user.value = getUser()
   }
 })
 
+store.addUserMenuCollectionNum = addMenuCollectionNum
+store.addUserMenuFavlistNum = addMenuFavlistNum
+
 const signatureInput = ref<HTMLInputElement>()
 
-let isMe = ref(common.isMe(user.uid))
+let isMe = ref(common.isMe(user.value.uid))
 let searchKey = ref("")
 let oldTopImgNo = ref(1)
 let replaceTopImgDrawerShow = ref(false)
-let focuBtnInnerText = ref(!user.isFocu ? "关注" : "已关注")
+let focuBtnInnerText = ref(!user.value.isFocu ? "关注" : "已关注")
 
 function getUser() {
   return mockUser //TODO
 }
 
 function recImgUrl(imgUrl: string) {
-  user.avatarUrl = imgUrl
+  user.value.avatarUrl = imgUrl
 }
 
 function saveSignature() {
-  user.signature = user.signature.trim()
-  if (user.signature.length > 50) {
+  user.value.signature = user.value.signature.trim()
+  if (user.value.signature.length > 50) {
     common.showInfo("签名的长度最大为50，超出部分已自动选中")
     signatureInput.value!.focus()
-    signatureInput.value!.setSelectionRange(50, user.signature.length)
+    signatureInput.value!.setSelectionRange(50, user.value.signature.length)
   }
 }
 
 function replaceTopImg() {
   replaceTopImgDrawerShow.value = true;
-  oldTopImgNo.value = user.topImgNo
+  oldTopImgNo.value = user.value.topImgNo
 }
 
 function cancelTopImg() {
   replaceTopImgDrawerShow.value = false
-  user.topImgNo = oldTopImgNo.value
+  user.value.topImgNo = oldTopImgNo.value
 }
 
 function saveTopImg() {
@@ -198,11 +204,11 @@ function focu() {
     common.showInfo("不能关注自己")
     return
   }
-  if (!user.isFocu) {
-    user.isFocu = true
+  if (!user.value.isFocu) {
+    user.value.isFocu = true
     focuBtnInnerText.value = "已关注"
   } else {
-    user.isFocu = false
+    user.value.isFocu = false
     focuBtnInnerText.value = "关注"
   }
 }
@@ -222,6 +228,14 @@ function openLoginWindow() {
     "customClass": "zIndex999",
   })
   store.openLoginWindow()
+}
+
+function addMenuCollectionNum(incr: number) {
+  user.value.collectionNum += incr
+}
+
+function addMenuFavlistNum(incr: number) {
+  user.value.favlistNum += incr
 }
 </script>
 
@@ -371,6 +385,12 @@ function openLoginWindow() {
   margin: -20px;
 }
 
+.menu .n {
+  color: #909399;
+  font-size: 12px;
+  margin-left: 3px;
+}
+
 .el-menu-item:focus {
   background-color: transparent !important;
   color: inherit !important;
@@ -400,17 +420,17 @@ function openLoginWindow() {
   cursor: default;
 }
 
-.num-span {
+.num-box .num-span {
   color: #909399;
 }
 
-.num {
+.num-box .num {
   text-align: center;
   margin-top: 5px;
 }
 
-.focu-num:hover,
-.fan-num:hover {
+.num-box .focu-num:hover,
+.num-box .fan-num:hover {
   color: #409EFF;
   cursor: pointer;
 }

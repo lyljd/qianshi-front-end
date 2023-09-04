@@ -24,5 +24,7 @@ export const useStore = defineStore("qianshi", {
     setManegeItemIndex: (idx: number, index: string) => { },
     setManegeFeedbackItemIndex: (idx: number, index: string) => { },
     setPlatformItemIndex: (idx: number, index: string) => { },
+    addUserMenuCollectionNum: (incr: number) => {},
+    addUserMenuFavlistNum: (incr: number) => {},
   }),
 })

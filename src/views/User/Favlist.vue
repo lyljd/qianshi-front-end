@@ -27,13 +27,15 @@
 
         <div v-if="mockVideoNum > 0" class="right-body">
           <div v-for="() in mockVideoNum">
-            <VideoCard class="card" :data="mockVideo"></VideoCard>
-            <el-popconfirm @confirm="deleteItem" width="212" hide-icon title="你确认要取消收藏该视频吗？" confirm-button-text="确认"
-              cancel-button-text="取消">
-              <template #reference>
-                <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
-              </template>
-            </el-popconfirm>
+            <div class="card-container">
+              <VideoCard :data="mockVideo"></VideoCard>
+              <el-popconfirm @confirm="deleteItem" width="212" hide-icon title="你确认要取消收藏该视频吗？" confirm-button-text="确认"
+                cancel-button-text="取消">
+                <template #reference>
+                  <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
+                </template>
+              </el-popconfirm>
+            </div>
           </div>
         </div>
 
@@ -71,7 +73,7 @@ const mockVideo = {
   "date": 1685599556000
 }
 const mockFavlistNum = 6
-const mockVideoNum = 9
+let mockVideoNum = 9
 const mockVideoTotalNum = 13
 
 const store = useStore()
@@ -156,6 +158,7 @@ function deleteFavlist() {
     autofocus: false,
   })
     .then(() => {
+      store.addUserMenuFavlistNum(-1)
       common.showSuccess('删除成功')
     })
   //TODO 删除后若当前activeId不为0则减1
@@ -273,24 +276,25 @@ function deleteItem() {
 .right-body {
   display: flex;
   flex-wrap: wrap;
-  margin: -10px;
   width: 870px;
-  margin-left: 10px;
+  margin-left: 20px;
+  gap: 20px;
 }
 
-.right-body .card {
-  margin: 10px;
+.right-body .card-container:hover .delete-item {
+  display: inline;
 }
 
-.right-body .delete-item {
+.right-body .card-container .delete-item {
   position: absolute;
-  margin-top: -27.5px;
-  margin-left: 266px;
+  margin-top: -18.4px;
+  margin-left: 254px;
   color: #F56C6C;
   cursor: pointer;
+  display: none;
 }
 
-.right-body .delete-item:hover {
+.right-body .card-container .delete-item:hover {
   color: #c45656;
 }
 

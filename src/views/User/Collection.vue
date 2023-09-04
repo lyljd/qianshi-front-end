@@ -29,13 +29,15 @@
 
         <div v-if="mockVideoNum > 0" class="right-body">
           <div v-for="() in mockVideoNum">
-            <VideoCard class="card" :data="mockVideo"></VideoCard>
-            <el-popconfirm @confirm="removeItem" width="212" hide-icon title="你确认要从此合集中移除该视频吗？" confirm-button-text="确认"
-              cancel-button-text="取消">
-              <template #reference>
-                <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
-              </template>
-            </el-popconfirm>
+            <div class="card-container">
+              <VideoCard :data="mockVideo"></VideoCard>
+              <el-popconfirm @confirm="removeItem" width="212" hide-icon title="你确认要从此合集中移除该视频吗？" confirm-button-text="确认"
+                cancel-button-text="取消">
+                <template #reference>
+                  <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
+                </template>
+              </el-popconfirm>
+            </div>
           </div>
         </div>
 
@@ -73,8 +75,8 @@ const mockVideo = {
   "date": 1685799558000
 }
 const mockCollectionNum = 3
-const mockVideoNum = 4
-const mockVideoTotalNum = 4
+let mockVideoNum = 9
+const mockVideoTotalNum = 17
 
 const store = useStore()
 store.$subscribe((_, state) => {
@@ -138,6 +140,7 @@ function deleteCollection() {
     autofocus: false,
   })
     .then(() => {
+      store.addUserMenuCollectionNum(-1)
       common.showSuccess('删除成功')
     })
   //TODO 删除后若当前activeId不为0则减1
@@ -304,24 +307,25 @@ function addToCollection() {
 .right-body {
   display: flex;
   flex-wrap: wrap;
-  margin: -10px;
   width: 870px;
-  margin-left: 10px;
+  margin-left: 20px;
+  gap: 20px;
 }
 
-.right-body .card {
-  margin: 10px;
+.right-body .card-container:hover .delete-item {
+  display: inline;
 }
 
-.right-body .delete-item {
+.right-body .card-container .delete-item {
   position: absolute;
-  margin-top: -27.5px;
-  margin-left: 266px;
+  margin-top: -18.4px;
+  margin-left: 254px;
   color: #F56C6C;
   cursor: pointer;
+  display: none;
 }
 
-.right-body .delete-item:hover {
+.right-body .card-container .delete-item:hover {
   color: #c45656;
 }
 

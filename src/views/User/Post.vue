@@ -40,8 +40,8 @@ const mockVideo = {
 }
 let mockVideoNum = 25
 const mockVideoTotalNum = 35
-const mockReadNum = 25
-const mockReadTotalNum = 35
+const mockReadNum = 0
+const mockReadTotalNum = 0
 //-->
 
 let viewItem = "video"
