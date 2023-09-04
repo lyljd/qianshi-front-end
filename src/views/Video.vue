@@ -1497,8 +1497,8 @@ function seeLater(vid: number) {
 }
 
 .right .collection-container .collection-list {
-  margin-top: -41px;
-  margin-bottom: -41px;
+  margin-top: -36px;
+  margin-bottom: -36px;
   margin-left: -15px;
   margin-right: -15px;
 }
@@ -1517,14 +1517,33 @@ function seeLater(vid: number) {
 .collection-list ul {
   list-style: none;
   padding: 0;
-  max-height: 228px;
+  max-height: 230.5px;
   overflow: scroll;
+  overflow-x: hidden;
+  margin-right: -5px;
+}
+
+.collection-list ul::-webkit-scrollbar {
+  display: none;
+  width: 5px;
+}
+
+.collection-list ul:hover::-webkit-scrollbar {
+  display: block;
+}
+
+.collection-list ul::-webkit-scrollbar-thumb {
+  background-color: #666;
+}
+
+.collection-list ul::-webkit-scrollbar-track {
+  background-color: #ccc;
 }
 
 .collection-list li {
   font-size: 15px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
