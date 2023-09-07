@@ -3,7 +3,7 @@
     :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">
-      <el-card style="max-height: 50vh; overflow: scroll;">
+      <el-card style="max-height: 50vh; overflow: auto;">
         <div v-if="data.length > 0" v-for="(_, idx) in data" class="row">
           <el-input :id="`ip-input-${idx}`" v-model="data[idx]" />
           <el-button @click="delItem(idx)" type="danger" tabindex="-1"><span

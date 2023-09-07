@@ -1,6 +1,5 @@
 <template>
-  <el-tabs @tab-change="viewItemChange" v-model="viewItem" style="margin-left: -1px; margin-right: -1px;"
-    type="border-card">
+  <el-tabs @tab-change="viewItemChange" v-model="viewItem" type="border-card" class="tabs">
     <el-tab-pane name="video" :label="`视频 ${mockVideoTotalNum}`">
       <el-tabs @tab-change="videoTabChange" v-if="mockVideoNum > 0" v-model="videoSortBy">
         <el-tab-pane label="最新发布" name="date"></el-tab-pane>
@@ -115,5 +114,11 @@ function readTabChange(sortBy: string) {
 
 .el-tabs__nav-wrap::after {
   z-index: inherit;
+}
+
+.tabs,
+.el-tabs--border-card>.el-tabs__header,
+.el-tabs__nav-wrap {
+  border-radius: 4px;
 }
 </style>

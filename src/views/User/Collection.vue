@@ -1,5 +1,5 @@
 <template>
-  <el-card style="margin-left: -1px; margin-right: -1px;">
+  <el-card>
     <div v-if="mockCollectionNum > 0 || isMe" class="container">
       <div class="left">
         <ul>
@@ -201,7 +201,7 @@ function addToCollection() {
   margin-left: -20px;
   margin-top: -20px;
   margin-bottom: -20px;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .left .new-favlist {

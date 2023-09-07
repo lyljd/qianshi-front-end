@@ -861,7 +861,7 @@ function modifyVideo() {
 .edit-dialog {
   height: 75%;
   max-height: 597px;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .edit-dialog .el-dialog__header {

@@ -29,7 +29,7 @@
           <div class="extra-menu">
             <ul>
               <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报&emsp;&emsp;</li>
-              <li @click="seeLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
+              <li @click="watchLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
             </ul>
           </div>
         </el-popover>
@@ -153,7 +153,7 @@
                   <el-radio-group @change="setVideoQuality" v-model="videoQuality"
                     style="display: flex;justify-content: center; margin: 0;">
                     <el-radio-button style="margin: 0;" label="原画" />
-                    <el-radio-button style="margin: 0;" label="普清" />
+                    <el-radio-button disabled style="margin: 0;" label="普清" />
                   </el-radio-group>
                 </el-popover>
 
@@ -1157,9 +1157,9 @@ function reportDanmu(did: number) {
   store.openFSWindow("弹幕举报", did.toString(), "请输入举报理由", "理由不能为空", "举报成功")
 }
 
-function seeLater(vid: number) {
+function watchLater(vid: number) {
   if (!hasSeeLater.value) {
-    common.seeLater(vid)
+    common.watchLater(vid)
   } else {
     common.cancelSeeLater(vid)
   }
@@ -1518,18 +1518,12 @@ function seeLater(vid: number) {
   list-style: none;
   padding: 0;
   max-height: 230.5px;
-  overflow: scroll;
-  overflow-x: hidden;
+  overflow: auto;
   margin-right: -5px;
 }
 
 .collection-list ul::-webkit-scrollbar {
-  display: none;
   width: 5px;
-}
-
-.collection-list ul:hover::-webkit-scrollbar {
-  display: block;
 }
 
 .collection-list ul::-webkit-scrollbar-thumb {

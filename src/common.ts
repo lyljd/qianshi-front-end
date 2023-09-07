@@ -243,7 +243,7 @@ function showInfo(msg: string) {
   })
 }
 
-function seeLater(vid: number) {
+function watchLater(vid: number) {
   console.log(vid) //TODO api request
   showSuccess("添加成功")
 }
@@ -300,7 +300,7 @@ export {
   showError,
   showSuccess,
   showInfo,
-  seeLater,
+  watchLater,
   cancelSeeLater,
   expToLevel,
 }

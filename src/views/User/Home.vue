@@ -217,7 +217,7 @@ function toMeSetting() {
 }
 
 .home-container .left {
-  width: 702px;
+  width: 703px;
 }
 
 .home-container .left>* {

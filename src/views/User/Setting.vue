@@ -1,5 +1,5 @@
 <template>
-  <el-card style="margin-left: -1px; margin-right: -1px;" v-if="isMe"
+  <el-card v-if="isMe"
     header="隐私设置">
     <div class="column">
       <div class="option">

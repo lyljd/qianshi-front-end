@@ -2,7 +2,7 @@
   <div class="video-card">
     <el-tooltip content="稍后再看" :show-arrow="false" offset="3" placement="bottom-end" :enterable="false" :hide-after="0">
       <div v-show="coverHoverStatus || videoHoverStatus" @mouseenter="laterMouseEnter" @mouseleave="laterMouseLeave"
-        @click="seeLater(data.vid)" class="later-container">
+        @click="watchLater(data.vid)" class="later-container">
         <span v-show="!hasSeeLater" class="iconfont later-icon el-icon-shaohou animate__animated animate__fadeIn"></span>
         <span v-show="hasSeeLater" class="iconfont later-icon el-icon-dui animate__animated animate__fadeIn"></span>
       </div>
@@ -113,9 +113,9 @@ function laterMouseLeave() {
   laterHoverStatus.value = false
 }
 
-function seeLater(vid: number) {
+function watchLater(vid: number) {
   if (!hasSeeLater.value) {
-    common.seeLater(vid)
+    common.watchLater(vid)
   } else {
     common.cancelSeeLater(vid)
   }

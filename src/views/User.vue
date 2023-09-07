@@ -105,7 +105,7 @@
       </el-menu>
     </el-card>
 
-    <router-view style="margin-bottom: 20px;"></router-view>
+    <router-view style="margin-bottom: 20px; margin-left: -1px; margin-right: -1px;"></router-view>
   </div>
 </template>
 
