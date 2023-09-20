@@ -1,12 +1,12 @@
 <template>
   <div :id="'container-' + data.cid" class="container">
-    <Image :customClick="() => { common.ToUser(data.uid) }" :url="data.avatarUrl" :w="40" :h="40" customClass="avatar"
+    <Image :customClick="() => { cmjs.jump.user(data.uid) }" :url="data.avatarUrl" :w="40" :h="40" customClass="avatar"
       avatar>
     </Image>
     <div class="right">
       <div class="main">
         <div class="user-info">
-          <span :class="{ nicknameVip: data.isVip }" @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname
+          <span :class="{ nicknameVip: data.isVip }" @click="cmjs.jump.user(data.uid)" class="nickname">{{ data.nickname
           }}</span>
 
           <svg class="icon-symbol level" aria-hidden="true">
@@ -18,22 +18,23 @@
           </svg>
         </div>
 
-        <div class="to" v-if="data.to !== undefined">回复 @<span @click="common.ToUser(data.to.uid)" class="nickname">{{
+        <div class="to" v-if="data.to !== undefined">回复 @<span @click="cmjs.jump.user(data.to.uid)" class="nickname">{{
           data.to?.nickname }}</span>：</div>
 
         <textarea :id="'comment-' + data.cid" class="comment" rows="1" readonly>{{ data.content }}</textarea>
 
         <div class="comment-info">
           <span>
-            <span class="date">{{ common.timestampFormatterRich(data.date) }}</span>
+            <span class="date">{{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD HH:mm") }}</span>
 
             <span class="ip-location">IP属地：{{ data.ipLocation }}</span>
 
-            <span @click="like" :class="{ blue: data.isLike }" :title="data.likeNum.toString()"
-              class="iconfont el-icon-zan like-btn">{{ common.numFormatterW(data.likeNum)
+            <span @click="like" :style="{ color: data.isLike ? '#409EFF' : '' }" :title="data.likeNum.toString()"
+              class="iconfont el-icon-zan like-btn">{{ cmjs.fmt.numWE(data.likeNum)
               }}</span>
 
-            <span @click="dislike" :class="{ blue: data.isDislike }" class="iconfont el-icon-cai dislike-btn"></span>
+            <span @click="dislike" :style="{ color: data.isDislike ? '#409EFF' : '' }"
+              class="iconfont el-icon-cai dislike-btn"></span>
 
             <span @click="openChildSendArea(data.parentCid, data.cid, data.nickname, data.isChild)"
               class="reply-btn">回复</span>
@@ -78,8 +79,8 @@
 
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import * as common from "../common"
-import { useStore } from "../store"
+import cmjs from '@/cmjs'
+import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 
 type Comment = {
@@ -124,8 +125,8 @@ const store = useStore()
 let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(props.data.uid)
-    isUp.value = common.isMe(props.vAuthorUid)
+    isMe.value = cmjs.biz.isMe(props.data.uid)
+    isUp.value = cmjs.biz.isMe(props.vAuthorUid)
     init()
   } else {
     isMe.value = false
@@ -137,8 +138,8 @@ store.$subscribe((_, state) => {
 const extraPop = ref()
 let commentEle: HTMLTextAreaElement
 
-let isMe = ref(common.isMe(props.data.uid))
-let isUp = ref(common.isMe(props.vAuthorUid))
+let isMe = ref(cmjs.biz.isMe(props.data.uid))
+let isUp = ref(cmjs.biz.isMe(props.vAuthorUid))
 
 onMounted(() => {
   commentEle = document.getElementById("comment-" + props.data.cid) as HTMLTextAreaElement
@@ -158,7 +159,7 @@ onMounted(() => {
   let sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
   let lastSendBtn = sendBtns[sendBtns.length - 1]
   if (!lastSendBtn.disabled) {
-    common.btnCD(lastSendBtn, 10)
+    cmjs.util.btnCD(lastSendBtn, 10)
   }
   //-->
 })
@@ -192,7 +193,7 @@ function like() {
     return
   }
   if (isMe.value) {
-    common.showInfo("不能给自己的评论点赞")
+    cmjs.prompt.info("不能给自己的评论点赞")
     return
   }
   if (!props.data.isLike) {
@@ -214,7 +215,7 @@ function dislike() {
     return
   }
   if (isMe.value) {
-    common.showInfo("不能给自己的评论点踩")
+    cmjs.prompt.info("不能给自己的评论点踩")
     return
   }
   if (props.data.isLike) {
@@ -249,7 +250,7 @@ function report() {
 function setTop() {
   extraPop.value.hide()
   props.data.isTop = !props.data.isTop
-  common.showSuccess(props.data.isTop ? '置顶成功' : '取消置顶成功')
+  cmjs.prompt.success(props.data.isTop ? '置顶成功' : '取消置顶成功')
 }
 </script>
 

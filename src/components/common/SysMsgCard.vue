@@ -3,7 +3,7 @@
     <template #header>
       <div class="smc-header">
         <div class="title">{{ data.title }}</div>
-        <div class="time">{{ common.timestampFormatterStandard(data.time) }}</div>
+        <div class="time">{{ cmjs.fmt.tsStandard(data.time) }}</div>
       </div>
     </template>
     <div v-html="data.content" class="smc-body"></div>
@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
+import cmjs from '@/cmjs'
 
 defineProps<{
   data: {

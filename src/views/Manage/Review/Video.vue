@@ -3,15 +3,15 @@
     <el-card v-for="(r, idx) in rs">
       <template #header>
         <div class="header">
-          <span class="flex-center">作者：<span @click="common.ToUser(r.uid)" class="nickname">{{ r.nickname }}</span></span>
-          <span>申请时间：{{ common.timestampFormatterStandard(r.applyTime) }}</span>
+          <span class="flex-center">作者：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname }}</span></span>
+          <span>申请时间：{{ cmjs.fmt.tsStandard(r.applyTime) }}</span>
           <div class="flex-center">
             <span>操作：{{ r.vid ? "修改" : "新发布" }}</span>
-            <el-button v-if="r.vid" @click="common.ToVideo(r.vid)" class="to-video" type="primary">原视频</el-button>
+            <el-button v-blur v-if="r.vid" @click="cmjs.jump.video(r.vid)" class="to-video" type="primary">原视频</el-button>
           </div>
           <div>
-            <el-button @click="pass(idx)" type="success">通过</el-button>
-            <el-button @click="deny(idx)" type="danger">驳回</el-button>
+            <el-button v-blur @click="pass(idx)" type="success">通过</el-button>
+            <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
           </div>
         </div>
       </template>
@@ -31,11 +31,11 @@
 </template>
 
 <script setup lang="ts">
-import Records from "../../../mock/manage/review/video.json"
-import * as common from "../../../common"
-import VideoDescriptions from "../../../components/VideoDescriptions.vue"
+import Records from "@/mock/manage/review/video.json"
+import cmjs from '@/cmjs'
+import VideoDescriptions from "@/components/util/VideoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
-import { useStore } from "../../../store"
+import { useStore } from "@/store"
 
 type video = {
   videoUrl: string,
@@ -87,7 +87,7 @@ function pass(formIdx: number) {
   console.log(rs[formIdx].id)
 
   rs.splice(formIdx, 1)
-  common.showSuccess("已通过")
+  cmjs.prompt.success("已通过")
 }
 
 function deny(formIdx: number) {
@@ -104,7 +104,7 @@ function deny(formIdx: number) {
       console.log("理由：" + value)
 
       rs.splice(formIdx, 1)
-      common.showSuccess("已驳回")
+      cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
 }

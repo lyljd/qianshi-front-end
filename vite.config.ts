@@ -21,5 +21,10 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
-  }
+  },
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
 })

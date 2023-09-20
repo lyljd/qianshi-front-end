@@ -10,11 +10,13 @@
       list-type="picture-card"><el-icon>
         <Plus />
       </el-icon></el-upload>
-    <div class="tip">上传的图片大小上限为10M，最多上传9张图片。</div>
+    <div class="tip">
+      <span>上传的图片大小上限为10M，最多上传9张图片。</span>
+    </div>
 
     <template #footer>
-      <el-button @click="closeMainWindow">取消</el-button>
-      <el-button @click="submit" type="primary">提交</el-button>
+      <el-button v-blur @click="closeMainWindow">取消</el-button>
+      <el-button v-blur @click="submit" type="primary">提交</el-button>
     </template>
   </el-dialog>
 
@@ -25,8 +27,8 @@
 
 <script setup lang="ts">
 import { UploadInstance, ElInput } from 'element-plus'
-import { useStore } from "../store"
-import * as common from "../common"
+import { useStore } from "@/store"
+import cmjs from '@/cmjs'
 
 const store = useStore()
 store.openFSWindow = openMainWindow
@@ -83,7 +85,7 @@ function submit() {
   msg.value = msg.value.trim()
   if (msg.value === "") {
     inputEle.value?.focus()
-    common.showError(failMsg.value)
+    cmjs.prompt.error(failMsg.value)
     return
   }
 
@@ -95,26 +97,22 @@ function submit() {
 
   afterSuccDo()
   closeMainWindow()
-  common.showSuccess(succMsg.value)
+  cmjs.prompt.success(succMsg.value)
 }
 
 function onExceed() {
-  common.showError("最多上传9张图片")
+  cmjs.prompt.error("最多上传9张图片")
 }
 
 function onChange(file: any) {
   if (file.status === "ready" && file.size / 1024 / 1024 > 10) {
     uploadRef.value!.handleRemove(file)
-    common.showError("上传的图片大小不能超过10M")
+    cmjs.prompt.error("上传的图片大小不能超过10M")
   }
 }
 </script>
 
 <style scoped>
-.main .tip {
-  margin-top: 3px;
-  font-size: 12px;
-}
 </style>
 
 <style>

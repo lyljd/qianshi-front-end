@@ -3,11 +3,11 @@
     <el-card v-for="(r, idx) in rs">
       <template #header>
         <div class="header">
-          <span class="flex-center">用户：<span @click="common.ToUser(r.uid)" class="nickname">{{ r.nickname }}</span></span>
-          <span>反馈时间：{{ common.timestampFormatterStandard(r.feedbackTime) }}</span>
+          <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname }}</span></span>
+          <span>反馈时间：{{ cmjs.fmt.tsStandard(r.feedbackTime) }}</span>
           <div>
-            <el-button @click="reply(idx)" type="success">回复</el-button>
-            <el-button @click="ignore(idx)" type="danger">忽略</el-button>
+            <el-button v-blur @click="reply(idx)" type="success">回复</el-button>
+            <el-button v-blur @click="ignore(idx)" type="danger">忽略</el-button>
           </div>
         </div>
       </template>
@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import Records from "../../../mock/manage/feedback/msg.json"
-import * as common from "../../../common"
-import FeedbackDescriptions from "../../../components/FeedbackDescriptions.vue"
-import { useStore } from "../../../store"
+import Records from "@/mock/manage/feedback/msg.json"
+import cmjs from '@/cmjs'
+import FeedbackDescriptions from "@/components/util/FeedbackDescriptions.vue"
+import { useStore } from "@/store"
 
 type record = {
   id: number,
@@ -82,7 +82,7 @@ function ignore(formIdx: number) {
   console.log(rs[formIdx].id)
 
   rs.splice(formIdx, 1)
-  common.showSuccess("已忽略")
+  cmjs.prompt.success("已忽略")
 }
 </script>
 

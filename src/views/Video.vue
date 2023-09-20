@@ -6,20 +6,20 @@
       <div class="interaction-bar">
         <span :title="video.likeNum.toString()" @click="likeVideo" :class="{ iconIsDo: video.isLike }"
           class="iconfont el-icon-good icon"><span class="num">{{
-            common.numFormatterW(video.likeNum)
+            cmjs.fmt.numWE(video.likeNum)
           }}</span></span>
 
         <span :title="video.coinNum.toString()" @click="coinVideo" :class="{ iconIsDo: video.isCoin }"
           class="iconfont el-icon-Bbi icon"><span class="num">{{
-            common.numFormatterW(video.coinNum) }}</span></span>
+            cmjs.fmt.numWE(video.coinNum) }}</span></span>
 
         <span :title="video.starNum.toString()" @click="starVideo" :class="{ iconIsDo: video.isStar }"
           class="iconfont el-icon-collection icon"><span class="num">{{
-            common.numFormatterW(video.starNum)
+            cmjs.fmt.numWE(video.starNum)
           }}</span></span>
 
         <span :title="video.shareNum.toString()" class="iconfont el-icon-fenxiang icon"><span class="num">{{
-          common.numFormatterW(video.shareNum)
+          cmjs.fmt.numWE(video.shareNum)
         }}</span></span>
 
         <el-popover ref="extraPop" placement="bottom-end">
@@ -29,7 +29,7 @@
           <div class="extra-menu">
             <ul>
               <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报&emsp;&emsp;</li>
-              <li @click="watchLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
+              <li @click="cmjs.biz.watchLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
             </ul>
           </div>
         </el-popover>
@@ -38,12 +38,12 @@
       <div class="info">
         <span class="item">
           <span class="iconfont el-icon-bofangshu icon"></span>
-          <span>{{ common.numFormatterW(video.playNum) }}</span>
+          <span>{{ cmjs.fmt.numWE(video.playNum) }}</span>
         </span>
 
         <span class="item">
           <span class="iconfont el-icon-danmushu icon"></span>
-          <span>{{ common.numFormatterW(video.danmu.length) }}</span>
+          <span>{{ cmjs.fmt.numWE(video.danmu.length) }}</span>
         </span>
 
         <span class="item">
@@ -73,7 +73,7 @@
             <li>弹幕视频播放器 v1.0.0</li>
             <li @click="copyVideoUrl">复制视频地址（精准空降）</li>
             <li @click="shortcutKeyDescriptionWindowVisible = true">快捷键说明</li>
-            <li @click="common.ToDeveloper">关于作者</li>
+            <li @click="cmjs.jump.developer()">关于作者</li>
           </ul>
         </div>
 
@@ -120,7 +120,7 @@
                       <div class="option">
                         <div style="margin-bottom: 5px;">颜色</div>
                         <div>
-                          <el-color-picker :append-to="videoContainer" v-model="dmColor" :predefine="predefinedmColors" />
+                          <ColorPicker :appendTo="videoContainer" v-model="dmColor"></ColorPicker>
                         </div>
                       </div>
 
@@ -141,7 +141,7 @@
                     placeholder="发个友善的弹幕见证当下" />
                 </div>
 
-                <el-button @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
+                <el-button v-blur @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
               </div>
 
 
@@ -215,7 +215,7 @@
       </div>
 
       <div class="danmu-bar">
-        <span class="watch-danmu-num">1人正在看，已装填{{ common.numFormatterW(video.danmu.length) }}条弹幕</span>
+        <span class="watch-danmu-num">1人正在看，已装填{{ cmjs.fmt.numWE(video.danmu.length) }}条弹幕</span>
         <el-tooltip content="关闭弹幕(d)" placement="top" effect="light" :enterable="false">
           <span @click="setDanmuStatus" v-show="danmuStatus" class="iconfont el-icon-bofangqi-danmukai icon dmkg"></span>
         </el-tooltip>
@@ -243,7 +243,7 @@
               <div class="option">
                 <div style="margin-bottom: 5px;">颜色</div>
                 <div>
-                  <el-color-picker v-model="dmColor" :predefine="predefinedmColors" />
+                  <ColorPicker v-model="dmColor"></ColorPicker>
                 </div>
               </div>
 
@@ -263,7 +263,7 @@
           <el-input @keyup.enter.native="sendDanmu" class="danmu-input" v-model="danmuInput" placeholder="发个友善的弹幕见证当下" />
         </div>
 
-        <el-button @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
+        <el-button v-blur @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
       </div>
 
       <el-card class="intro-tag-container">
@@ -281,20 +281,20 @@
 
     <div class="right">
       <div class="avatar-container">
-        <el-avatar @click="common.ToUser(video.author.uid)" class="avatar" :src="video.author.avatarUrl" @error=" true">
-          <img @click="common.ToUser(video.author.uid)" src="/default-avatar.png" />
+        <el-avatar @click="cmjs.jump.user(video.author.uid)" class="avatar" :src="video.author.avatarUrl" @error=" true">
+          <img @click="cmjs.jump.user(video.author.uid)" src="/default-avatar.png" />
         </el-avatar>
 
         <div class="info">
           <div class="nickname-row">
-            <div :title="video.author.nickname" @click="common.ToUser(video.author.uid)" class="nickname">{{
+            <div :title="video.author.nickname" @click="cmjs.jump.user(video.author.uid)" class="nickname">{{
               video.author.nickname }}</div>
             <span class="iconfont el-icon-sixin send-msg">发消息</span>
           </div>
 
           <div :title="video.author.signature" class="signature">{{ video.author.signature || "-" }}</div>
 
-          <el-button id="focu-btn" @click="focuAuthor" class="focus" :type="!video.author.isFocu ? 'primary' : 'info'">{{
+          <el-button v-blur id="focu-btn" @click="focuAuthor" class="focus" :type="!video.author.isFocu ? 'primary' : 'info'">{{
             focuBtnInnerText }}</el-button>
         </div>
       </div>
@@ -337,6 +337,8 @@
         </el-table>
       </transition>
 
+      <div class="gap"></div>
+
       <el-card v-if="video.collection" class="collection-container" shadow="never">
         <template #header>
           <div class="header">
@@ -346,7 +348,7 @@
           </div>
           <div class="info-row">
             <span class="collection-video-num">共{{ video.collection.videos.length }}个视频</span>
-            <span class="collection-play-num">{{ common.numFormatterW(video.collection.playNum) }}播放</span>
+            <span class="collection-play-num">{{ cmjs.fmt.numWE(video.collection.playNum) }}播放</span>
             <el-tooltip effect="light" :content="video.collection.introduction || '-'" placement="bottom">
               <span style="font-size: 13px;" class="iconfont el-icon-browse">简介</span>
             </el-tooltip>
@@ -358,17 +360,17 @@
             <li :class="{ collectionItemHighlight: item.vid === video.vid }"
               v-for="( item ) in  video.collection.videos ">
               <span @click="video.vid = item.vid" class="title">{{ item.title }}</span>
-              <span class="duration">{{ common.videoTimeFormatterHMS(item.duration) }}</span>
+              <span class="duration">{{ cmjs.fmt.videoDuration(item.duration) }}</span>
             </li>
           </ul>
         </div>
       </el-card>
 
-      <div class="advertisement">
-        <Advertisement></Advertisement>
+      <div v-if="video.advertisement" class="advertisement">
+        <Advertisement :data="video.advertisement"></Advertisement>
       </div>
 
-      <div v-if="!video.collection && video.recommend.length > 0" class="autoStreaming-row">
+      <div v-if="!video.collection && video.recommend" class="autoStreaming-row">
         <div>接下来播放</div>
         <div class="autoStreaming">自动连播<el-switch @click="setAutoStreaming" v-model="autoStreaming" /></div>
       </div>
@@ -382,14 +384,15 @@
 </template>
 
 <script setup lang="ts">
-import VideoCard from '../components/VideoCard.vue'
-import Advertisement from '../components/Advertisement.vue'
-import CommentArea from '../components/CommentArea.vue'
-import VideoTag from "../components/VideoTag.vue"
-import * as common from "../common"
-import mockVideo from "../mock/video.json"
+import VideoCard from '@/components/common/VideoCard.vue'
+import Advertisement from "@/components/common/Advertisement.vue"
+import CommentArea from "@/components/common/CommentArea.vue"
+import VideoTag from "@/components/common/VideoTag.vue"
+import ColorPicker from "@/components/common/ColorPicker.vue"
+import cmjs from '@/cmjs'
+import mockVideo from "@/mock/video.json"
 import { ElMessage } from 'element-plus'
-import { useStore } from "../store"
+import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 
 type Video = {
@@ -416,6 +419,7 @@ type Video = {
   danmu: Danmu[]
   collection?: Collection
   recommend: Recommend[]
+  advertisement: Advertisement
 }
 
 type Comment = {
@@ -498,21 +502,21 @@ type Recommend = {
   date: number
 }
 
+type Advertisement = {
+  type: string,
+  content: string | Text,
+  linkUrl: string,
+}
+
+type Text = {
+  text: string,
+  fontSize: number,
+  fontColor: string,
+  bgColor: string,
+}
+
 let video: Video = reactive(getVideo())
 document.title = video.title + " - 浅时"
-
-const predefinedmColors = ref([
-  '#FFFFFF',
-  '#909399',
-  '#000000',
-  '#F56C6C',
-  '#E6A23C',
-  '#FFFF00',
-  '#67C23A',
-  '#409EFF',
-  '#800080',
-  '#FFC0CB',
-])
 
 const shortcutKeyDesc = [
   {
@@ -553,7 +557,7 @@ const store = useStore()
 let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(video.author.uid)
+    isMe.value = cmjs.biz.isMe(video.author.uid)
     video = getVideo()
   } else {
     isMe.value = false
@@ -573,7 +577,7 @@ let c2d: CanvasRenderingContext2D
 let contextMenu: HTMLDivElement
 let focuBtn: HTMLElement
 
-let isMe = ref(common.isMe(video.author.uid))
+let isMe = ref(cmjs.biz.isMe(video.author.uid))
 let danmuStatus = ref(localStorage.getItem("danmuStatus") !== "false" ? true : false)
 let danmuInput = ref("")
 let dmSize = ref(25)
@@ -601,13 +605,12 @@ let videoQuality = ref("原画")
 let proportion = ref(1)
 let shortcutKeyDescriptionWindowVisible = ref(false)
 let focuBtnInnerText = ref("")
-let hasSeeLater = ref(false)
 
 watch(video, (newVal) => {
   if (!newVal.author.isFocu) {
-    focuBtnInnerText.value = "+ 关注 " + common.numFormatterW(video.author.focuNum)
+    focuBtnInnerText.value = "+ 关注 " + cmjs.fmt.numWE(video.author.focuNum)
   } else {
-    focuBtnInnerText.value = "已关注 " + common.numFormatterW(video.author.focuNum)
+    focuBtnInnerText.value = "已关注 " + cmjs.fmt.numWE(video.author.focuNum)
   }
 })
 
@@ -651,7 +654,7 @@ onMounted(() => {
   }
 
   videoEle.addEventListener('loadedmetadata', function () {
-    videoDuration.value = common.videoTimeFormatterHMS(Math.floor(videoEle.duration))
+    videoDuration.value = cmjs.fmt.videoDuration(Math.floor(videoEle.duration))
     videoContainer.style.pointerEvents = "auto"
     videoEle.muted = mutedStatus.value
     if (autoplay.value) {
@@ -672,7 +675,7 @@ onMounted(() => {
 
   videoEle.addEventListener('timeupdate', function () {
     videoHasPercentage.value = videoEle.currentTime / videoEle.duration * 100
-    videoCurrent.value = common.videoTimeFormatterHMS(Math.floor(videoEle.currentTime))
+    videoCurrent.value = cmjs.fmt.videoDuration(Math.floor(videoEle.currentTime))
     if (videoCurrent.value === videoDuration.value) {
       playStatus.value = false
     }
@@ -1020,7 +1023,7 @@ function sendDanmu() {
     return
   }
   danmuSendBtns.forEach((ele) => {
-    common.btnCD(ele, 5)
+    cmjs.util.btnCD(ele, 5)
   })
   //TODO 这里did应该从后端返回的值取得
   video.danmu.push({
@@ -1041,7 +1044,7 @@ function delDanmu(did: number) {
   //TODO did === 2应该换成请求api后失败；弹幕可以由发送人和up删除
   // 为了保护弹幕发送人的隐私，后端不会传发送人的信息过来，也就是说如果有删除弹幕的请求，就必须直达后端，前端不会做拦截
   if (did === 2) {
-    common.showError("删除失败，此弹幕不属于你！")
+    cmjs.prompt.error("删除失败，此弹幕不属于你！")
     return
   }
   video.danmu.forEach((danmu, index) => {
@@ -1049,19 +1052,19 @@ function delDanmu(did: number) {
       video.danmu.splice(index, 1)
     }
   })
-  common.showSuccess("删除成功")
+  cmjs.prompt.success("删除成功")
 }
 
 function videoDateFormatter(date: number) {
-  return common.timestampFormatterStandard(date)
+  return cmjs.fmt.tsStandard(date)
 }
 
 function danmuTimeFormatter(_: any, __: any, cellValue: number, ___: any) {
-  return common.videoTimeFormatterHMS(cellValue)
+  return cmjs.fmt.videoDuration(cellValue)
 }
 
 function danmuDateFormatter(_: any, __: any, cellValue: number, ___: any) {
-  return common.timestampFormatterStandardExcludeSecondOrAndYear(cellValue)
+  return cmjs.fmt.tsYTmpl(cellValue, "MM-DD HH:mm")
 }
 
 function setIntroFull() {
@@ -1080,7 +1083,7 @@ function likeVideo() {
     return
   }
   if (isMe.value) {
-    common.showInfo("不能给自己的视频点赞")
+    cmjs.prompt.info("不能给自己的视频点赞")
     return
   }
   video.isLike = !video.isLike
@@ -1092,7 +1095,7 @@ function coinVideo() {
     return
   }
   if (isMe.value) {
-    common.showInfo("不能给自己的视频投币")
+    cmjs.prompt.info("不能给自己的视频投币")
     return
   }
   video.isCoin = !video.isCoin
@@ -1121,7 +1124,7 @@ function focuAuthor() {
     return
   }
   if (isMe.value) {
-    common.showInfo("不能关注自己")
+    cmjs.prompt.info("不能关注自己")
     return
   }
   video.author.isFocu = !video.author.isFocu
@@ -1155,15 +1158,6 @@ function reportDanmu(did: number) {
   }
 
   store.openFSWindow("弹幕举报", did.toString(), "请输入举报理由", "理由不能为空", "举报成功")
-}
-
-function watchLater(vid: number) {
-  if (!hasSeeLater.value) {
-    common.watchLater(vid)
-  } else {
-    common.cancelSeeLater(vid)
-  }
-  hasSeeLater.value = !hasSeeLater.value
 }
 </script>
 
@@ -1459,9 +1453,13 @@ function watchLater(vid: number) {
   height: 0;
 }
 
+.right .gap {
+  margin-bottom: 20px;
+}
+
 .right .collection-container {
-  margin-top: 20px;
   background-color: #f4f4f5;
+  margin-bottom: 20px;
 }
 
 .right .collection-container .header {
@@ -1559,8 +1557,7 @@ function watchLater(vid: number) {
 
 .right .advertisement {
   width: 270px;
-  height: 151.875px;
-  margin-top: 20px;
+  height: 151.88px;
   margin-bottom: 20px;
 }
 
@@ -1698,14 +1695,6 @@ function watchLater(vid: number) {
 </style>
 
 <style>
-.el-color-dropdown__link-btn {
-  display: none;
-}
-
-.el-color-dropdown {
-  background-color: rgb(240, 240, 240) !important;
-}
-
 .danmu-input-container .el-input__wrapper {
   box-shadow: none !important;
 }

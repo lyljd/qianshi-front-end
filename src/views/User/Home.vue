@@ -5,7 +5,7 @@
         <template #header>
           <div class="header">
             <span>投币的视频 {{ coinVideoTotalNum }}</span>
-            <el-button v-if="coinVideoTotalNum > 6">更多</el-button>
+            <el-button v-blur v-if="coinVideoTotalNum > 6">更多</el-button>
           </div>
         </template>
         <div v-if="coinVideoNum > 0" class="video-card-container">
@@ -18,7 +18,7 @@
         <template #header>
           <div class="header">
             <span>点赞的视频 {{ likeVideoTotalNum }}</span>
-            <el-button v-if="likeVideoTotalNum > 6">更多</el-button>
+            <el-button v-blur v-if="likeVideoTotalNum > 6">更多</el-button>
           </div>
         </template>
         <div v-if="likeVideoNum > 0" class="video-card-container">
@@ -34,14 +34,14 @@
           <div class="header">
             <span>个人认证</span>
             <div v-if="isMe">
-              <el-button @click="apply" v-if="userHome.applyTitle === ''">{{ userHome.title === "" ? "申请" : "重新申请"
+              <el-button v-blur @click="apply" v-if="userHome.applyTitle === ''">{{ userHome.title === "" ? "申请" : "重新申请"
               }}</el-button>
               <div v-else>
                 <el-tooltip :content="userHome.applyTitle" placement="top">
                   <span class="iconfont el-icon-info"
                     style="font-size: 14px; margin-right: 10px; cursor: default;">申请中</span>
                 </el-tooltip>
-                <el-button @click="cancelApply">取消申请</el-button>
+                <el-button v-blur @click="cancelApply">取消申请</el-button>
               </div>
             </div>
           </div>
@@ -62,7 +62,7 @@
         <template #header>
           <div class="header">
             <span>个人资料</span>
-            <el-button @click="toMeSetting" v-if="isMe">修改资料</el-button>
+            <el-button v-blur @click="toMeSetting" v-if="isMe">修改资料</el-button>
           </div>
         </template>
         <div class="info-row">
@@ -86,12 +86,12 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../../common"
-import SmallVideoCard from '../../components/SmallVideoCard.vue'
+import cmjs from '@/cmjs'
+import SmallVideoCard from '@/components/common/SmallVideoCard.vue'
 import { ElMessageBox } from 'element-plus'
 import { useRoute } from 'vue-router'
-import { useStore } from "../../store"
-import mockUserHome from "../../mock/user/home.json"
+import { useStore } from "@/store"
+import mockUserHome from "@/mock/user/home.json"
 
 type UserHome = {
   title: string
@@ -121,7 +121,7 @@ const likeVideoTotalNum = 13
 const store = useStore()
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(parseInt(route.params.uid as string))
+    isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
   }
@@ -135,7 +135,7 @@ let newTitle = ref("")
 
 onMounted(() => {
   route = useRoute()
-  isMe.value = common.isMe(parseInt(route.params.uid as string))
+  isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
 })
 
 function getUserHome() {
@@ -145,7 +145,7 @@ function getUserHome() {
 function saveSpaceNotice() {
   userHome.notice = userHome.notice.trim()
   if (userHome.notice.length > 150) {
-    common.showInfo("公告的字数最多为150，超出部分已自动选中")
+    cmjs.prompt.info("公告的字数最多为150，超出部分已自动选中")
     noticeTextarea.value!.focus()
     noticeTextarea.value!.setSelectionRange(150, userHome.notice.length)
   }
@@ -194,7 +194,7 @@ function beforeNewTitleWindowClose(action: string, _: any, done: Function) {
     if (!checkInput()) {
       return
     }
-    common.showSuccess("已提交申请")
+    cmjs.prompt.success("已提交申请")
     userHome.applyTitle = newTitle.value
   }
   newTitle.value = ""
@@ -202,7 +202,7 @@ function beforeNewTitleWindowClose(action: string, _: any, done: Function) {
 }
 
 function cancelApply() {
-  common.showSuccess("已取消申请")
+  cmjs.prompt.success("已取消申请")
   userHome.applyTitle = ""
 }
 

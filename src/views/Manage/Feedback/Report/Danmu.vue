@@ -3,12 +3,12 @@
     <el-card v-for="(r, idx) in rs">
       <template #header>
         <div class="header">
-          <span class="flex-center">用户：<span @click="common.ToUser(r.uid)" class="nickname">{{ r.nickname }}</span></span>
-          <span>举报时间：{{ common.timestampFormatterStandard(r.reportTime) }}</span>
+          <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname }}</span></span>
+          <span>举报时间：{{ cmjs.fmt.tsStandard(r.reportTime) }}</span>
           <div>
-            <el-button @click="del(idx)" type="success">删除弹幕</el-button>
-            <el-button @click="deny(idx)" type="warning">驳回</el-button>
-            <el-button @click="ignore(idx)" type="danger">忽略</el-button>
+            <el-button v-blur @click="del(idx)" type="success">删除弹幕</el-button>
+            <el-button v-blur @click="deny(idx)" type="warning">驳回</el-button>
+            <el-button v-blur @click="ignore(idx)" type="danger">忽略</el-button>
           </div>
         </div>
       </template>
@@ -27,12 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import Records from "../../../../mock/manage/feedback/report/danmu.json"
-import * as common from "../../../../common"
-import FeedbackDescriptions from "../../../../components/FeedbackDescriptions.vue"
-import InfoDescriptions from "../../../../components/InfoDescriptions.vue"
+import Records from "@/mock/manage/feedback/report/danmu.json"
+import cmjs from '@/cmjs'
+import FeedbackDescriptions from "@/components/util/FeedbackDescriptions.vue"
+import InfoDescriptions from "@/components/util/InfoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
-import { useStore } from "../../../../store"
+import { useStore } from "@/store"
 
 type info = {
   vid: number,
@@ -96,7 +96,7 @@ function del(formIdx: number) {
       console.log(rs[formIdx].id)
 
       rs.splice(formIdx, 1)
-      common.showSuccess('已删除')
+      cmjs.prompt.success('已删除')
     })
 }
 
@@ -114,7 +114,7 @@ function deny(formIdx: number) {
       console.log("理由：" + value)
 
       rs.splice(formIdx, 1)
-      common.showSuccess("已驳回")
+      cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
 }
@@ -124,7 +124,7 @@ function ignore(formIdx: number) {
   console.log(rs[formIdx].id)
 
   rs.splice(formIdx, 1)
-  common.showSuccess("已忽略")
+  cmjs.prompt.success("已忽略")
 }
 </script>
 

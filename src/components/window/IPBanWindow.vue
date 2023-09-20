@@ -6,7 +6,7 @@
       <el-card style="max-height: 50vh; overflow: auto;">
         <div v-if="data.length > 0" v-for="(_, idx) in data" class="row">
           <el-input :id="`ip-input-${idx}`" v-model="data[idx]" />
-          <el-button @click="delItem(idx)" type="danger" tabindex="-1"><span
+          <el-button v-blur @click="delItem(idx)" type="danger" tabindex="-1"><span
               class="iconfont el-icon-ashbin"></span></el-button>
         </div>
         <div v-else class="flex-center" style="color: #909399;">暂无ip</div>
@@ -15,18 +15,18 @@
 
     <template #footer>
       <div style="float: left;">
-        <el-button @click="newItem" type="success" tabindex="-1">新增一项</el-button>
+        <el-button v-blur @click="newItem" type="success" tabindex="-1">新增一项</el-button>
       </div>
-      <el-button @click="closeMainWindow" tabindex="-1">取消</el-button>
-      <el-button @click="save" type="primary" tabindex="-1">保存</el-button>
+      <el-button v-blur @click="closeMainWindow" tabindex="-1">取消</el-button>
+      <el-button v-blur @click="save" type="primary" tabindex="-1">保存</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
-import Data from "../mock/manage/ipban.json"
-import { useStore } from "../store"
+import cmjs from '@/cmjs'
+import Data from "@/mock/manage/ipban.json"
+import { useStore } from "@/store"
 import { ElMessageBox } from 'element-plus'
 
 const stf = defineEmits<{
@@ -86,7 +86,7 @@ function save() {
   for (let i = 0; i < data.length; i++) {
     if (!ipRegex.test(data[i])) {
       (document.getElementById(`ip-input-${i}`) as HTMLElement).focus()
-      common.showError(`"${data[i]}"不符合ip格式`)
+      cmjs.prompt.error(`"${data[i]}"不符合ip格式`)
       return
     }
   }
@@ -96,7 +96,7 @@ function save() {
 
   store.switchAsk = false
   closeMainWindow()
-  common.showSuccess("保存成功")
+  cmjs.prompt.success("保存成功")
 }
 
 function newItem() {

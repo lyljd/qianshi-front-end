@@ -8,18 +8,20 @@
           :disabled-date="dateSelectCheck" :shortcuts="shortcuts" style="width: 100%;" />
       </el-config-provider>
 
-      <div v-for="t in tips" class="tip">{{ t }}</div>
+      <div v-for="t in tips" class="tip">
+        <span>{{ t }}</span>
+      </div>
     </div>
 
     <template #footer>
-      <el-button @click="closeWindow">取消</el-button>
-      <el-button @click="save" type="primary">确定</el-button>
+      <el-button v-blur @click="closeWindow">取消</el-button>
+      <el-button v-blur @click="save" type="primary">确定</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import * as common from "../common"
+import cmjs from '@/cmjs'
 import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 
 withDefaults(defineProps<{
@@ -89,7 +91,7 @@ function dateSelectCheck(date: Date) {
 function save() {
   afterSuccDo(date.value ? date.value : "")
   closeWindow()
-  common.showSuccess("保存成功")
+  cmjs.prompt.success("保存成功")
 }
 
 function getVIPDate(day: number): Date {
@@ -100,11 +102,6 @@ function getVIPDate(day: number): Date {
 </script>
 
 <style scoped>
-.dpw .body .tip {
-  margin-top: 3px;
-  font-size: 12px;
-  color: #909399;
-}
 </style>
 
 <style>

@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 import { ElMessageBox } from 'element-plus'
 import { createApp } from 'vue'
-import App from '../App.vue'
+import App from '@/App.vue'
 import { createPinia } from 'pinia'
-import { useStore } from "../store"
+import { useStore } from "@/store"
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -15,17 +15,17 @@ const store = useStore()
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    component: () => import("../views/Index.vue")
+    component: () => import("@/views/Index.vue")
   },
 
   {
     path: "/:pathMatch(.*)",
-    component: () => import("../views/Error.vue")
+    component: () => import("@/views/Error.vue")
   },
 
   {
     path: "/401",
-    component: () => import("../views/Error.vue"),
+    component: () => import("@/views/Error.vue"),
     meta: {
       code: 401,
       msg: "未登录",
@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
 
   {
     path: "/403",
-    component: () => import("../views/Error.vue"),
+    component: () => import("@/views/Error.vue"),
     meta: {
       code: 403,
       msg: "拒绝服务",
@@ -43,30 +43,30 @@ const routes: Array<RouteRecordRaw> = [
 
   {
     path: "/v/:vid",
-    component: () => import("../views/Video.vue")
+    component: () => import("@/views/Video.vue")
   },
 
   {
     path: "/u/:uid",
-    component: () => import("../views/User.vue"),
+    component: () => import("@/views/User.vue"),
     children: [
-      { path: "/u/:uid", component: () => import("../views/User/Home.vue") },
-      { path: "/u/:uid/dynamic", component: () => import("../views/User/Dynamic.vue") },
-      { path: "/u/:uid/post", component: () => import("../views/User/Post.vue") },
-      { path: "/u/:uid/collection", component: () => import("../views/User/Collection.vue") },
-      { path: "/u/:uid/favlist", component: () => import("../views/User/Favlist.vue") },
-      { path: "/u/:uid/setting", component: () => import("../views/User/Setting.vue") },
+      { path: "/u/:uid", component: () => import("@/views/User/Home.vue") },
+      { path: "/u/:uid/dynamic", component: () => import("@/views/User/Dynamic.vue") },
+      { path: "/u/:uid/post", component: () => import("@/views/User/Post.vue") },
+      { path: "/u/:uid/collection", component: () => import("@/views/User/Collection.vue") },
+      { path: "/u/:uid/favlist", component: () => import("@/views/User/Favlist.vue") },
+      { path: "/u/:uid/setting", component: () => import("@/views/User/Setting.vue") },
     ]
   },
 
   {
     path: "/me",
-    component: () => import("../views/Me.vue"),
+    component: () => import("@/views/Me.vue"),
     children: [
-      { path: "/me", component: () => import("../views/Me/Home.vue") },
-      { path: "/me/setting", component: () => import("../views/Me/Setting.vue") },
-      { path: "/me/security", component: () => import("../views/Me/Security.vue") },
-      { path: "/me/coin", component: () => import("../views/Me/Coin.vue") },
+      { path: "/me", component: () => import("@/views/Me/Home.vue") },
+      { path: "/me/setting", component: () => import("@/views/Me/Setting.vue") },
+      { path: "/me/security", component: () => import("@/views/Me/Security.vue") },
+      { path: "/me/coin", component: () => import("@/views/Me/Coin.vue") },
     ],
     meta: {
       title: '个人中心',
@@ -76,25 +76,25 @@ const routes: Array<RouteRecordRaw> = [
 
   {
     path: "/platform",
-    component: () => import("../views/Platform.vue"),
+    component: () => import("@/views/Platform.vue"),
     children: [
-      { path: "/platform", component: () => import("../views/Platform/Home.vue") },
+      { path: "/platform", component: () => import("@/views/Platform/Home.vue") },
 
       {
         path: "/platform/upload/video",
-        component: () => import("../views/Platform/Upload.vue"),
+        component: () => import("@/views/Platform/Upload.vue"),
         children: [
-          { path: "/platform/upload/video", component: () => import("../views/Platform/Upload/Video.vue") },
-          { path: "/platform/upload/read", component: () => import("../views/Platform/Upload/Read.vue") },
+          { path: "/platform/upload/video", component: () => import("@/views/Platform/Upload/Video.vue") },
+          { path: "/platform/upload/read", component: () => import("@/views/Platform/Upload/Read.vue") },
         ]
       },
 
       {
         path: "/platform/article/video",
-        component: () => import("../views/Platform/Article.vue"),
+        component: () => import("@/views/Platform/Article.vue"),
         children: [
-          { path: "/platform/article/video", component: () => import("../views/Platform/Article/Video.vue") },
-          { path: "/platform/article/read", component: () => import("../views/Platform/Article/Read.vue") },
+          { path: "/platform/article/video", component: () => import("@/views/Platform/Article/Video.vue") },
+          { path: "/platform/article/read", component: () => import("@/views/Platform/Article/Read.vue") },
         ]
       },
     ],
@@ -106,43 +106,43 @@ const routes: Array<RouteRecordRaw> = [
 
   {
     path: "/manage",
-    component: () => import("../views/Manage.vue"),
+    component: () => import("@/views/Manage.vue"),
     children: [
-      { path: "/manage", component: () => import("../views/Manage/Home.vue") },
+      { path: "/manage", component: () => import("@/views/Manage/Home.vue") },
 
       {
         path: "/manage/review/video",
-        component: () => import("../views/Manage/Review.vue"),
+        component: () => import("@/views/Manage/Review.vue"),
         children: [
-          { path: "/manage/review/video", component: () => import("../views/Manage/Review/Video.vue"), meta: { power: 1 } },
-          { path: "/manage/review/read", component: () => import("../views/Manage/Review/Read.vue"), meta: { power: 1 } },
-          { path: "/manage/review/title", component: () => import("../views/Manage/Review/Title.vue"), meta: { power: 2 } },
+          { path: "/manage/review/video", component: () => import("@/views/Manage/Review/Video.vue"), meta: { power: 1 } },
+          { path: "/manage/review/read", component: () => import("@/views/Manage/Review/Read.vue"), meta: { power: 1 } },
+          { path: "/manage/review/title", component: () => import("@/views/Manage/Review/Title.vue"), meta: { power: 2 } },
         ]
       },
 
       {
         path: "/manage/feedback/appeal/video",
-        component: () => import("../views/Manage/Feedback.vue"),
+        component: () => import("@/views/Manage/Feedback.vue"),
         children: [
           {
             path: "/manage/feedback/appeal/video",
-            component: () => import("../views/Manage/Feedback/Appeal.vue"),
+            component: () => import("@/views/Manage/Feedback/Appeal.vue"),
             children: [
-              { path: "/manage/feedback/appeal/video", component: () => import("../views/Manage/Feedback/Appeal/Video.vue") },
-              { path: "/manage/feedback/appeal/read", component: () => import("../views/Manage/Feedback/Appeal/Read.vue") },
+              { path: "/manage/feedback/appeal/video", component: () => import("@/views/Manage/Feedback/Appeal/Video.vue") },
+              { path: "/manage/feedback/appeal/read", component: () => import("@/views/Manage/Feedback/Appeal/Read.vue") },
             ]
           },
 
-          { path: "/manage/feedback/msg", component: () => import("../views/Manage/Feedback/Msg.vue"), meta: { power: 2 } },
+          { path: "/manage/feedback/msg", component: () => import("@/views/Manage/Feedback/Msg.vue"), meta: { power: 2 } },
 
           {
             path: "/manage/feedback/report/video",
-            component: () => import("../views/Manage/Feedback/Report.vue"),
+            component: () => import("@/views/Manage/Feedback/Report.vue"),
             children: [
-              { path: "/manage/feedback/report/video", component: () => import("../views/Manage/Feedback/Report/Video.vue") },
-              { path: "/manage/feedback/report/read", component: () => import("../views/Manage/Feedback/Report/Read.vue") },
-              { path: "/manage/feedback/report/comment", component: () => import("../views/Manage/Feedback/Report/Comment.vue") },
-              { path: "/manage/feedback/report/danmu", component: () => import("../views/Manage/Feedback/Report/Danmu.vue") },
+              { path: "/manage/feedback/report/video", component: () => import("@/views/Manage/Feedback/Report/Video.vue") },
+              { path: "/manage/feedback/report/read", component: () => import("@/views/Manage/Feedback/Report/Read.vue") },
+              { path: "/manage/feedback/report/comment", component: () => import("@/views/Manage/Feedback/Report/Comment.vue") },
+              { path: "/manage/feedback/report/danmu", component: () => import("@/views/Manage/Feedback/Report/Danmu.vue") },
             ],
             meta: {
               power: 3,
@@ -151,22 +151,22 @@ const routes: Array<RouteRecordRaw> = [
         ]
       },
 
-      { path: "/manage/user", component: () => import("../views/Manage/User.vue"), meta: { power: 4 } },
+      { path: "/manage/user", component: () => import("@/views/Manage/User.vue"), meta: { power: 4 } },
 
       {
         path: "/manage/power",
-        component: () => import("../views/Manage/Power.vue"),
+        component: () => import("@/views/Manage/Power.vue"),
         children: [
-          { path: "/manage/power", component: () => import("../views/Manage/Power/All.vue") },
-          { path: "/manage/power/admin", component: () => import("../views/Manage/Power/Admin.vue") },
-          { path: "/manage/power/table", component: () => import("../views/Manage/Power/Table.vue") },
+          { path: "/manage/power", component: () => import("@/views/Manage/Power/All.vue") },
+          { path: "/manage/power/admin", component: () => import("@/views/Manage/Power/Admin.vue") },
+          { path: "/manage/power/table", component: () => import("@/views/Manage/Power/Table.vue") },
         ],
         meta: {
           power: 3,
         }
       },
 
-      { path: "/manage/statistic", component: () => import("../views/Manage/Statistic.vue"), meta: { power: 5 } },
+      { path: "/manage/statistic", component: () => import("@/views/Manage/Statistic.vue"), meta: { power: 5 } },
     ],
     meta: {
       title: '后台管理',
@@ -209,6 +209,7 @@ type UserInfo = {
   power: number
 }
 function getCurUserInfo(): UserInfo {
+  // TODO api请求：获取当前用户信息
   return {
     id: 1,
     nickname: "Bonnenult",
@@ -218,7 +219,9 @@ function getCurUserInfo(): UserInfo {
 }
 
 function beforeEach(to: any, from: any, next: Function) {
-  if (store.mui.power === -1) {
+  store.topPath = to.path.split('/')[1]
+
+  if (store.topPath === "manage" && store.mui.power === -1) {
     store.mui = getCurUserInfo()
   }
 
@@ -237,8 +240,6 @@ function beforeEach(to: any, from: any, next: Function) {
   } else {
     document.title = "浅时"
   }
-
-  store.topPath = to.path.split('/')[1]
 
   window.scrollTo(0, 0) //设置滚动条位置到顶部
   next()

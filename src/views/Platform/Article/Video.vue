@@ -22,10 +22,10 @@
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div style="display: flex; flex-direction: column; ">
-                <el-button @click="edit(scope.$index)" size="small"><span
+                <el-button v-blur @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
                 <br>
-                <el-button @click="deleteItem(scope.$index)" size="small" type="danger"><span
+                <el-button v-blur @click="deleteItem(scope.$index)" size="small" type="danger"><span
                     class="iconfont el-icon-ashbin"></span>删除</el-button>
               </div>
             </template>
@@ -65,13 +65,13 @@
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div style="display: flex; flex-direction: column; ">
-                <el-button @click="edit(scope.$index)" size="small"><span
+                <el-button v-blur @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
                 <br v-if="!isPubing.list[scope.$index].vid">
-                <el-button v-if="!isPubing.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
+                <el-button v-blur v-if="!isPubing.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
                   type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
                 <br v-if="isPubing.list[scope.$index].vid">
-                <el-button v-if="isPubing.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
+                <el-button v-blur v-if="isPubing.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
                   type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
               </div>
             </template>
@@ -113,16 +113,16 @@
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div style="display: flex; flex-direction: column; ">
-                <el-button @click="edit(scope.$index)" size="small"><span
+                <el-button v-blur @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
                 <br v-if="!notPubed.list[scope.$index].vid">
-                <el-button v-if="!notPubed.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
+                <el-button v-blur v-if="!notPubed.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
                   type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
                 <br v-if="notPubed.list[scope.$index].vid">
-                <el-button v-if="notPubed.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
+                <el-button v-blur v-if="notPubed.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
                   type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
                 <br>
-                <el-button :class="{ appealBtnT: notPubed.list[scope.$index].appealStatus }"
+                <el-button v-blur :class="{ appealBtnT: notPubed.list[scope.$index].appealStatus }"
                   @click="appealIdx = scope.$index; appeal()" size="small" type="info"><span
                     class="iconfont el-icon-appeal"></span>{{
                       notPubed.list[scope.$index].appealStatus ? "已申诉" : "申诉" }}</el-button>
@@ -144,16 +144,17 @@
     <div class="setting">
       <div>
         <span class="notice"><span style="color: red;">*</span>视频：</span>
-        <el-button :disabled="videoUploadPercent !== 0" @click="store.openPVWindow(video.videoUrl)">预览</el-button>
-        <el-button :disabled="videoUploadPercent !== 0" @click="openVideoUpload">上传</el-button>
+        <el-button v-blur :disabled="videoUploadPercent !== 0" @click="store.openPVWindow(video.videoUrl)">预览</el-button>
+        <el-button v-blur :disabled="videoUploadPercent !== 0" @click="openVideoUpload">上传</el-button>
       </div>
       <el-upload :before-upload="beforeVideoUpload" :on-remove="onVideoUploadRemove" :on-change="onVideoUploadChange"
         :on-progress="onVideoUploadProgress" :on-success="onVideoUploadSuccess" :on-error="onVideoUploadError"
         ref="videoUpload" action="/api/resource/video" accept="video/*" v-show="false"></el-upload>
       <el-progress v-show="videoUploadPercent !== 0" :percentage="videoUploadPercent" class="prg" :stroke-width="10" />
-      <span class="tip">上传的视频大小上限为1G</span>
-      <br>
-      <span class="tip">上传视频，即表示您已同意 <span style="color: #409EFF;">浅时使用协议</span> ，请勿上传色情，反动等违法视频。</span>
+      <div class="tip">
+        <span>上传的视频大小上限为1G</span>
+        <span>上传视频，即表示您已同意 <Agreement></Agreement> ，请勿上传色情，反动等违法视频。</span>
+      </div>
 
       <div>
         <span class="notice"><span style="color: red;">*</span>封面：</span>
@@ -186,7 +187,7 @@
           </el-tag>
           <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
             @keyup.enter="newTag" @blur="newTag">
-          <el-button class="new-tag-btn" v-else size="small" @click="showNewTagInput">
+          <el-button v-blur class="new-tag-btn" v-else size="small" @click="showNewTagInput">
             + New Tag
           </el-button>
         </div>
@@ -202,10 +203,13 @@
         <span class="notice">权益声明：</span>
         <el-checkbox :disabled="editEmpowerDisabled" v-model="video.empower" label="未经作者授权，禁止转载" />
       </div>
-      <span class="tip">勾选后该文案会显示在视频播放页中，此选项可以在再次编辑时取消。<span style="color: #FF6699;">一旦取消勾选操作，不可再次勾选。</span></span>
+      <div class="tip">
+        <span>勾选后该文案会显示在视频播放页中，此选项可以在再次编辑时取消。<span style="color: #FF6699;">一旦取消勾选操作，不可再次勾选。</span></span>
+      </div>
 
       <div style="justify-content: center;">
-        <el-button :disabled="!hasEdit || videoUploadPercent !== 0 || coverUploadPercent !== 0 || video.title === ''"
+        <el-button v-blur
+          :disabled="!hasEdit || videoUploadPercent !== 0 || coverUploadPercent !== 0 || video.title === ''"
           @click="modifyVideo" type="primary" size="large">修改</el-button>
       </div>
     </div>
@@ -213,16 +217,17 @@
 </template>
 
 <script setup lang="ts">
-import mockListNum from "../../../mock/platform/article/video.json"
-import mockPubed from "../../../mock/platform/article/video/pubed.json"
-import mockIsPubing from "../../../mock/platform/article/video/is_pubing.json"
-import mockNotPubed from "../../../mock/platform/article/video/not_pubed.json"
-import * as common from "../../../common"
+import mockListNum from "@/mock/platform/article/video.json"
+import mockPubed from "@/mock/platform/article/video/pubed.json"
+import mockIsPubing from "@/mock/platform/article/video/is_pubing.json"
+import mockNotPubed from "@/mock/platform/article/video/not_pubed.json"
+import cmjs from '@/cmjs'
 import { Search } from '@element-plus/icons-vue'
 import { UploadInstance, ElMessageBox, ElSelect, ElInput } from 'element-plus'
-import { useStore } from "../../../store"
-import VideoDescriptions from "../../../components/VideoDescriptions.vue"
-import ImageUpload from "../../../components/ImageUpload.vue"
+import { useStore } from "@/store"
+import VideoDescriptions from "@/components/util/VideoDescriptions.vue"
+import ImageUpload from "@/components/common/ImageUpload.vue"
+import Agreement from '@/components/common/Agreement.vue'
 
 type ListNum = {
   pubedNum: number,
@@ -392,7 +397,7 @@ function getNotPubed(): NotPubed {
 }
 
 function tableTimeFormatter(_: any, __: any, time: number) {
-  return common.timestampFormatterStandard(time)
+  return cmjs.fmt.tsStandard(time)
 }
 
 function search() {
@@ -431,7 +436,7 @@ function deleteItem(idx: number) {
           break
         }
       }
-      common.showSuccess('删除成功')
+      cmjs.prompt.success('删除成功')
     })
 }
 
@@ -469,7 +474,7 @@ function cancelModify(idx: number) {
         listNum.notPubedNum--
       }
 
-      common.scrollToTopSmoothly()
+      cmjs.util.scrollToTopSmoothly()
       pubed = reactive(getPubed())
       pubed.num = pubed.list.length
       listNum.pubedNum = pubed.list.length
@@ -478,13 +483,13 @@ function cancelModify(idx: number) {
       listNum.pubedNum++
       //-->
       viewItem.value = "pubed"
-      common.showSuccess('取消修改成功')
+      cmjs.prompt.success('取消修改成功')
     })
 }
 
 function appeal() {
   if (notPubed.list[appealIdx.value].appealStatus) {
-    common.showInfo("你已申诉，请耐心等待！管理员会尽快处理的，请留意系统消息")
+    cmjs.prompt.info("你已申诉，请耐心等待！管理员会尽快处理的，请留意系统消息")
     return
   }
 
@@ -493,7 +498,7 @@ function appeal() {
 
 function pubedCellClick(row: any, column: any) {
   if (column.label === "封面" || column.label === "标题") {
-    common.ToVideo(row.vid)
+    cmjs.jump.video(row.vid)
   }
 }
 
@@ -506,7 +511,7 @@ function pubedCellStyle(cell: any) {
 
 function isPubingCellClick(row: any, column: any) {
   if (row.vid !== undefined && (column.label === "封面" || column.label === "标题")) {
-    common.ToVideo(row.vid)
+    cmjs.jump.video(row.vid)
   }
 
 }
@@ -531,7 +536,7 @@ function isPubingCellClassName(cell: any) {
 
 function notPubedCellClick(row: any, column: any) {
   if (row.vid !== undefined && (column.label === "封面" || column.label === "标题")) {
-    common.ToVideo(row.vid)
+    cmjs.jump.video(row.vid)
   }
 
 }
@@ -639,7 +644,7 @@ function openVideoUpload() {
 
 function beforeVideoUpload(rawFile: any) {
   if (rawFile.size / 1024 / 1024 / 1024 > 1) {
-    common.showError("上传的视频大小不能超过1G")
+    cmjs.prompt.error("上传的视频大小不能超过1G")
     return false
   }
   return true
@@ -663,13 +668,13 @@ function onVideoUploadProgress(event: any) {
 function onVideoUploadSuccess() {
   preVideoUrl.value = video.videoUrl
   videoUploadPercent.value = 0
-  common.showSuccess("视频上传成功")
+  cmjs.prompt.success("视频上传成功")
 }
 
 function onVideoUploadError() {
   video.videoUrl = preVideoUrl.value
   videoUploadPercent.value = 0
-  common.showError("视频上传失败")
+  cmjs.prompt.error("视频上传失败")
 }
 
 function delTag(tag: string) {
@@ -687,7 +692,7 @@ function newTag() {
   let val = newTagInputValue.value
   if (val) {
     if (video.tags.includes(val)) {
-      common.showError("该标签已存在")
+      cmjs.prompt.error("该标签已存在")
       newTagInput.value!.focus()
       return
     }
@@ -702,7 +707,7 @@ function modifyVideo() {
   video.intro = video.intro.trim()
 
   if (video.title.length === 0) {
-    common.showError("请输入标题")
+    cmjs.prompt.error("请输入标题")
     titleInput.value?.focus()
     return
   }
@@ -712,7 +717,7 @@ function modifyVideo() {
   editWindowVisible.value = false
   store.switchAsk = false
 
-  common.showSuccess("修改成功")
+  cmjs.prompt.success("修改成功")
 }
 </script>
 
@@ -740,18 +745,16 @@ function modifyVideo() {
   margin-bottom: -10px;
 }
 
-.setting>div {
+.setting>div:not(.tip) {
   display: flex;
   align-items: center;
 }
 
-.setting>div:not(:first-child) {
+.setting>div:not(:first-child, .tip) {
   margin-top: 10px;
 }
 
-.setting .tip {
-  font-size: 12px;
-  color: #909399;
+.tip {
   margin-left: 85px;
 }
 

@@ -9,35 +9,35 @@
     </el-tooltip>
 
     <el-image v-show="!playStatus" @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
-      @click="common.ToVideo(data.vid)" class="cover" :src="data.coverUrl">
+      @click="cmjs.jump.video(data.vid)" class="cover" :src="data.coverUrl">
       <template #error>
-        <div @click="common.ToVideo(data.vid)" class="default">封面加载失败</div>
+        <div @click="cmjs.jump.video(data.vid)" style="font-size: 16px;" class="default">封面加载失败</div>
       </template>
     </el-image>
 
     <video v-show="playStatus" @mouseenter="videoMouseEnter" @mouseleave="videoMouseLeave"
-      @click="common.ToVideo(data.vid)" @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle"
+      @click="cmjs.jump.video(data.vid)" @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle"
       :src="data.videoUrl" muted disablePictureInPicture class="video"></video>
 
     <div v-show="!playStatus" class="info">
       <span>
         <span class="iconfont el-icon-bofangshu icon"></span>
-        {{ common.numFormatterW(data.playNum) }}
+        {{ cmjs.fmt.numWE(data.playNum) }}
         <span class="danmushu">
           <span class="iconfont el-icon-danmushu icon"></span>
-          {{ common.numFormatterW(data.danmuNum) }}
+          {{ cmjs.fmt.numWE(data.danmuNum) }}
         </span>
       </span>
-      <span class="duration">{{ common.videoTimeFormatterHMS(data.duration) }}</span>
+      <span class="duration">{{ cmjs.fmt.videoDuration(data.duration) }}</span>
     </div>
 
     <div class="content">
-      <div class="title-container"><span @click="common.ToVideo(data.vid)" class="title">{{ data.title }}</span></div>
+      <div class="title-container"><span @click="cmjs.jump.video(data.vid)" class="title">{{ data.title }}</span></div>
       <div class="up-time-container">
-        <div @click="common.ToUser(data.uid)" class="up-time-text">
-          <span :title="data.nickname + ' · ' + common.timestampFormatterRichExcludeHM(data.date)"
+        <div @click="cmjs.jump.user(data.uid)" class="up-time-text">
+          <span :title="data.nickname + ' · ' + cmjs.fmt.tsYRichTmpl(data.date, 'MM-DD')"
             class="up-time-text-span"><span style="font-size: 14px;" class="iconfont el-icon-UPzhu icon"></span>
-            {{ data.nickname }} · {{ common.timestampFormatterRichExcludeHM(data.date) }}</span>
+            {{ data.nickname }} · {{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}</span>
         </div>
       </div>
     </div>
@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
+import cmjs from '@/cmjs'
 
 defineProps<{
   data: {
@@ -114,12 +114,12 @@ function laterMouseLeave() {
 }
 
 function watchLater(vid: number) {
-  if (!hasSeeLater.value) {
-    common.watchLater(vid)
-  } else {
-    common.cancelSeeLater(vid)
+  const res = cmjs.biz.watchLater(vid)
+  if (res === 1) {
+    hasSeeLater.value = true
+  } else if (res === 0) {
+    hasSeeLater.value = false
   }
-  hasSeeLater.value = !hasSeeLater.value
 }
 </script>
 
@@ -132,7 +132,7 @@ function watchLater(vid: number) {
 .video-card .cover,
 .video-card .video {
   width: 270px;
-  height: 151.875px;
+  height: 151.88px;
   border-radius: 5px;
   cursor: pointer;
   background-color: black;

@@ -8,7 +8,7 @@
             <div class="row">
               <span class="tag">邮箱</span>
               <el-input style="width: calc(100% - 57px - 135px);" v-model="email" placeholder="请输入邮箱" />
-              <el-button :disabled="!checkEmailValid()" @click="openCaptchaWindow" id="get-captcha-btn"
+              <el-button v-blur :disabled="!checkEmailValid()" @click="openCaptchaWindow" id="get-captcha-btn"
                 class="get-captcha-btn">获取验证码</el-button>
             </div>
             <div class="row">
@@ -33,7 +33,7 @@
         </el-tab-pane>
       </el-tabs>
       <template #footer>
-        <el-button @click="login" :disabled="!loginBtnCheck()" class="btn" type="primary">{{ btnText }}</el-button>
+        <el-button v-blur @click="login" :disabled="!loginBtnCheck()" class="btn" type="primary">{{ btnText }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -42,9 +42,9 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
-import CaptchaWindow from "./CaptchaWindow.vue"
-import { useStore } from "../store"
+import cmjs from '@/cmjs'
+import CaptchaWindow from "@/components/window/CaptchaWindow.vue"
+import { useStore } from "@/store"
 import { useRouter } from "vue-router"
 import { ElNotification } from 'element-plus'
 
@@ -95,9 +95,9 @@ function tabChange(newTabName: string) {
 function openCaptchaWindow() {
   captchaWindow.value?.show((cdTime: number) => {
     let btn = document.getElementById("get-captcha-btn") as HTMLButtonElement
-    common.btnCD(btn, cdTime)
+    cmjs.util.btnCD(btn, cdTime)
     hasVerify.value = true
-    common.showSuccess("验证码已发送")
+    cmjs.prompt.success("验证码已发送")
   })
 }
 

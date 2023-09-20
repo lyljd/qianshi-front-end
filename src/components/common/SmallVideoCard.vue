@@ -9,31 +9,31 @@
     </el-tooltip>
 
     <el-image v-show="!playStatus" @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
-      @click="common.ToVideo(data.vid)" class="cover" :src="data.coverUrl">
+      @click="cmjs.jump.video(data.vid)" class="cover" :src="data.coverUrl">
       <template #error>
-        <div @click="common.ToVideo(data.vid)" class="default">封面加载失败</div>
+        <div @click="cmjs.jump.video(data.vid)" class="default">封面加载失败</div>
       </template>
     </el-image>
 
     <video v-show="playStatus" @mouseenter="videoMouseEnter" @mouseleave="videoMouseLeave"
-      @click="common.ToVideo(data.vid)" @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle"
+      @click="cmjs.jump.video(data.vid)" @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle"
       :src="data.videoUrl" muted disablePictureInPicture class="video"></video>
 
-    <div v-show="!playStatus" class="duration">{{ common.videoTimeFormatterHMS(data.duration) }}</div>
+    <div v-show="!playStatus" class="duration">{{ cmjs.fmt.videoDuration(data.duration) }}</div>
 
     <div class="content">
-      <div class="title-container"><span @click="common.ToVideo(data.vid)" class="title">{{ data.title }}</span></div>
+      <div class="title-container"><span @click="cmjs.jump.video(data.vid)" class="title">{{ data.title }}</span></div>
       <div class="num-time-container">
         <span class="iconfont el-icon-bofangshu icon"></span>
-        <span>{{ common.numFormatterW(data.playNum) }}</span>
-        <span style="margin-left: 10px;">{{ common.timestampFormatterRichExcludeHM(data.date) }}</span>
+        <span>{{ cmjs.fmt.numWE(data.playNum) }}</span>
+        <span style="margin-left: 10px;">{{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
+import cmjs from '@/cmjs'
 
 defineProps<{
   data: {
@@ -99,12 +99,12 @@ function laterMouseLeave() {
 }
 
 function watchLater(vid: number) {
-  if (!hasSeeLater.value) {
-    common.watchLater(vid)
-  } else {
-    common.cancelSeeLater(vid)
+  const res = cmjs.biz.watchLater(vid)
+  if (res === 1) {
+    hasSeeLater.value = true
+  } else if (res === 0) {
+    hasSeeLater.value = false
   }
-  hasSeeLater.value = !hasSeeLater.value
 }
 </script>
 

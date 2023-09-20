@@ -1,5 +1,5 @@
 <template>
-  <el-button class="refresh">
+  <el-button v-blur class="refresh">
     <span class="info"><el-icon class="icon">
         <Refresh />
       </el-icon>换一换</span>

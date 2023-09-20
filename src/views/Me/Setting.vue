@@ -38,23 +38,23 @@
         </el-tag>
         <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
           @keyup.enter="newTag" @blur="newTag">
-        <el-button class="new-tag-btn" v-else size="small" @click="showNewTagInput">
+        <el-button v-blur class="new-tag-btn" v-else size="small" @click="showNewTagInput">
           + New Tag
         </el-button>
       </div>
     </div>
     
     <div class="btn-row">
-      <el-button @click="saveSetting" id="sava-setting-btn" type="primary" size="large">保存</el-button>
+      <el-button v-blur @click="saveSetting" id="sava-setting-btn" type="primary" size="large">保存</el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import zhCn from 'element-plus/lib/locale/lang/zh-cn'
-import mockMeSetting from "../../mock/me/setting.json"
-import * as common from "../../common"
-import { useStore } from "../../store"
+import mockMeSetting from "@/mock/me/setting.json"
+import cmjs from '@/cmjs'
+import { useStore } from "@/store"
 
 type MeSetting = {
   nickname: string
@@ -115,7 +115,7 @@ function newTag() {
   let val = newTagInputValue.value
   if (val) {
     if (meSetting.tag.includes(val)) {
-      common.showError("该标签已存在")
+      cmjs.prompt.error("该标签已存在")
       newTagInput.value!.focus()
       return
     }
@@ -132,20 +132,20 @@ function saveSetting() {
   meSetting.nickname = meSetting.nickname.trim()
   meSetting.signature = meSetting.signature.trim()
   if (meSetting.nickname.length === 0) {
-    common.showError("请输入昵称")
+    cmjs.prompt.error("请输入昵称")
     return
   }
   if (meSetting.nickname.length > 20) {
-    common.showError("昵称的长度最大为20")
+    cmjs.prompt.error("昵称的长度最大为20")
     return
   }
   if (meSetting.signature.length > 50) {
-    common.showError("签名的长度最大为50")
+    cmjs.prompt.error("签名的长度最大为50")
     return
   }
-  common.btnCD(saveSettingBtn, 5)
+  cmjs.util.btnCD(saveSettingBtn, 5)
   nnmdy.value = false
-  common.showSuccess("保存成功")
+  cmjs.prompt.success("保存成功")
 }
 </script>
 

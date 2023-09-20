@@ -54,11 +54,11 @@
 </template>
 
 <script setup lang="ts">
-import VideoCard from "../../components/VideoCard.vue"
+import VideoCard from "@/components/common/VideoCard.vue"
 import { ElMessageBox } from 'element-plus'
-import * as common from "../../common"
+import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
-import { useStore } from "../../store"
+import { useStore } from "@/store"
 
 const mockVideo = {
   "vid": 0,
@@ -79,7 +79,7 @@ const mockVideoTotalNum = 13
 const store = useStore()
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(parseInt(route.params.uid as string))
+    isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
   }
@@ -94,7 +94,7 @@ let newName = ref("")
 
 onMounted(() => {
   route = useRoute();
-  isMe.value = common.isMe(parseInt(route.params.uid as string))
+  isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
 })
 
 function newFavlist() {
@@ -141,7 +141,7 @@ function beforeNewFavlistWindowClose(action: string, _: any, done: Function) {
     if (!checkInput()) {
       return
     }
-    common.showSuccess(`新收藏夹的名称为：${newName.value}`)
+    cmjs.prompt.success(`新收藏夹的名称为：${newName.value}`)
   }
   newName.value = ""
   done()
@@ -159,13 +159,13 @@ function deleteFavlist() {
   })
     .then(() => {
       store.addUserMenuFavlistNum(-1)
-      common.showSuccess('删除成功')
+      cmjs.prompt.success('删除成功')
     })
   //TODO 删除后若当前activeId不为0则减1
 }
 
 function deleteItem() {
-  common.showSuccess("取消收藏成功")
+  cmjs.prompt.success("取消收藏成功")
   //TODO 若有多的视频，则请求一个补充到最后
 }
 </script>

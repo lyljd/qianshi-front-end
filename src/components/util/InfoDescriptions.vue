@@ -2,16 +2,16 @@
   <div class="id-container">
     <el-descriptions :title="title" :column="1" border>
       <template v-if="data.vid || data.rid" #extra>
-        <el-button @click="data.vid ? common.ToVideo(data.vid as number) : common.ToRead(data.rid as number)" type="primary"
+        <el-button v-blur @click="data.vid ? cmjs.jump.video(data.vid as number) : cmjs.jump.read(data.rid as number)" type="primary"
           size="small">打开{{ data.vid ? '视频' : '专栏' }}页</el-button>
       </template>
 
       <el-descriptions-item label="发布者">
-        <span @click="common.ToUser(data.uid)" class="nickname">{{ data.nickname }}</span>
+        <span @click="cmjs.jump.user(data.uid)" class="nickname">{{ data.nickname }}</span>
       </el-descriptions-item>
 
       <el-descriptions-item label="发布时间">
-        {{ common.timestampFormatterStandard(data.time) }}
+        {{ cmjs.fmt.tsStandard(data.time) }}
       </el-descriptions-item>
 
       <el-descriptions-item label="发布内容">
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
+import cmjs from '@/cmjs'
 
 type info = {
   vid?: number,

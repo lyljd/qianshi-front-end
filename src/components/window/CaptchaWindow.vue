@@ -7,14 +7,14 @@
         <Image :url="captchaUrl" :w="100" :h="30" border :round="false"></Image>
       </div>
       <template #footer>
-        <el-button @click="verify" :disabled="input.length !== 4" type="primary">验证</el-button>
+        <el-button v-blur @click="verify" :disabled="input.length !== 4" type="primary">验证</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
+import cmjs from '@/cmjs'
 
 defineExpose({
   show
@@ -46,7 +46,8 @@ function verify() {
   }
 
   if (!checkCaptchaInput()) {
-    common.showError("请输入4位数字")
+    cmjs.prompt.error("请输入4位数字")
+    return
   }
   dialogVisible.value = false
   afterSuccDo(180)

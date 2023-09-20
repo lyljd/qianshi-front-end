@@ -1,18 +1,22 @@
 [
   {
     "title": "锁屏1",
-    "imgUrl": "/resource/壁纸/锁屏1.jpg"
+    "imgUrl": "/resource/壁纸/锁屏1.jpg",
+    "linkUrl": ""
   },
   {
     "title": "锁屏2",
-    "imgUrl": "/resource/壁纸/锁屏2.jpg"
+    "imgUrl": "/resource/壁纸/锁屏2.jpg",
+    "linkUrl": ""
   },
   {
     "title": "Destiny 2",
-    "imgUrl": "/resource/壁纸/Destiny 2.jpg"
+    "imgUrl": "/resource/壁纸/Destiny 2.jpg",
+    "linkUrl": ""
   },
   {
     "title": "Everlasting Summer Room",
-    "imgUrl": "/resource/壁纸/Everlasting Summer Room.jpg"
+    "imgUrl": "/resource/壁纸/Everlasting Summer Room.jpg",
+    "linkUrl": ""
   }
 ]

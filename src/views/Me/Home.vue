@@ -46,8 +46,8 @@
 </template>
 
 <script setup lang="ts">
-import mockMeHome from "../../mock/me/home.json"
-import { useStore } from "../../store"
+import mockMeHome from "@/mock/me/home.json"
+import { useStore } from "@/store"
 
 type MeHome = {
   avatarUrl: string

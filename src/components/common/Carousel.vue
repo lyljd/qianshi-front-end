@@ -4,7 +4,7 @@
       <a :href="c.linkUrl !== '' ? c.linkUrl : undefined" target="_blank">
         <el-image class="image" :src="c.imgUrl">
           <template #error>
-            <div class="default">轮播图加载失败</div>
+            <div style="font-size: 18px;" class="default">轮播图加载失败</div>
           </template>
         </el-image>
         <div v-if="c.title" class="title">
@@ -19,9 +19,9 @@
 <script setup lang="ts">
 
 type carousel = {
-  title?: string,
+  title: string,
   imgUrl: string,
-  linkUrl?: string,
+  linkUrl: string,
 }
 
 defineProps<{

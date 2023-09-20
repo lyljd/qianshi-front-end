@@ -111,8 +111,8 @@
 </template>
 
 <script setup lang="ts">
-import mockPlatformHome from "../../mock/platform/home.json"
-import { useStore } from "../../store"
+import mockPlatformHome from "@/mock/platform/home.json"
+import { useStore } from "@/store"
 
 type PlatformHome = {
   video: {

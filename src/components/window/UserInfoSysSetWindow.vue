@@ -44,7 +44,7 @@
           </el-tag>
           <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
             @keyup.enter="newTag" @blur="newTag" />
-          <el-button class="new-tag-btn" v-else size="small" @click="showNewTagInput">
+          <el-button v-blur class="new-tag-btn" v-else size="small" @click="showNewTagInput">
             + New Tag
           </el-button>
         </div>
@@ -52,16 +52,16 @@
     </div>
 
     <template #footer>
-      <el-button :disabled="uploadPercent !== 0" @click="closeWindow">取消</el-button>
-      <el-button :disabled="uploadPercent !== 0" @click="save" type="primary">保存</el-button>
+      <el-button v-blur :disabled="uploadPercent !== 0" @click="closeWindow">取消</el-button>
+      <el-button v-blur :disabled="uploadPercent !== 0" @click="save" type="primary">保存</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import * as common from "../common"
-import Data from "../mock/manage/userInfo.json"
-import { useStore } from "../store"
+import cmjs from '@/cmjs'
+import Data from "@/mock/manage/userInfo.json"
+import { useStore } from "@/store"
 import { ElMessageBox } from "element-plus"
 import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 
@@ -161,7 +161,7 @@ function save() {
   afterSuccDo(data)
   store.switchAsk = false
   closeWindow()
-  common.showSuccess("保存成功")
+  cmjs.prompt.success("保存成功")
 }
 
 function birthdaySelectCheck(date: Date) {
@@ -183,7 +183,7 @@ function newTag() {
   let val = newTagInputValue.value
   if (val) {
     if (data.tags.includes(val)) {
-      common.showError("该标签已存在")
+      cmjs.prompt.error("该标签已存在")
       newTagInput.value!.focus()
       return
     }

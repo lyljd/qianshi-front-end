@@ -2,7 +2,9 @@
   <ManageTopMenuBar title="统计" icon="statistic"></ManageTopMenuBar>
 
   <div class="ms-container">
-    <div class="text-info">数据截止时间：{{ common.timestampFormatterStandard(timestamp) }}</div>
+    <div class="tip">
+      <span style="margin-top: 0;">数据截止时间：{{ cmjs.fmt.tsStandard(timestamp) }}</span>
+    </div>
 
     <el-card>
       <Statistic title="网站总访问量" :value="data.total"></Statistic>
@@ -40,10 +42,10 @@
 </template>
 
 <script setup lang="ts">
-import ManageTopMenuBar from "../../components/ManageTopMenuBar.vue"
-import Data from "../../mock/manage/statistic.json"
-import * as common from "../../common"
-import Statistic from "../../components/Statistic.vue"
+import ManageTopMenuBar from "@/components/util/ManageTopMenuBar.vue"
+import Data from "@/mock/manage/statistic.json"
+import cmjs from '@/cmjs'
+import Statistic from "@/components/util/Statistic.vue"
 
 type item = {
   label: string,
@@ -88,7 +90,7 @@ function calcChange(t: number, y: number): change {
 
   if (t >= y) {
     if (y !== 0) {
-      value = common.toFixed((t / y - 1) * 100, 0)
+      value = cmjs.util.toFixed((t / y - 1) * 100, 0)
     }
     return {
       value: value,
@@ -97,7 +99,7 @@ function calcChange(t: number, y: number): change {
   }
 
   if (t !== 0) {
-    value = common.toFixed((y / t - 1) * 100, 0)
+    value = cmjs.util.toFixed((y / t - 1) * 100, 0)
   }
   return {
     value: value,

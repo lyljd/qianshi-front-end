@@ -28,8 +28,8 @@
 </template>
 
 <script setup lang="ts">
-import mockMeSecurity from "../../mock/me/security.json"
-import { useStore } from "../../store"
+import mockMeSecurity from "@/mock/me/security.json"
+import { useStore } from "@/store"
 
 type MeSecurity = {
   isSetPassword: boolean

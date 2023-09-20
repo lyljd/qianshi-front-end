@@ -2,7 +2,7 @@
   <el-table :data="form" empty-text="暂无待处理的个人认证" class="table" stripe border>
     <el-table-column label="用户" align="center">
       <template #default="scope">
-        <span @click="common.ToUser(form[scope.$index].uid)" class="user">{{ form[scope.$index].nickname }}</span>
+        <span @click="cmjs.jump.user(form[scope.$index].uid)" class="user">{{ form[scope.$index].nickname }}</span>
       </template>
     </el-table-column>
 
@@ -14,18 +14,18 @@
 
     <el-table-column label="操作" align="center">
       <template #default="scope">
-        <el-button @click="pass(scope.$index)" type="success">通过</el-button>
-        <el-button @click="deny(scope.$index)" type="danger">驳回</el-button>
+        <el-button v-blur @click="pass(scope.$index)" type="success">通过</el-button>
+        <el-button v-blur @click="deny(scope.$index)" type="danger">驳回</el-button>
       </template>
     </el-table-column>
   </el-table>
 </template>
 
 <script setup lang="ts">
-import Form from "../../../mock/manage/review/title.json"
-import * as common from "../../../common"
+import Form from "@/mock/manage/review/title.json"
+import cmjs from '@/cmjs'
 import { ElMessageBox } from 'element-plus'
-import { useStore } from "../../../store"
+import { useStore } from "@/store"
 
 type record = {
   id: number,
@@ -49,7 +49,7 @@ function getForm(): record[] {
 }
 
 function tableTimeFormatter(_: any, __: any, time: number) {
-  return common.timestampFormatterStandard(time)
+  return cmjs.fmt.tsStandard(time)
 }
 
 function pass(formIdx: number) {
@@ -57,7 +57,7 @@ function pass(formIdx: number) {
   console.log(form[formIdx].id)
 
   form.splice(formIdx, 1)
-  common.showSuccess("已通过")
+  cmjs.prompt.success("已通过")
 }
 
 function deny(formIdx: number) {
@@ -74,7 +74,7 @@ function deny(formIdx: number) {
       console.log("理由：" + value)
 
       form.splice(formIdx, 1)
-      common.showError("已驳回")
+      cmjs.prompt.error("已驳回")
     })
     .catch(() => { })
 }

@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "../store"
+import { useStore } from "@/store"
 
 let item = ref([
   { index: "/platform", content: "首页", icon: "home" },

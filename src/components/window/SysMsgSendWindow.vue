@@ -7,13 +7,17 @@
       show-word-limit type="textarea" id="input-msg-ele" />
 
     <div class="fc-bar">
-      <el-button @click="setColor" id="color">设置颜色</el-button>
-      <el-color-picker v-model="color" :predefine="predefinedmColors" />
+      <el-button v-blur @click="setColor" id="color">设置颜色</el-button>
+      <ColorPicker v-model="color"></ColorPicker>
 
-      <el-button @click="setLink" id="link" style="margin-left: 20px;">设置链接</el-button>
+      <el-button v-blur @click="setLink" id="link" style="margin-left: 20px;">设置链接</el-button>
       <el-input v-model="link" placeholder="支持但不推荐相对路径，绝对路径请加http(s)前缀" />
     </div>
-    <div class="tip">1.选择颜色或输入链接；2.选中要设置的内容（注意不要将生成的style给选中了）；3.点击设置按钮</div>
+    <div class="tip">
+      <span>1.选择颜色或输入链接</span>
+      <span>2.选中要设置的内容（注意不要将生成的style给选中了）</span>
+      <span>3.点击设置按钮</span>
+    </div>
 
     <div v-show="title !== '' && msg !== ''" class="row-title">预览消息实际显示效果</div>
     <SysMsgCard v-show="title !== '' && msg !== ''" :data="{ title: title, content: msg, time: Date.now() }"></SysMsgCard>
@@ -22,43 +26,30 @@
     <div class="rec-row">
       <el-checkbox v-model="recEveryone" border style="width: 100px; margin-right: 10px;">所有人</el-checkbox>
       <el-select v-show="!recEveryone" v-model="recipient" multiple filterable remote :remote-method="searchNickname"
-        :loading="loading" loading-text="搜索中，请稍等" :no-data-text="hasSearch ? '无搜索结果' : '等待输入中'" placeholder=" "
+        :loading="loading" loading-text="搜索中，请稍等" :no-data-text="hasSearch ? '无搜索结果' : '等待输入中'" placeholder="请输入收件人昵称关键字"
         style="width: calc(100% - 110px)">
         <el-option v-for="nickname in option" :label="nickname" :value="nickname" :key="nickname"></el-option>
       </el-select>
     </div>
-    <div v-show="!recEveryone" class="tip" style="margin-left: 110px;">请输入收件人昵称关键字</div>
 
     <template #footer>
-      <el-button @click="closeMainWindow">取消</el-button>
-      <el-button @click="send" type="primary">发送</el-button>
+      <el-button v-blur @click="closeMainWindow">取消</el-button>
+      <el-button v-blur @click="send" type="primary">发送</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { ElButton, ElInput } from 'element-plus'
-import { useStore } from "../store"
-import * as common from "../common"
-import SysMsgCard from "../components/SysMsgCard.vue"
+import { useStore } from "@/store"
+import cmjs from '@/cmjs'
+import SysMsgCard from "@/components/common/SysMsgCard.vue"
+import ColorPicker from "@/components/common/ColorPicker.vue"
 
 type openPm = {
   afterSuccDo?: Function
   to?: string[]
 }
-
-const predefinedmColors = ref([
-  '#FFFFFF',
-  '#909399',
-  '#000000',
-  '#F56C6C',
-  '#E6A23C',
-  '#FFFF00',
-  '#67C23A',
-  '#409EFF',
-  '#800080',
-  '#FFC0CB',
-])
 
 const store = useStore()
 store.openSMSWindow = openMainWindow
@@ -72,7 +63,7 @@ let afterSuccDo: Function = () => { }
 let mainWindowVisible = ref(false)
 let title = ref("")
 let msg = ref("")
-let color = ref(null)
+let color = ref("#000000")
 let link = ref("")
 let recipient = ref<string[]>([])
 let recEveryone = ref(false)
@@ -99,7 +90,7 @@ function closeMainWindow() {
   mainWindowVisible.value = false
   title.value = ""
   msg.value = ""
-  color.value = null
+  color.value = "#000000"
   link.value = ""
   recipient.value = []
   recEveryone.value = false
@@ -111,16 +102,16 @@ function send() {
 
   if (title.value === "") {
     inputTitleEle.value?.focus()
-    common.showError("标题不能为空")
+    cmjs.prompt.error("标题不能为空")
     return
   }
   if (msg.value === "") {
     inputMsgEle.value?.focus()
-    common.showError("内容不能为空")
+    cmjs.prompt.error("内容不能为空")
     return
   }
   if (!recEveryone.value && recipient.value.length === 0) {
-    common.showError("收件人不能为空")
+    cmjs.prompt.error("收件人不能为空")
     return
   }
 
@@ -135,19 +126,19 @@ function send() {
 
   afterSuccDo()
   closeMainWindow()
-  common.showSuccess("发送成功")
+  cmjs.prompt.success("发送成功")
 }
 
 function setColor() {
   if (color.value === null) {
-    common.showError("请选择颜色")
+    cmjs.prompt.error("请选择颜色")
     return
   }
 
   inputMsgEleById = document.getElementById("input-msg-ele") as HTMLInputElement
   const selectContent = msg.value.substring(inputMsgEleById.selectionStart as number, inputMsgEleById.selectionEnd as number)
   if (selectContent === '') {
-    common.showError("请选中要设置的内容")
+    cmjs.prompt.error("请选中要设置的内容")
     return
   }
 
@@ -158,14 +149,14 @@ function setColor() {
 
 function setLink() {
   if (link.value === '') {
-    common.showError("请输入链接")
+    cmjs.prompt.error("请输入链接")
     return
   }
 
   inputMsgEleById = document.getElementById("input-msg-ele") as HTMLInputElement
   const selectContent = msg.value.substring(inputMsgEleById.selectionStart as number, inputMsgEleById.selectionEnd as number)
   if (selectContent === '') {
-    common.showError("请选中要设置的内容")
+    cmjs.prompt.error("请选中要设置的内容")
     return
   }
 
@@ -197,12 +188,6 @@ function searchNickname(searchKey: string) {
   margin-bottom: 3px !important;
 }
 
-.smsw .tip {
-  font-size: 12px;
-  color: #909399;
-  margin-bottom: 0 !important;
-}
-
 .smsw .row-title {
   margin-bottom: 3px !important;
   font-size: 16px;
@@ -232,23 +217,5 @@ function searchNickname(searchKey: string) {
 .smsw .el-dialog__body {
   padding-top: 0;
   padding-bottom: 0;
-}
-
-.el-color-dropdown__value {
-  margin-top: -3px;
-}
-
-.el-color-dropdown__link-btn {
-  background-color: white !important;
-  border: 1px solid #dedfe0 !important;
-}
-
-.el-color-dropdown__link-btn:hover {
-  color: #409EFF;
-  border-color: #409EFF !important;
-}
-
-.el-color-dropdown {
-  background-color: rgb(240, 240, 240) !important;
 }
 </style>

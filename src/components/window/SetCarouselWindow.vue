@@ -5,12 +5,12 @@
     <div class="body">
       <el-card v-if="data.length > 0" class="card">
         <template #header>
-          <div class="flex-row">
+          <div class="card-header">
             <span class="header">{{ `轮播图${viewItem} (${viewItem}/${data.length})` }}</span>
             <div>
-              <el-button @click="moveUp" :disabled="viewItem === 1" size="small">上移</el-button>
-              <el-button @click="moveDown" :disabled="viewItem === data.length" size="small">下移</el-button>
-              <el-button @click="delItem" type="danger" size="small">删除</el-button>
+              <el-button v-blur @click="moveUp" :disabled="viewItem === 1" size="small">上移</el-button>
+              <el-button v-blur @click="moveDown" :disabled="viewItem === data.length" size="small">下移</el-button>
+              <el-button v-blur @click="delItem" type="danger" size="small">删除</el-button>
             </div>
           </div>
         </template>
@@ -42,32 +42,34 @@
       </div>
     </div>
 
-    <div class="tip">轮播图为空时主页的轮播图区域将不会显示，推荐区的视频将由4个变为8个</div>
+    <div class="tip">
+      <span>轮播图为空时主页的轮播图区域将不会显示，推荐区的视频将由4个变为8个</span>
+    </div>
 
     <template #footer>
       <div style="float: left;">
-        <el-button @click="newItem" type="success">新增一项</el-button>
-        <el-button @click="pre" :disabled="viewItem === 1" v-show="data.length > 0">上一项</el-button>
-        <el-button @click="next" :disabled="viewItem === data.length" v-show="data.length > 0">下一项</el-button>
+        <el-button v-blur @click="newItem" type="success">新增一项</el-button>
+        <el-button v-blur @click="pre" :disabled="viewItem === 1" v-show="data.length > 0">上一项</el-button>
+        <el-button v-blur @click="next" :disabled="viewItem === data.length" v-show="data.length > 0">下一项</el-button>
       </div>
-      <el-button @click="closeMainWindow">取消</el-button>
-      <el-button @click="save" type="primary">保存</el-button>
+      <el-button v-blur @click="closeMainWindow">取消</el-button>
+      <el-button v-blur @click="save" type="primary">保存</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import Carousel from "../components/Carousel.vue"
-import ImageUpload from "../components/ImageUpload.vue"
-import * as common from "../common"
-import Data from "../mock/manage/carousel.json"
-import { useStore } from "../store"
+import Carousel from "@/components/common/Carousel.vue"
+import ImageUpload from "@/components/common/ImageUpload.vue"
+import cmjs from '@/cmjs'
+import Data from "@/mock/manage/carousel.json"
+import { useStore } from "@/store"
 import { ElMessageBox } from 'element-plus'
 
 type carousel = {
-  title?: string,
+  title: string,
   imgUrl: string,
-  linkUrl?: string,
+  linkUrl: string,
 }
 
 const stf = defineEmits<{
@@ -147,7 +149,7 @@ function save() {
   for (let i = 0; i < data.length; i++) {
     if (data[i].imgUrl === '') {
       viewItem.value = i + 1
-      common.showError("图片不能为空")
+      cmjs.prompt.error("图片不能为空")
       return
     }
   }
@@ -157,7 +159,7 @@ function save() {
 
   store.switchAsk = false
   closeMainWindow()
-  common.showSuccess("保存成功")
+  cmjs.prompt.success("保存成功")
 }
 
 function pre() {
@@ -170,11 +172,13 @@ function next() {
 
 function newItem() {
   if (data.length >= 7) {
-    common.showError("轮播图最多有7项")
+    cmjs.prompt.error("轮播图最多有7项")
     return
   }
   data.push({
-    imgUrl: ""
+    title: "",
+    imgUrl: "",
+    linkUrl: ""
   })
   viewItem.value = data.length
 }
@@ -213,6 +217,12 @@ function moveDown() {
   font-size: 18px;
 }
 
+.scw .body .card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .scw .body .card .card-body {
   display: flex;
   flex-direction: column;
@@ -230,12 +240,6 @@ function moveDown() {
 
 .scw .body .carousel-container {
   height: 100%;
-}
-
-.scw .tip {
-  margin-top: 3px;
-  font-size: 12px;
-  color: #909399;
 }
 </style>
 

@@ -1,11 +1,13 @@
 <template>
   <div class="mp-container">
-    <div class="text-info">共{{ result.total }}条数据，数据截止时间：{{ common.timestampFormatterStandard(timestamp) }}</div>
+    <div class="tip">
+      <span style="margin-top: 0; margin-bottom: 3px;">共{{ result.total }}条数据，数据截止时间：{{ cmjs.fmt.tsStandard(timestamp) }}</span>
+    </div>
 
     <el-table :data="result.data" stripe border>
       <el-table-column label="用户" align="center">
         <template #default="scope">
-          <span @click="common.ToUser(scope.row.id)" class="nickname">{{ scope.row.nickname }}</span>
+          <span @click="cmjs.jump.user(scope.row.id)" class="nickname">{{ scope.row.nickname }}</span>
         </template>
       </el-table-column>
 
@@ -13,14 +15,14 @@
 
       <el-table-column label="初次被谁赋权" align="center">
         <template #default="scope">
-          <span v-if="scope.row.initUser" @click="common.ToUser(scope.row.initUser!.id)" class="nickname">{{
+          <span v-if="scope.row.initUser" @click="cmjs.jump.user(scope.row.initUser!.id)" class="nickname">{{
             scope.row.initUser!.nickname }}</span>
         </template>
       </el-table-column>
 
       <el-table-column label="近一次被谁调整" align="center">
         <template #default="scope">
-          <span v-if="scope.row.adjustedUser" @click="common.ToUser(scope.row.adjustedUser!.id)" class="nickname">{{
+          <span v-if="scope.row.adjustedUser" @click="cmjs.jump.user(scope.row.adjustedUser!.id)" class="nickname">{{
             scope.row.adjustedUser!.nickname }}</span>
         </template>
       </el-table-column>
@@ -31,7 +33,7 @@
       <el-table-column :width="120" label="操作" align="center">
         <template #default="scope">
           <div class="flex-center" style="flex-wrap: wrap; gap: 5px;">
-            <el-button v-if="store.mui.power > scope.row.power" @click="setPower(scope.$index)" type="danger" size="small">调整权限</el-button>
+            <el-button v-blur v-if="store.mui.power > scope.row.power" @click="setPower(scope.$index)" type="danger" size="small">调整权限</el-button>
           </div>
         </template>
       </el-table-column>
@@ -40,10 +42,10 @@
 </template>
 
 <script setup lang="ts">
-import Data from "../../../mock/manage/powerAdmin.json"
-import * as common from "../../../common"
+import Data from "@/mock/manage/powerAdmin.json"
+import cmjs from '@/cmjs'
 import { ElMessageBox } from 'element-plus'
-import { useStore } from "../../../store"
+import { useStore } from "@/store"
 
 type user = {
   id: number,
@@ -110,14 +112,14 @@ function setPower(idx: number) {
           nickname: store.mui.nickname
         }
       }
-      common.showSuccess("操作成功")
+      cmjs.prompt.success("操作成功")
     })
     .catch(() => { })
 }
 
 function dateFormatter(_: any, __: any, v: number): string {
   if (v) {
-    return common.timestampFormatterStandard(v)
+    return cmjs.fmt.tsStandard(v)
   }
   return ""
 }

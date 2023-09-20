@@ -18,7 +18,7 @@
           <div class="info">
             <div class="title">{{ title }}</div>
             <div class="num">共{{ mockVideoTotalNum }}个视频</div>
-            <div class="num">{{ common.numFormatterW(0) }}播放</div>
+            <div class="num">{{ cmjs.fmt.numWE(0) }}播放</div>
             <el-tooltip effect="light" :content="'都是些奇奇怪怪的东西' || '-'" placement="bottom">
               <span class="iconfont el-icon-browse num">简介</span>
             </el-tooltip>
@@ -56,11 +56,11 @@
 </template>
 
 <script setup lang="ts">
-import VideoCard from "../../components/VideoCard.vue"
+import VideoCard from "@/components/common/VideoCard.vue"
 import { ElMessageBox } from 'element-plus'
-import * as common from "../../common"
+import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
-import { useStore } from "../../store"
+import { useStore } from "@/store"
 
 const mockVideo = {
   "vid": 0,
@@ -81,7 +81,7 @@ const mockVideoTotalNum = 17
 const store = useStore()
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(parseInt(route.params.uid as string))
+    isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
   }
@@ -96,7 +96,7 @@ let newIntro = ref("")
 
 onMounted(() => {
   route = useRoute();
-  isMe.value = common.isMe(parseInt(route.params.uid as string))
+  isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
 })
 
 function newCollection() {
@@ -141,13 +141,13 @@ function deleteCollection() {
   })
     .then(() => {
       store.addUserMenuCollectionNum(-1)
-      common.showSuccess('删除成功')
+      cmjs.prompt.success('删除成功')
     })
   //TODO 删除后若当前activeId不为0则减1
 }
 
 function removeItem() {
-  common.showSuccess("移除成功")
+  cmjs.prompt.success("移除成功")
   //TODO 若有多的视频，则请求一个补充到最后
 }
 
@@ -177,7 +177,7 @@ function beforeNewCollectionWindowClose(action: string, _: any, done: Function) 
     if (!checkInput()) {
       return
     }
-    common.showSuccess(`新合集的名称为：${newName.value}，新合集的简介为：${newIntro.value}`)
+    cmjs.prompt.success(`新合集的名称为：${newName.value}，新合集的简介为：${newIntro.value}`)
   }
   newName.value = ""
   newIntro.value = ""

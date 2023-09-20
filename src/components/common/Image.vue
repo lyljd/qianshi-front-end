@@ -6,7 +6,7 @@
       :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle || avatar) ? (circle || avatar ? '50%' : '5px') : '', cursor: customClick || uploadUrl !== '' ? 'pointer' : 'default', opacity: imgUploadPercent !== 0 ? 0.5 : 1 }"
       class="img">
       <template #error>
-        <div v-if="!data.avatar" class="default">{{ loadFailInfo }}</div>
+        <div v-if="!data.avatar" style="font-size: 16px;" class="default">{{ loadFailInfo }}</div>
 
         <el-image v-else src="/default-avatar.png" :fit="contain ? 'contain' : ''"
           :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle || avatar) ? (circle || avatar ? '50%' : '5px') : '', cursor: customClick || uploadUrl !== '' ? 'pointer' : 'default', opacity: imgUploadPercent !== 0 ? 0.5 : 1 }"
@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { UploadInstance } from 'element-plus'
-import * as common from "../common"
+import cmjs from '@/cmjs'
 
 const stf = defineEmits<{
   (cen: "recImgUrl", imgUrl: string): void
@@ -75,7 +75,7 @@ function openImgUpload() {
 
   if (data.uploadUrl !== "") {
     if (imgUploadPercent.value !== 0) {
-      common.showError("图片上传时禁止修改")
+      cmjs.prompt.error("图片上传时禁止修改")
       return
     }
     imgUpload.value?.$el.querySelector('input').click()
@@ -84,7 +84,7 @@ function openImgUpload() {
 
 function beforeImgUpload(rawFile: any) {
   if (rawFile.size / 1024 / 1024 > data.uploadMaxSize) {
-    common.showError(`上传的图片大小不能超过${data.uploadMaxSize}M`)
+    cmjs.prompt.error(`上传的图片大小不能超过${data.uploadMaxSize}M`)
     return false
   }
   return true
@@ -118,7 +118,7 @@ function onImgUploadError() {
   imgUrl.value = preImgUrl.value
   imgUploadPercent.value = 0
   stf('recImgUploadPercent', 0)
-  common.showError("图片上传失败")
+  cmjs.prompt.error("图片上传失败")
 }
 </script>
 

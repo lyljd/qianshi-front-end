@@ -179,6 +179,11 @@
       }
     ]
   },
+  "advertisement": {
+    "type": "image",
+    "content": "/resource/壁纸/Destiny 2.jpg",
+    "linkUrl": "http://qianshi.fun"
+  },
   "recommend": [
     {
       "vid": 4,

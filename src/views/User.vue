@@ -1,30 +1,19 @@
 <template>
   <div class="container">
-    <img style="width: 1140px; height: 180px;" :src="`/userhome-top-img/${user.topImgNo}.png`">
+    <img style="width: 1140px; height: 180px;" :src="user.topImg">
 
     <div v-if="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
-    <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false"
-      :size="'338px'">
+    <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false" size="auto">
       <template #default>
         <div class="top-img-container">
-          <div style="text-align: center;">
-            <img :style="{ cursor: user.topImgNo === 1 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 1"
-              class="top-img mr10 mb10" src="/userhome-top-img/1.png">
-            <img :style="{ cursor: user.topImgNo === 2 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 2"
-              class="top-img ml10 mb10" src="/userhome-top-img/2.png">
-          </div>
-          <div style="text-align: center;">
-            <img :style="{ cursor: user.topImgNo === 3 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 3"
-              class="top-img mr10 mt10" src="/userhome-top-img/3.png">
-            <img :style="{ cursor: user.topImgNo === 4 ? 'not-allowed' : 'pointer' }" @click="user.topImgNo = 4"
-              class="top-img ml10 mt10" src="/userhome-top-img/4.png">
-          </div>
+          <img v-for="ti in topImgs" :src="ti" @click="user.topImg = ti"
+            :style="{ cursor: user.topImg === ti ? 'not-allowed' : 'pointer' }" class="top-img">
         </div>
       </template>
       <template #footer>
-        <el-button @click="cancelTopImg">取消</el-button>
-        <el-button @click="saveTopImg">保存</el-button>
+        <el-button v-blur @click="cancelTopImg">取消</el-button>
+        <el-button v-blur @click="saveTopImg">保存</el-button>
       </template>
     </el-drawer>
 
@@ -36,7 +25,7 @@
           <span class="nickname">{{ user.nickname }}</span>
           <span v-show="user.gender === '男'" style="color: #a0cfff;" class="iconfont el-icon-male gender"></span>
           <span v-show="user.gender === '女'" style="color: #ff6699;" class="iconfont el-icon-female gender"></span>
-          <svg @click="common.ToNewPage('/me')" class="icon-symbol level" aria-hidden="true">
+          <svg @click="cmjs.jump.new('/me')" class="icon-symbol level" aria-hidden="true">
             <use :xlink:href="'#el-icon-level_' + user.level"></use>
           </svg>
           <span v-if="user.isVip" class="vip">会员</span>
@@ -52,8 +41,8 @@
     </div>
 
     <div v-if="!isMe" class="btns">
-      <el-button @click="focu">{{ focuBtnInnerText }}</el-button>
-      <el-button @click="sendMessage">发消息</el-button>
+      <el-button v-blur @click="focu">{{ focuBtnInnerText }}</el-button>
+      <el-button v-blur @click="sendMessage">发消息</el-button>
     </div>
 
     <el-card class="menu-container">
@@ -61,8 +50,10 @@
         <el-menu-item :index="`/u/${$route.params.uid}`">主页</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/dynamic`">动态</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/post`">投稿<span class="n">{{ user.postNum }}</span></el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集<span class="n">{{ user.collectionNum }}</span></el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏<span class="n">{{ user.favlistNum }}</span></el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集<span class="n">{{ user.collectionNum
+        }}</span></el-menu-item>
+        <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏<span class="n">{{ user.favlistNum
+        }}</span></el-menu-item>
         <el-menu-item v-if="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
 
         <div class="search-container">
@@ -79,26 +70,26 @@
           <div class="num-box">
             <div class="num-span">关注数</div>
             <div :title="(user.focuNum).toString()" class="num focu-num">{{
-              common.numFormatterW(user.focuNum) }}</div>
+              cmjs.fmt.numWE(user.focuNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">粉丝数</div>
             <div :title="(user.fanNum).toString()" class="num fan-num">{{
-              common.numFormatterW(user.fanNum) }}</div>
+              cmjs.fmt.numWE(user.fanNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">获赞数</div>
-            <div :title="(user.likeNum).toString()" class="num">{{ common.numFormatterW(user.likeNum) }}
+            <div :title="(user.likeNum).toString()" class="num">{{ cmjs.fmt.numWE(user.likeNum) }}
             </div>
           </div>
           <div class="num-box">
             <div class="num-span">播放数</div>
-            <div :title="(user.playNum).toString()" class="num">{{ common.numFormatterW(user.playNum) }}
+            <div :title="(user.playNum).toString()" class="num">{{ cmjs.fmt.numWE(user.playNum) }}
             </div>
           </div>
           <div class="num-box">
             <div class="num-span">阅读数</div>
-            <div :title="(user.readNum).toString()" class="num">{{ common.numFormatterW(user.readNum) }}
+            <div :title="(user.readNum).toString()" class="num">{{ cmjs.fmt.numWE(user.readNum) }}
             </div>
           </div>
         </div>
@@ -110,10 +101,10 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
+import cmjs from '@/cmjs'
 import { ElMessage } from 'element-plus'
-import mockUser from "../mock/user.json"
-import { useStore } from "../store"
+import mockUser from "@/mock/user.json"
+import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 
 type User = {
@@ -125,7 +116,7 @@ type User = {
   level: number
   isVip: boolean
   ipLocation: string
-  topImgNo: number
+  topImg: string
   isFocu: boolean
   postNum: number
   collectionNum: number
@@ -144,7 +135,7 @@ const store = useStore()
 let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = common.isMe(user.value.uid)
+    isMe.value = cmjs.biz.isMe(user.value.uid)
     user.value = getUser()
   } else {
     isMe.value = false
@@ -156,10 +147,16 @@ store.addUserMenuCollectionNum = addMenuCollectionNum
 store.addUserMenuFavlistNum = addMenuFavlistNum
 
 const signatureInput = ref<HTMLInputElement>()
+const topImgs: string[] = [
+  "/userhome-top-img/1.png",
+  "/userhome-top-img/2.png",
+  "/userhome-top-img/3.png",
+  "/userhome-top-img/4.png",
+]
 
-let isMe = ref(common.isMe(user.value.uid))
+let isMe = ref(cmjs.biz.isMe(user.value.uid))
 let searchKey = ref("")
-let oldTopImgNo = ref(1)
+let oldTopImg = ref("")
 let replaceTopImgDrawerShow = ref(false)
 let focuBtnInnerText = ref(!user.value.isFocu ? "关注" : "已关注")
 
@@ -174,7 +171,7 @@ function recImgUrl(imgUrl: string) {
 function saveSignature() {
   user.value.signature = user.value.signature.trim()
   if (user.value.signature.length > 50) {
-    common.showInfo("签名的长度最大为50，超出部分已自动选中")
+    cmjs.prompt.info("签名的长度最大为50，超出部分已自动选中")
     signatureInput.value!.focus()
     signatureInput.value!.setSelectionRange(50, user.value.signature.length)
   }
@@ -182,12 +179,12 @@ function saveSignature() {
 
 function replaceTopImg() {
   replaceTopImgDrawerShow.value = true;
-  oldTopImgNo.value = user.value.topImgNo
+  oldTopImg.value = user.value.topImg
 }
 
 function cancelTopImg() {
   replaceTopImgDrawerShow.value = false
-  user.value.topImgNo = oldTopImgNo.value
+  user.value.topImg = oldTopImg.value
 }
 
 function saveTopImg() {
@@ -201,7 +198,7 @@ function focu() {
     return
   }
   if (isMe) {
-    common.showInfo("不能关注自己")
+    cmjs.prompt.info("不能关注自己")
     return
   }
   if (!user.value.isFocu) {
@@ -259,12 +256,11 @@ function addMenuFavlistNum(incr: number) {
 }
 
 .top-img-container {
+  padding-left: 20px;
+  padding-right: 20px;
   display: flex;
-  flex-direction: column;
-  width: 1140px;
-  margin-inline: auto;
-  margin-top: -20px;
-  margin-bottom: -20px;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .top-img {
@@ -446,5 +442,18 @@ function addMenuFavlistNum(incr: number) {
 
 :deep(.el-input__wrapper.is-focus) {
   box-shadow: 0 0 0 1px #409EFF inset !important
+}
+
+:deep(.el-drawer__header) {
+  margin-bottom: 0;
+  padding: 20px;
+}
+
+:deep(.el-drawer__body) {
+  padding: 0;
+}
+
+:deep(.el-drawer__footer) {
+  padding: 20px;
 }
 </style>

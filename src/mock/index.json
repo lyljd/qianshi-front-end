@@ -2,19 +2,33 @@
   "carousel": [
     {
       "title": "轮播图1",
-      "imgUrl": "/resource/壁纸/锁屏1.jpg"
+      "imgUrl": "/resource/壁纸/锁屏1.jpg",
+      "linkUrl": ""
     },
     {
       "title": "轮播图2",
-      "imgUrl": "/resource/壁纸/锁屏2.jpg"
+      "imgUrl": "/resource/壁纸/锁屏2.jpg",
+      "linkUrl": ""
     },
     {
       "title": "轮播图3",
-      "imgUrl": "/resource/壁纸/Destiny 2.jpg"
+      "imgUrl": "/resource/壁纸/Destiny 2.jpg",
+      "linkUrl": ""
     },
     {
       "title": "轮播图4",
-      "imgUrl": "/resource/壁纸/Everlasting Summer Room.jpg"
+      "imgUrl": "/resource/壁纸/Everlasting Summer Room.jpg",
+      "linkUrl": ""
     }
-  ]
+  ],
+  "advertisement": {
+    "type": "text",
+    "content": {
+      "text": "仅供学习使用",
+      "fontSize": 18,
+      "fontColor": "white",
+      "bgColor": "#909399"
+    },
+    "linkUrl": ""
+  }
 }

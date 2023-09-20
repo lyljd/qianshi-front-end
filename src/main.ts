@@ -1,26 +1,39 @@
-import { createApp } from 'vue'
-import './normalize.css'
-import './main.css'
-import App from './App.vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import router from './router'
-import './assets/iconfont/iconfont.css'
-import './assets/iconfont/iconfont.js'
+import ElementPlus from 'element-plus'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import Image from "@/components/common/Image.vue"
+
+import '@/assets/iconfont/iconfont.js'
+
+import '@/assets/iconfont/iconfont.css'
+import 'element-plus/dist/index.css'
+import '@/normalize.css'
 import 'animate.css'
-import { useStore } from "./store"
-import Image from "./components/Image.vue"
+import '@/main.css'
+
+import { createApp } from 'vue'
+import App from '@/App.vue'
+import { useStore } from "@/store"
 
 const app = createApp(App)
 const store = useStore()
+
+app.directive('blur', {
+  mounted(el) {
+    el.addEventListener('click', () => {
+      el.blur()
+    })
+  },
+})
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 app.component('Image', Image)
+
 app.use(ElementPlus)
 app.use(router)
+
 app.mount('#app')
 
 function beforeUnload(e: any) {

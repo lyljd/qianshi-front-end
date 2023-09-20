@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "../../../store"
+import { useStore } from "@/store"
 
 const store = useStore()
 store.setPlatformItemIndex(2, location.pathname)

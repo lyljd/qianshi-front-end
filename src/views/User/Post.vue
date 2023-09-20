@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import SmallVideoCard from '../../components/SmallVideoCard.vue'
+import SmallVideoCard from '@/components/common/SmallVideoCard.vue'
 
 //<!--TODO
 const mockVideo = {

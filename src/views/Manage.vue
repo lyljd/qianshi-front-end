@@ -9,7 +9,7 @@
               <span>浅时</span>
             </div>
             <div>后台管理</div>
-            <div @click="common.ToNewPage('/')" class="open-main-web">打开主站</div>
+            <div @click="cmjs.jump.new('/')" class="open-main-web">打开主站</div>
           </div>
 
           <el-menu-item v-for="i in item.filter(i => store.mui.power >= i.power)" :index="i.index">
@@ -31,9 +31,9 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
-import { useStore } from "../store"
-import SysMsgSendWindow from "../components/SysMsgSendWindow.vue"
+import cmjs from '@/cmjs'
+import { useStore } from "@/store"
+import SysMsgSendWindow from "@/components/window/SysMsgSendWindow.vue"
 
 const store = useStore()
 store.setManegeItemIndex = setItemIndex

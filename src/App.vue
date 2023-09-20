@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!common.isMobile()">
+  <div v-if="!cmjs.util.isMobile()">
     <el-backtop :right="50" :bottom="50" />
 
     <TopMenuBar v-if="store.topPath !== 'manage'"></TopMenuBar>
@@ -24,11 +24,11 @@
 </template>
 
 <script setup lang="ts">
-import TopMenuBar from "./components/TopMenuBar.vue"
-import FeedbackSubmissionWindow from "./components/FeedbackSubmissionWindow.vue"
-import PreviewVideoWindow from "./components/PreviewVideoWindow.vue"
-import * as common from "./common"
-import { useStore } from "./store"
+import TopMenuBar from "@/components/once/TopMenuBar.vue"
+import FeedbackSubmissionWindow from "@/components/window/FeedbackSubmissionWindow.vue"
+import PreviewVideoWindow from "@/components/window/PreviewVideoWindow.vue"
+import { useStore } from "@/store"
+import cmjs from '@/cmjs'
 
 const store = useStore()
 </script>

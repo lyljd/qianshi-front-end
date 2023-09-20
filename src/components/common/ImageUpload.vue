@@ -2,30 +2,36 @@
   <div class="iu-container">
     <div :style="{ width: `${width - 2}px`, height: `${height - 2}px` }" v-show="imgUrl === ''" @click="openImgUpload"
       class="upload-div">
-      <span style="font-size: 40px;">+</span>
+      <span style="font-size: 30px;">+</span>
       <span>上传图片</span>
     </div>
 
     <div v-show="imgUrl !== ''" class="img-container">
       <el-image :style="{ width: `${width}px`, height: `${height}px`, opacity: imgUploadPercent !== 0 ? 0.25 : 1 }"
-        @click="openImgUpload" :src="imgUrl" class="img"></el-image>
+        @click="openImgUpload" :src="imgUrl" class="img">
+        <template #error>
+          <div @click="openImgUpload" style="font-size: 16px;" class="default">加载失败</div>
+        </template>
+      </el-image>
 
-      <el-progress v-show="imgUploadPercent !== 0" :percentage="imgUploadPercent" :width="height" type="circle"
-        class="progress" />
+      <el-progress :style="{ marginLeft: `${(width - height) / 2}px` }" v-show="imgUploadPercent !== 0"
+        :percentage="imgUploadPercent" :width="height" type="circle" class="progress" />
     </div>
 
     <el-upload :before-upload="beforeImgUpload" :on-remove="onImgUploadRemove" :on-change="onImgUploadChange"
       :on-progress="onImgUploadProgress" :on-success="onImgUploadSuccess" :on-error="onImgUploadError" ref="imgUpload"
       :action="uploadUrl" accept="image/*" v-show="false"></el-upload>
 
-    <div class="tip">上传的图片大小上限为{{ maxSize }}M</div>
-    <div class="tip">推荐使用{{ proportion }}的图片</div>
+    <div class="tip">
+      <span>上传的图片大小上限为{{ maxSize }}M</span>
+      <span>推荐使用{{ proportion }}的图片</span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { UploadInstance } from 'element-plus'
-import * as common from "../common"
+import cmjs from '@/cmjs'
 
 const imgUpload = ref<UploadInstance>()
 
@@ -63,7 +69,7 @@ function setImgUrl(url: string) {
 
 function openImgUpload() {
   if (imgUploadPercent.value !== 0) {
-    common.showError("图片上传时禁止修改")
+    cmjs.prompt.error("图片上传时禁止修改")
     return
   }
   imgUpload.value?.$el.querySelector('input').click()
@@ -71,7 +77,7 @@ function openImgUpload() {
 
 function beforeImgUpload(rawFile: any) {
   if (rawFile.size / 1024 / 1024 > data.maxSize) {
-    common.showError(`上传的图片大小不能超过${data.maxSize}M`)
+    cmjs.prompt.error(`上传的图片大小不能超过${data.maxSize}M`)
     return false
   }
   return true
@@ -105,7 +111,7 @@ function onImgUploadError() {
   imgUrl.value = preImgUrl.value
   imgUploadPercent.value = 0
   stf('recImgUploadPercent', 0)
-  common.showError("图片上传失败")
+  cmjs.prompt.error("图片上传失败")
 }
 </script>
 
@@ -124,7 +130,6 @@ function onImgUploadError() {
 
 .iu-container .img-container {
   display: flex;
-  justify-content: center;
 }
 
 .iu-container .img-container .img {
@@ -137,11 +142,5 @@ function onImgUploadError() {
 
 .iu-container .img-container .progress {
   position: absolute;
-}
-
-.iu-container .tip {
-  margin-top: 3px;
-  font-size: 12px;
-  color: #909399;
 }
 </style>

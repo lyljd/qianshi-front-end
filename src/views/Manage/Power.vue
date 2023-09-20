@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import ManageTopMenuBar from "../../components/ManageTopMenuBar.vue"
+import ManageTopMenuBar from "@/components/util/ManageTopMenuBar.vue"
 
 let item = reactive([
   { index: "/manage/power", content: "全部用户" },

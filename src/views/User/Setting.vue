@@ -24,9 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../../common"
+import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
-import mockUserSetting from "../../mock/user/setting.json"
+import mockUserSetting from "@/mock/user/setting.json"
 
 type UserSetting = {
   openStar: boolean,
@@ -42,7 +42,7 @@ let isMe = ref(false)
 
 onMounted(()=>{
   route = useRoute();
-  isMe.value = common.isMe(parseInt(route.params.uid as string))
+  isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
 })
 
 function getUserSetting() {

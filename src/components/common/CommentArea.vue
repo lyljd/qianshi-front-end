@@ -5,7 +5,7 @@
       <div class="top">
         <div>
           <span class="comment-span">评论</span>
-          <span class="comment-num">{{ common.numFormatterW(data.num) }}</span>
+          <span class="comment-num">{{ cmjs.fmt.numWE(data.num) }}</span>
         </div>
 
         <div>
@@ -19,7 +19,7 @@
 
     <div style="display: flex;">
       <textarea v-model="content" class="comment-input" placeholder="快来发表评论吧～"></textarea>
-      <el-button @click="send(data.value)" class="comment-send" type="primary">发布</el-button>
+      <el-button v-blur @click="send(data.value)" class="comment-send" type="primary">发布</el-button>
     </div>
 
     <el-empty v-if="data.value.length === 0" description="暂无评论" />
@@ -41,7 +41,7 @@
 
         <div v-show="item.cid === sendAreaId" style="display: flex; margin-left: 47.5px; margin-top: 20px;">
           <textarea v-model="childContent" class="comment-input" :placeholder="`回复 @${sendAreaNickname}：`"></textarea>
-          <el-button @click="childSend" class="comment-send" type="primary">发布</el-button>
+          <el-button v-blur @click="childSend" class="comment-send" type="primary">发布</el-button>
         </div>
 
         <hr class="comment-divide" v-if="index !== data.value.length - 1">
@@ -55,9 +55,9 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
-import Comment from './Comment.vue'
-import { useStore } from "../store"
+import cmjs from '@/cmjs'
+import Comment from "@/components/common/Comment.vue"
+import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 import { ElMessage } from 'element-plus'
 
@@ -147,7 +147,7 @@ function send(comment: Comment[]) {
   }
 
   sendBtns.forEach((ele) => {
-    common.btnCD(ele, 10)
+    cmjs.util.btnCD(ele, 10)
   })
 
   props.data.num++
@@ -210,7 +210,7 @@ function childSend() {
   }
 
   sendBtns.forEach((ele) => {
-    common.btnCD(ele, 10)
+    cmjs.util.btnCD(ele, 10)
   })
 
   props.data.num++

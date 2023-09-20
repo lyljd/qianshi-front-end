@@ -4,13 +4,13 @@
   <div class="mu-container">
     <div class="search-bar">
       <el-input v-model="searchKey" @keyup.enter.native="search" placeholder="请输入欲搜索的用户名关键字" />
-      <el-button @click="search" :icon="Search" type="primary">搜索</el-button>
+      <el-button v-blur @click="search" :icon="Search" type="primary">搜索</el-button>
     </div>
 
     <el-table :data="result.data" stripe border>
       <el-table-column label="用户" align="center">
         <template #default="scope">
-          <span @click="common.ToUser(scope.row.id)" class="nickname">{{ scope.row.nickname }}</span>
+          <span @click="cmjs.jump.user(scope.row.id)" class="nickname">{{ scope.row.nickname }}</span>
         </template>
       </el-table-column>
 
@@ -24,7 +24,7 @@
         <template #default="scope">
           <div class="flex-center">
             <svg class="icon-symbol level" aria-hidden="true">
-              <use :xlink:href="'#el-icon-level_' + common.expToLevel(scope.row.exp)"></use>
+              <use :xlink:href="'#el-icon-level_' + cmjs.biz.expToLevel(scope.row.exp)"></use>
             </svg>
             <span class="exp">({{ scope.row.exp }})</span>
           </div>
@@ -47,7 +47,7 @@
               :title="!scope.row.isRestrict ? '你确认要限制该用户吗？' : '你确认要取消限制该用户吗？'" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
-                <el-button :type="!scope.row.isRestrict ? 'success' : 'danger'" size="small">{{ !scope.row.isRestrict ?
+                <el-button v-blur :type="!scope.row.isRestrict ? 'success' : 'danger'" size="small">{{ !scope.row.isRestrict ?
                   "限制交互" : "取消限制交互" }}</el-button>
               </template>
             </el-popconfirm>
@@ -56,15 +56,15 @@
               :title="!scope.row.isBan ? '你确认要封禁该用户吗？' : '你确认要取消封禁该用户吗？'" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
-                <el-button :type="!scope.row.isBan ? 'success' : 'danger'" size="small">{{ !scope.row.isBan ? "封禁账号" :
+                <el-button v-blur :type="!scope.row.isBan ? 'success' : 'danger'" size="small">{{ !scope.row.isBan ? "封禁账号" :
                   "取消封禁账号" }}</el-button>
               </template>
             </el-popconfirm>
 
-            <el-button @click="setInfo(scope.$index)" size="small">调整信息</el-button>
-            <el-button @click="setCoinNum(scope.$index)" size="small">调整硬币数</el-button>
-            <el-button @click="setExp(scope.$index)" size="small">调整经验</el-button>
-            <el-button @click="setvipExpireDate(scope.$index)" size="small">调整会员过期日期</el-button>
+            <el-button v-blur @click="setInfo(scope.$index)" size="small">调整信息</el-button>
+            <el-button v-blur @click="setCoinNum(scope.$index)" size="small">调整硬币数</el-button>
+            <el-button v-blur @click="setExp(scope.$index)" size="small">调整经验</el-button>
+            <el-button v-blur @click="setvipExpireDate(scope.$index)" size="small">调整会员过期日期</el-button>
           </div>
         </template>
       </el-table-column>
@@ -80,13 +80,13 @@
 </template>
 
 <script setup lang="ts">
-import ManageTopMenuBar from "../../components/ManageTopMenuBar.vue"
-import Data from "../../mock/manage/user.json"
-import * as common from "../../common"
+import ManageTopMenuBar from "@/components/util/ManageTopMenuBar.vue"
+import Data from "@/mock/manage/user.json"
+import cmjs from '@/cmjs'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
-import DatePickerWindow from "../../components/DatePickerWindow.vue"
-import UserInfoSysSetWindow from "../../components/UserInfoSysSetWindow.vue"
+import DatePickerWindow from "@/components/window/DatePickerWindow.vue"
+import UserInfoSysSetWindow from "@/components/window/UserInfoSysSetWindow.vue"
 
 type user = {
   id: number,
@@ -145,7 +145,7 @@ function getData(): result {
 
 function search() {
   if (searchKey.value.trim() === "") {
-    common.showError("关键字为空")
+    cmjs.prompt.error("关键字为空")
     return
   }
 
@@ -166,7 +166,7 @@ function restrict(idx: number) {
   console.log(result.value.data[idx].id)
 
   result.value.data[idx].isRestrict = !result.value.data[idx].isRestrict
-  common.showSuccess("操作成功")
+  cmjs.prompt.success("操作成功")
 }
 
 function ban(idx: number) {
@@ -174,7 +174,7 @@ function ban(idx: number) {
   console.log(result.value.data[idx].id)
 
   result.value.data[idx].isBan = !result.value.data[idx].isBan
-  common.showSuccess("操作成功")
+  cmjs.prompt.success("操作成功")
 }
 
 function setInfo(idx: number) {
@@ -200,7 +200,7 @@ function setCoinNum(idx: number) {
       console.log(result.value.data[idx].id)
 
       result.value.data[idx].coinNum = parseInt(value)
-      common.showSuccess("操作成功")
+      cmjs.prompt.success("操作成功")
     })
     .catch(() => { })
 }
@@ -219,7 +219,7 @@ function setExp(idx: number) {
       console.log(result.value.data[idx].id)
 
       result.value.data[idx].exp = parseInt(value)
-      common.showSuccess("操作成功")
+      cmjs.prompt.success("操作成功")
     })
     .catch(() => { })
 }

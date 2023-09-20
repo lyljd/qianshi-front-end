@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import ManageTopMenuBar from "../../components/ManageTopMenuBar.vue"
-import { useStore } from "../../store"
+import ManageTopMenuBar from "@/components/util/ManageTopMenuBar.vue"
+import { useStore } from "@/store"
 
 const store = useStore()
 store.setManegeFeedbackItemIndex = setItemIndex

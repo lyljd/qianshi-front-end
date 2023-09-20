@@ -2,7 +2,7 @@
   <div class="vd-container">
     <el-descriptions v-if="data" :title="title" :column="1" border>
       <template v-if="data.vid" #extra>
-        <el-button @click="common.ToVideo(data.vid)" type="primary" size="small">打开视频页</el-button>
+        <el-button v-blur @click="cmjs.jump.video(data.vid)" type="primary" size="small">打开视频页</el-button>
       </template>
 
       <el-descriptions-item label="标题">
@@ -14,7 +14,7 @@
       </el-descriptions-item>
 
       <el-descriptions-item label="视频">
-        <el-button @click="store.openPVWindow(data.videoUrl)">预览</el-button>
+        <el-button v-blur @click="store.openPVWindow(data.videoUrl)">预览</el-button>
       </el-descriptions-item>
 
       <el-descriptions-item label="分区">
@@ -39,9 +39,9 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "../store"
-import VideoTag from "../components/VideoTag.vue"
-import * as common from "../common"
+import { useStore } from "@/store"
+import VideoTag from "@/components/common/VideoTag.vue"
+import cmjs from '@/cmjs'
 
 const store = useStore()
 

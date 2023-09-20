@@ -41,7 +41,7 @@
         <div class="good">免费看高清视频</div>
         <div class="good">同步播放记录</div>
         <div class="good">发表弹幕/评论</div>
-        <el-button @click="openLoginWindow()" class="pop-login-btn" type="primary">立即登录</el-button>
+        <el-button v-blur @click="openLoginWindow()" class="pop-login-btn" type="primary">立即登录</el-button>
         <div class="info2">首次使用？<span @click="openLoginWindow()" class="register-span">点我注册</span></div>
       </div>
     </el-popover>
@@ -55,7 +55,7 @@
             <img @click="toHome" src="/default-avatar.png" />
           </el-avatar>
         </template>
-        <el-button @click="signin" :type="!signinStatus ? 'success' : 'info'"
+        <el-button v-blur @click="signin" :type="!signinStatus ? 'success' : 'info'"
           :style="{ cursor: !signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
         <ul class="almul">
           <div class="nickname">
@@ -63,7 +63,7 @@
           </div>
           <div class="tags">
             <span v-show="ahi.isVip" class="vip">会员</span>
-            <svg @click="common.ToNewPage('/me')" class="icon-symbol level" aria-hidden="true">
+            <svg @click="cmjs.jump.new('/me')" class="icon-symbol level" aria-hidden="true">
               <use :xlink:href="'#el-icon-level_' + ahi.level"></use>
             </svg>
           </div>
@@ -72,33 +72,33 @@
           </div>
           <div class="num-container">
             <div class="num">
-              <div class="number">{{ common.numFormatterW(ahi.focuNum) }}</div>
+              <div class="number">{{ cmjs.fmt.numWE(ahi.focuNum) }}</div>
               <div class="text">关注</div>
             </div>
             <div class="num">
-              <div class="number">{{ common.numFormatterW(ahi.fanNum) }}</div>
+              <div class="number">{{ cmjs.fmt.numWE(ahi.fanNum) }}</div>
               <div class="text">粉丝</div>
             </div>
             <div class="num">
-              <div class="number">{{ common.numFormatterW(ahi.trendNum) }}</div>
+              <div class="number">{{ cmjs.fmt.numWE(ahi.trendNum) }}</div>
               <div class="text">动态</div>
             </div>
           </div>
-          <li @click="common.ToNewPage('/manage')" v-if="ahi.power > 0">后台管理</li>
-          <li @click="common.ToNewPage('/me')">个人中心</li>
+          <li @click="cmjs.jump.new('/manage')" v-if="ahi.power > 0">后台管理</li>
+          <li @click="cmjs.jump.new('/me')">个人中心</li>
           <li @click="logout">退出登录</li>
         </ul>
       </el-popover>
 
       <div class="ico-btn">
-        <el-button class="iconfont el-icon-vip ico" circle></el-button>
+        <el-button v-blur class="iconfont el-icon-vip ico" circle></el-button>
         <div class="notice">会员</div>
       </div>
 
       <el-popover :show-arrow=false>
         <template #reference>
           <div class="ico-btn">
-            <el-button circle><el-icon class="ico">
+            <el-button v-blur circle><el-icon class="ico">
                 <Message />
               </el-icon></el-button>
             <div class="notice">消息</div>
@@ -114,30 +114,30 @@
       </el-popover>
 
       <div class="ico-btn">
-        <el-button class="iconfont el-icon-fengche ico" circle></el-button>
+        <el-button v-blur class="iconfont el-icon-fengche ico" circle></el-button>
         <div class="notice">动态</div>
       </div>
 
       <div class="ico-btn">
-        <el-button circle><el-icon class="ico">
+        <el-button v-blur circle><el-icon class="ico">
             <Star />
           </el-icon></el-button>
         <div class="notice">收藏</div>
       </div>
 
       <div class="ico-btn">
-        <el-button circle><el-icon class="ico">
+        <el-button v-blur circle><el-icon class="ico">
             <Clock />
           </el-icon></el-button>
         <div class="notice">历史</div>
       </div>
 
-      <div @click="common.ToNewPage('/platform')" style="text-align: center;" class="ico-btn">
-        <el-button style="font-weight: bold;" class="iconfont el-icon-idea ico" circle></el-button>
+      <div @click="cmjs.jump.new('/platform')" style="text-align: center;" class="ico-btn">
+        <el-button v-blur style="font-weight: bold;" class="iconfont el-icon-idea ico" circle></el-button>
         <div class="notice">创作中心</div>
       </div>
 
-      <el-button @click="common.ToNewPage('/platform/upload/video')" type="primary" class="upload-btn">
+      <el-button v-blur @click="cmjs.jump.new('/platform/upload/video')" type="primary" class="upload-btn">
         <el-icon>
           <Upload />
         </el-icon>
@@ -148,11 +148,11 @@
 </template>
 
 <script lang="ts" setup>
-import TopMenuImg from "./TopMenuImg.vue"
-import LoginWindow from "./LoginWindow.vue"
-import * as common from "../common"
+import TopMenuImg from "@/components/once/TopMenuImg.vue"
+import LoginWindow from "@/components/window/LoginWindow.vue"
+import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
-import { useStore } from "../store"
+import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 
 type AvatarHoverInfo = {
@@ -273,18 +273,18 @@ function onAvatarPopShow() {
 
 function signin() {
   if (signinStatus.value) {
-    common.showInfo("今日已签到，请明日再来")
+    cmjs.prompt.info("今日已签到，请明日再来")
     return
   }
   signinStatus.value = true
   ahi.coin += 5 //TODO
-  common.showSuccess("签到成功")
+  cmjs.prompt.success("签到成功")
 }
 
 function toHome() {
   let uid = localStorage.getItem("uid")
   if (uid) {
-    common.ToUser(parseInt(uid))
+    cmjs.jump.user(parseInt(uid))
   }
 }
 

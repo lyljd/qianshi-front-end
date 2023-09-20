@@ -12,7 +12,7 @@
   </div>
 
   <div class="advertisement">
-    <Advertisement></Advertisement>
+    <Advertisement :data="data.advertisement"></Advertisement>
   </div>
 
   <div v-for="(item) in 4" class="channel">
@@ -30,21 +30,35 @@
 </template>
 
 <script setup lang="ts">
-import Carousel from "../components/Carousel.vue"
-import VideoCard from "../components/VideoCard.vue"
-import VideoRefreshBtn from "../components/VideoRefreshBtn.vue"
-import Advertisement from "../components/Advertisement.vue"
-import DeveloperInfo from "../components/DeveloperInfo.vue"
-import Data from "../mock/index.json"
+import Carousel from "@/components/common/Carousel.vue"
+import VideoCard from "@/components/common/VideoCard.vue"
+import VideoRefreshBtn from "@/components/common/VideoRefreshBtn.vue"
+import Advertisement from "@/components/common/Advertisement.vue"
+import DeveloperInfo from "@/components/once/DeveloperInfo.vue"
+import Data from "@/mock/index.json"
 
 type carousel = {
-  title?: string,
+  title: string,
   imgUrl: string,
-  linkUrl?: string,
+  linkUrl: string,
+}
+
+type Advertisement = {
+  type: string,
+  content: string | Text,
+  linkUrl: string,
+}
+
+type Text = {
+  text: string,
+  fontSize: number,
+  fontColor: string,
+  bgColor: string,
 }
 
 type data = {
   carousel: carousel[],
+  advertisement: Advertisement,
 }
 
 const mockVideo = {
