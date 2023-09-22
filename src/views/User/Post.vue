@@ -7,7 +7,7 @@
         <el-tab-pane label="最多收藏" name="star"></el-tab-pane>
       </el-tabs>
       <div v-if="mockVideoNum > 0" class="video-card-container">
-        <SmallVideoCard class="video-card" v-for="() in mockVideoNum" :data="mockVideo"></SmallVideoCard>
+        <VideoCard v-for=" in mockVideoNum" :data="mockVideo" type="small" class="video-card"></VideoCard>
       </div>
       <el-pagination class="page" background layout="prev, pager, next" :page-size="25" :total="mockVideoTotalNum"
         :hide-on-single-page="true" />
@@ -25,17 +25,20 @@
 </template>
 
 <script setup lang="ts">
-import SmallVideoCard from '@/components/common/SmallVideoCard.vue'
+import VideoCard from '@/components/common/VideoCard.vue'
 
 //<!--TODO
 const mockVideo = {
-  "vid": 0,
-  "coverUrl": "",
+  "vid": 1,
   "videoUrl": "",
+  "coverUrl": "",
   "playNum": 0,
+  "danmuNum": 0,
   "duration": 0,
   "title": "标题",
-  "date": 1686799558000
+  "uid": 1,
+  "nickname": "Bonnenult",
+  "date": 1685599556000
 }
 let mockVideoNum = 25
 const mockVideoTotalNum = 35

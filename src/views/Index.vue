@@ -5,7 +5,7 @@
     </div>
 
     <div :style="{ width: data.carousel.length > 0 ? '560px' : '' }" class="recommendation">
-      <VideoCard v-for=" in data.carousel.length > 0 ? 4 : 8" :data="mockVideo"></VideoCard>
+      <VideoCard v-for=" in data.carousel.length > 0 ? 4 : 8" :data="mockVideo" type="big"></VideoCard>
     </div>
 
     <VideoRefreshBtn></VideoRefreshBtn>
@@ -15,10 +15,10 @@
     <Advertisement :data="data.advertisement"></Advertisement>
   </div>
 
-  <div v-for="(item) in 4" class="channel">
+  <div v-for="(item) in 4" class="region">
     <div class="title-container"><span class="title">分区{{ item }}</span></div>
-    <div class="channel-row">
-      <VideoCard :data="mockVideo" class="card" v-for="() in 4"></VideoCard>
+    <div class="region-row">
+      <VideoCard v-for=" in 4" :data="mockVideo" type="big" class="card"></VideoCard>
 
       <VideoRefreshBtn></VideoRefreshBtn>
     </div>
@@ -111,34 +111,34 @@ function getData(): data {
   margin-bottom: 20px;
 }
 
-.channel {
+.region {
   width: 1140px;
   margin-inline: auto;
   margin-bottom: 20px;
 }
 
-.channel .title-container {
+.region .title-container {
   font-size: 20px;
   margin-bottom: 5px;
 }
 
-.channel .title:hover {
+.region .title:hover {
   color: #409EFF;
   cursor: pointer;
 }
 
-.channel-row {
+.region-row {
   width: 100%;
   height: 200px;
   display: flex;
 }
 
-.channel-row .card {
+.region-row .card {
   margin-left: 10px;
   margin-right: 10px;
 }
 
-.channel-row .card:first-child {
+.region-row .card:first-child {
   margin-left: 0px;
 }
 

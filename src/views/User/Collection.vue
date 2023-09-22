@@ -30,13 +30,7 @@
         <div v-if="mockVideoNum > 0" class="right-body">
           <div v-for="() in mockVideoNum">
             <div class="card-container">
-              <VideoCard :data="mockVideo"></VideoCard>
-              <el-popconfirm @confirm="removeItem" width="212" hide-icon title="你确认要从此合集中移除该视频吗？" confirm-button-text="确认"
-                cancel-button-text="取消">
-                <template #reference>
-                  <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
-                </template>
-              </el-popconfirm>
+              <VideoCard :data="mockVideo" type="small" :extra="extra"></VideoCard>
             </div>
           </div>
         </div>
@@ -62,8 +56,16 @@ import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
 
+type Extra = {
+  name: string,
+  cb: Function,
+}
+const extra: Extra[] = [
+  { name: "移除合集", cb: removeItem },
+]
+
 const mockVideo = {
-  "vid": 0,
+  "vid": 1,
   "videoUrl": "",
   "coverUrl": "",
   "playNum": 0,
@@ -75,7 +77,7 @@ const mockVideo = {
   "date": 1685799558000
 }
 const mockCollectionNum = 3
-let mockVideoNum = 9
+let mockVideoNum = 12
 const mockVideoTotalNum = 17
 
 const store = useStore()
@@ -147,7 +149,7 @@ function deleteCollection() {
 }
 
 function removeItem() {
-  cmjs.prompt.success("移除成功")
+  cmjs.prompt.success("移除合集成功")
   //TODO 若有多的视频，则请求一个补充到最后
 }
 
@@ -193,11 +195,11 @@ function addToCollection() {
 <style scoped>
 .container {
   display: flex;
-  height: 746.5px;
+  height: 612px;
 }
 
 .left {
-  width: 249px;
+  width: 199px;
   margin-left: -20px;
   margin-top: -20px;
   margin-bottom: -20px;
@@ -244,7 +246,7 @@ function addToCollection() {
 }
 
 .right {
-  width: 870px;
+  width: 920px;
   display: flex;
   flex-direction: column;
 }
@@ -307,26 +309,9 @@ function addToCollection() {
 .right-body {
   display: flex;
   flex-wrap: wrap;
-  width: 870px;
+  width: 920px;
   margin-left: 20px;
   gap: 20px;
-}
-
-.right-body .card-container:hover .delete-item {
-  display: inline;
-}
-
-.right-body .card-container .delete-item {
-  position: absolute;
-  margin-top: -18.4px;
-  margin-left: 254px;
-  color: #F56C6C;
-  cursor: pointer;
-  display: none;
-}
-
-.right-body .card-container .delete-item:hover {
-  color: #c45656;
 }
 
 .right-foot {

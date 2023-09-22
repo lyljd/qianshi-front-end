@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4087073 */
-  src: url('iconfont.woff2?t=1694087552467') format('woff2'),
-       url('iconfont.woff?t=1694087552467') format('woff'),
-       url('iconfont.ttf?t=1694087552467') format('truetype');
+  src: url('iconfont.woff2?t=1695351521704') format('woff2'),
+       url('iconfont.woff?t=1695351521704') format('woff'),
+       url('iconfont.ttf?t=1695351521704') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.el-icon-watch-later:before {
+  content: "\e61e";
 }
 
 .el-icon-guanggao:before {
@@ -67,10 +71,6 @@
 
 .el-icon-dui:before {
   content: "\eaf1";
-}
-
-.el-icon-shaohou:before {
-  content: "\e6fb";
 }
 
 .el-icon-shaohouzaikan:before {

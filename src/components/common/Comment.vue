@@ -344,6 +344,7 @@ export default {
 
 .comment-info .extra {
   display: none;
+  font-size: 13px;
 }
 
 .comment-info .extra:hover {
@@ -387,6 +388,11 @@ export default {
 
 .comment-info .like-btn {
   margin-right: 5px;
+}
+
+.comment-info .like-btn,
+.comment-info .dislike-btn {
+  font-size: 15px;
 }
 
 .comment-info .reply-btn:hover,

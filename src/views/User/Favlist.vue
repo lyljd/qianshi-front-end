@@ -28,13 +28,7 @@
         <div v-if="mockVideoNum > 0" class="right-body">
           <div v-for="() in mockVideoNum">
             <div class="card-container">
-              <VideoCard :data="mockVideo"></VideoCard>
-              <el-popconfirm @confirm="deleteItem" width="212" hide-icon title="你确认要取消收藏该视频吗？" confirm-button-text="确认"
-                cancel-button-text="取消">
-                <template #reference>
-                  <span v-if="isMe" class="iconfont el-icon-ashbin delete-item"></span>
-                </template>
-              </el-popconfirm>
+              <VideoCard :data="mockVideo" type="small-star" :extra="extra"></VideoCard>
             </div>
           </div>
         </div>
@@ -60,8 +54,18 @@ import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
 
+type Extra = {
+  name: string,
+  cb: Function,
+}
+const extra: Extra[] = [
+  { name: "取消收藏", cb: deleteItem },
+  { name: "移动到", cb: () => { cmjs.prompt.info("敬请期待") } },
+  { name: "复制到", cb: () => { cmjs.prompt.info("敬请期待") } },
+]
+
 const mockVideo = {
-  "vid": 0,
+  "vid": 1,
   "videoUrl": "",
   "coverUrl": "",
   "playNum": 0,
@@ -70,11 +74,12 @@ const mockVideo = {
   "title": "标题",
   "uid": 2,
   "nickname": "admin",
-  "date": 1685599556000
+  "date": 1685599556000,
+  "starDate": 1695357486771
 }
 const mockFavlistNum = 6
-let mockVideoNum = 9
-const mockVideoTotalNum = 13
+let mockVideoNum = 12
+const mockVideoTotalNum = 23
 
 const store = useStore()
 store.$subscribe((_, state) => {
@@ -173,11 +178,11 @@ function deleteItem() {
 <style scoped>
 .container {
   display: flex;
-  height: 746.5px;
+  height: 612px;
 }
 
 .left {
-  width: 249px;
+  width: 199px;
   margin-left: -20px;
   margin-top: -20px;
   margin-bottom: -20px;
@@ -224,7 +229,7 @@ function deleteItem() {
 }
 
 .right {
-  width: 870px;
+  width: 920px;
   display: flex;
   flex-direction: column;
 }
@@ -276,26 +281,9 @@ function deleteItem() {
 .right-body {
   display: flex;
   flex-wrap: wrap;
-  width: 870px;
+  width: 920px;
   margin-left: 20px;
   gap: 20px;
-}
-
-.right-body .card-container:hover .delete-item {
-  display: inline;
-}
-
-.right-body .card-container .delete-item {
-  position: absolute;
-  margin-top: -18.4px;
-  margin-left: 254px;
-  color: #F56C6C;
-  cursor: pointer;
-  display: none;
-}
-
-.right-body .card-container .delete-item:hover {
-  color: #c45656;
 }
 
 .right-foot {

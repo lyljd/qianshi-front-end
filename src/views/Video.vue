@@ -29,7 +29,8 @@
           <div class="extra-menu">
             <ul>
               <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报&emsp;&emsp;</li>
-              <li @click="cmjs.biz.watchLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
+              <li @click="cmjs.biz.watchLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看
+              </li>
             </ul>
           </div>
         </el-popover>
@@ -294,8 +295,9 @@
 
           <div :title="video.author.signature" class="signature">{{ video.author.signature || "-" }}</div>
 
-          <el-button v-blur id="focu-btn" @click="focuAuthor" class="focus" :type="!video.author.isFocu ? 'primary' : 'info'">{{
-            focuBtnInnerText }}</el-button>
+          <el-button v-blur id="focu-btn" @click="focuAuthor" class="focus"
+            :type="!video.author.isFocu ? 'primary' : 'info'">{{
+              focuBtnInnerText }}</el-button>
         </div>
       </div>
 
@@ -376,8 +378,8 @@
       </div>
 
       <div>
-        <VideoCard :class="{ cardFCA: !video.collection && video.recommend.length > 1 }" :data="item" class="card"
-          v-for="( item ) in  video.recommend "></VideoCard>
+        <VideoCard v-for="(item) in video.recommend" :data="item" type="big" class="card"
+          :class="{ cardFCA: !video.collection && video.recommend.length > 1 }"></VideoCard>
       </div>
     </div>
   </div>

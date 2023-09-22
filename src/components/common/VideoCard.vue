@@ -1,44 +1,101 @@
 <template>
-  <div class="video-card">
+  <div class="video-card" :style="{ width: `${cs.w}px`, height: `${cs.h}px` }">
     <el-tooltip content="稍后再看" :show-arrow="false" offset="3" placement="bottom-end" :enterable="false" :hide-after="0">
-      <div v-show="coverHoverStatus || videoHoverStatus" @mouseenter="laterMouseEnter" @mouseleave="laterMouseLeave"
-        @click="watchLater(data.vid)" class="later-container">
-        <span v-show="!hasSeeLater" class="iconfont later-icon el-icon-shaohou animate__animated animate__fadeIn"></span>
-        <span v-show="hasSeeLater" class="iconfont later-icon el-icon-dui animate__animated animate__fadeIn"></span>
+      <div v-if="watchLaterShow" v-show="(coverHoverStatus || videoHoverStatus) && !hoverInfoStatus"
+        @mouseenter="wliMouseEnter" @mouseleave="wliMouseLeave" @click="watchLaterFc(data.vid)" class="wli-container"
+        :style="{ width: `${cs.wlis}px`, height: `${cs.wlis}px`, lineHeight: `${cs.wlis}px` }">
+        <span v-show="!watchLaterStatus" class="iconfont wli el-icon-watch-later animate__animated animate__fadeIn"
+          :style="{ fontSize: `${cs.wlis}px` }"></span>
+        <span v-show="watchLaterStatus" class="iconfont wli el-icon-dui animate__animated animate__fadeIn"
+          :style="{ fontSize: `${cs.wlis}px` }"></span>
       </div>
     </el-tooltip>
 
-    <el-image v-show="!playStatus" @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
-      @click="cmjs.jump.video(data.vid)" class="cover" :src="data.coverUrl">
+    <el-image v-if="!data.expire" v-show="!playStatus" @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
+      @click="cmjs.jump.video(data.vid)" :src="data.coverUrl" class="cover"
+      :style="{ width: `${cs.w}px`, height: `${cs.ch}px` }">
       <template #error>
-        <div @click="cmjs.jump.video(data.vid)" style="font-size: 16px;" class="default">封面加载失败</div>
+        <div @click="cmjs.jump.video(data.vid)" class="default" :style="{ fontSize: `${cs.bfs}px` }">封面加载失败</div>
       </template>
     </el-image>
+    <div v-else class="default" style="border-radius: 5px; cursor: default;"
+      :style="{ width: `${cs.w}px`, height: `${cs.ch}px`, fontSize: `${cs.bfs}px` }">视频已失效</div>
 
-    <video v-show="playStatus" @mouseenter="videoMouseEnter" @mouseleave="videoMouseLeave"
-      @click="cmjs.jump.video(data.vid)" @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle"
-      :src="data.videoUrl" muted disablePictureInPicture class="video"></video>
-
-    <div v-show="!playStatus" class="info">
-      <span>
-        <span class="iconfont el-icon-bofangshu icon"></span>
-        {{ cmjs.fmt.numWE(data.playNum) }}
-        <span class="danmushu">
-          <span class="iconfont el-icon-danmushu icon"></span>
-          {{ cmjs.fmt.numWE(data.danmuNum) }}
-        </span>
-      </span>
-      <span class="duration">{{ cmjs.fmt.videoDuration(data.duration) }}</span>
+    <video v-if="hoverStyleSwitch === 'preview'" v-show="playStatus" @mouseenter="videoMouseEnter"
+      @mouseleave="videoMouseLeave" @click="cmjs.jump.video(data.vid)"
+      @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle" :src="data.videoUrl" muted
+      disablePictureInPicture class="video" :style="{ width: `${cs.w}px`, height: `${cs.ch}px` }"></video>
+    <div v-if="hoverStyleSwitch === 'info'" v-show="hoverInfoStatus" @mouseleave="hoverInfoMouseLeave"
+      @click="cmjs.jump.video(data.vid)" class="hover-style-info-container"
+      :style="{ width: `${cs.w}px`, height: `${cs.ch}px`, fontSize: `${cs.bfs}px` }">
+      <div class="hover-style-info" :style="{ height: `${cs.ch - 20}px` }">
+        <div>播放：{{ cmjs.fmt.numWE(data.playNum) }}</div>
+        <div>弹幕：{{ cmjs.fmt.numWE(data.danmuNum) }}</div>
+        <div class="hover-style-info-up">UP主：{{ data.nickname }}</div>
+        <div>投稿：{{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}</div>
+      </div>
     </div>
 
-    <div class="content">
-      <div class="title-container"><span @click="cmjs.jump.video(data.vid)" class="title">{{ data.title }}</span></div>
-      <div class="up-time-container">
-        <div @click="cmjs.jump.user(data.uid)" class="up-time-text">
-          <span :title="data.nickname + ' · ' + cmjs.fmt.tsYRichTmpl(data.date, 'MM-DD')"
-            class="up-time-text-span"><span style="font-size: 14px;" class="iconfont el-icon-UPzhu icon"></span>
-            {{ data.nickname }} · {{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}</span>
+    <div v-if="!data.expire" v-show="!playStatus && !hoverInfoStatus" class="inner-info"
+      :style="{ width: `${cs.w}px`, height: `${cs.ufs}px`, lineHeight: `${cs.ufs}px`, fontSize: `${cs.ufs}px`, justifyContent: innerInfoShow ? 'space-between' : 'right' }">
+      <span v-if="innerInfoShow" style="margin-left: 5px;">
+        <span>
+          <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
+            cmjs.fmt.numWE(data.playNum) }}
+        </span>
+        <span style="margin-left: 5px;">
+          <span class="iconfont el-icon-danmushu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
+            cmjs.fmt.numWE(data.danmuNum) }}
+        </span>
+      </span>
+      <span v-show="!hoverInfoStatus" style="margin-right: 5px;">{{ cmjs.fmt.videoDuration(data.duration) }}</span>
+    </div>
+
+    <div class="info" :style="{ height: `${cs.h - cs.ch}px` }">
+      <div class="title-row" :style="{ lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">
+        <span v-if="!data.expire" @click="cmjs.jump.video(data.vid)" :title="data.title" class="title"
+          :style="{ fontSize: `${cs.bfs}px` }">{{
+            data.title
+          }}</span>
+        <el-tooltip v-else content="因为该视频被up 删除或隐藏" placement="top">
+          <div class="iconfont el-icon-info" style="cursor: default; margin-top: 4px; display: inline-flex;"
+            :style="{ fontSize: `${cs.bfs}px`, lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">视频为什么会失效？</div>
+        </el-tooltip>
+      </div>
+
+      <div class="util-container" :style="{ fontSize: `${cs.ufs}px` }">
+        <div class="util-row">
+          <span v-if="data.starDate && data.expire" style="cursor: default; margin-right: 10px;">收藏于：{{ data.starDate ?
+            cmjs.fmt.tsYRichTmpl(data.starDate, "MM-DD") : '未知' }}</span>
+          <span v-if="props.type === 'big' || data.expire" @click="cmjs.jump.user(data.uid)"
+            :title="data.nickname + ' · ' + cmjs.fmt.tsYRichTmpl(data.date, 'MM-DD')" class="util util-hl">
+            <span class="iconfont el-icon-UPzhu" :style="{ fontSize: `${cs.ufs}px` }"></span>
+            {{ data.nickname }} · {{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}
+          </span>
+
+          <div v-else>
+            <span v-if="props.type === 'small'" class="util">
+              <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>
+              {{ cmjs.fmt.numWE(data.playNum) }}<span style="margin-left: 10px;">{{ cmjs.fmt.tsYRichTmpl(data.date,
+                "MM-DD")
+              }}</span>
+            </span>
+
+            <span v-if="props.type === 'small-star'" class="util" style="cursor: default;">
+              收藏于：{{ data.starDate ? cmjs.fmt.tsYRichTmpl(data.starDate, "MM-DD") : '未知' }}
+            </span>
+          </div>
         </div>
+
+        <el-popover ref="extraPop" trigger="click" placement="bottom-end">
+          <template #reference>
+            <span v-if="extra" class="iconfont el-icon-diandiandianshu diandiandian"
+              :style="{ fontSize: `${cs.ufs}px` }"></span>
+          </template>
+          <div class="extra-container">
+            <div v-for="btn in extra" @click="() => { btn.cb(); extraPop.hide(); }" class="extra">{{ btn.name }}</div>
+          </div>
+        </el-popover>
       </div>
     </div>
   </div>
@@ -47,7 +104,16 @@
 <script setup lang="ts">
 import cmjs from '@/cmjs'
 
-defineProps<{
+type CardSize = {
+  w: number,
+  h: number,
+  ch: number, // content height
+  bfs: number, // base fontsize 应用于视频标题、悬浮信息、封面加载错误和视频失效时显示字体大小
+  ufs: number, // util fontsize 应用于除bfs之外的字体大小
+  wlis: number, // watchLater ico size
+}
+
+const props = withDefaults(defineProps<{
   data: {
     vid: number
     videoUrl: string
@@ -59,31 +125,106 @@ defineProps<{
     uid: number
     nickname: string
     date: number
-  }
-}>()
+    starDate?: number
+    expire?: boolean // 视频已失效
+  },
+  type: "big" | "small" | "small-star",
+  hoverStyle: "preview" | "info",
+  innerInfo: boolean,
+  watchLater: boolean,
+  extra: {
+    name: string,
+    cb: Function, // callback
+  }[],
+
+}>(), {
+  hoverStyle: undefined,
+  innerInfo: undefined,
+  watchLater: undefined,
+  extra: undefined,
+})
 
 const videoEle = ref<HTMLVideoElement>()
+const extraPop = ref()
 
+let cs: CardSize
+let hoverStyleSwitch = ref(props.hoverStyle)
+let innerInfoShow = ref(props.innerInfo)
+let watchLaterShow = ref(props.watchLater)
 let playStatus = ref(false)
+let hoverInfoStatus = ref(false)
 let coverHoverStatus = ref(false)
 let videoHoverStatus = ref(false)
-let laterHoverStatus = ref(false)
-let hasSeeLater = ref(false)
+let wliHoverStatus = ref(false) // watchLater ico
+let watchLaterStatus = ref(false)
+
+initData()
+
+function initData() {
+  switch (props.type) {
+    case "big": {
+      if (props.hoverStyle === undefined) {
+        hoverStyleSwitch.value = "preview"
+      }
+      if (props.innerInfo === undefined) {
+        innerInfoShow.value = true
+      }
+      if (props.watchLater === undefined) {
+        watchLaterShow.value = true
+      }
+      cs = { w: 270, h: 200, ch: 151.88, bfs: 18, ufs: 14, wlis: 18 }
+      break
+    }
+    case "small": {
+      if (props.hoverStyle === undefined) {
+        hoverStyleSwitch.value = "preview"
+      }
+      if (props.innerInfo === undefined) {
+        innerInfoShow.value = false
+      }
+      if (props.watchLater === undefined) {
+        watchLaterShow.value = true
+      }
+      cs = { w: 210, h: 155, ch: 118.13, bfs: 16, ufs: 12, wlis: 16 }
+      break
+    }
+    case "small-star": {
+      if (props.hoverStyle === undefined) {
+        hoverStyleSwitch.value = "info"
+      }
+      if (props.innerInfo === undefined) {
+        innerInfoShow.value = false
+      }
+      watchLaterShow.value = false
+      cs = { w: 210, h: 155, ch: 118.13, bfs: 16, ufs: 12, wlis: 16 }
+      break
+    }
+  }
+}
 
 function coverMouseEnter() {
   coverHoverStatus.value = true
-  videoHoverStatus.value = false
-  setTimeout(() => {
-    if (coverHoverStatus.value) {
-      playStatus.value = true
-      videoEle.value?.play()
+  switch (hoverStyleSwitch.value) {
+    case "preview": {
+      setTimeout(() => {
+        videoHoverStatus.value = false
+        if (coverHoverStatus.value) {
+          playStatus.value = true
+          videoEle.value?.play()
+        }
+      }, 1000)
+      break
     }
-  }, 1000)
+    case "info": {
+      hoverInfoStatus.value = true
+      break
+    }
+  }
 }
 
 function coverMouseLeave() {
   setTimeout(() => {
-    if (!laterHoverStatus.value) {
+    if (!wliHoverStatus.value) {
       coverHoverStatus.value = false
     }
   }, 1);
@@ -96,7 +237,7 @@ function videoMouseEnter() {
 
 function videoMouseLeave() {
   setTimeout(() => {
-    if (!laterHoverStatus.value) {
+    if (!wliHoverStatus.value) {
       videoHoverStatus.value = false
       playStatus.value = false
       videoEle.value!.currentTime = 0
@@ -105,127 +246,155 @@ function videoMouseLeave() {
   }, 1);
 }
 
-function laterMouseEnter() {
-  laterHoverStatus.value = true
+function hoverInfoMouseLeave() {
+  hoverInfoStatus.value = false
 }
 
-function laterMouseLeave() {
-  laterHoverStatus.value = false
+function wliMouseEnter() {
+  wliHoverStatus.value = true
 }
 
-function watchLater(vid: number) {
+function wliMouseLeave() {
+  wliHoverStatus.value = false
+}
+
+function watchLaterFc(vid: number) {
   const res = cmjs.biz.watchLater(vid)
   if (res === 1) {
-    hasSeeLater.value = true
+    watchLaterStatus.value = true
   } else if (res === 0) {
-    hasSeeLater.value = false
+    watchLaterStatus.value = false
   }
 }
 </script>
 
 <style scoped>
 .video-card {
-  width: 270px;
-  height: 200px;
+  position: relative;
+}
+
+.video-card .wli-container {
+  padding: 5px;
+  border-radius: 5px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 1;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.video-card .wli-container .wli {
+  pointer-events: none;
 }
 
 .video-card .cover,
 .video-card .video {
-  width: 270px;
-  height: 151.88px;
   border-radius: 5px;
   cursor: pointer;
   background-color: black;
 }
 
-.video-card .info {
-  width: 260px;
-  height: 14px;
-  line-height: 14px;
-  font-size: 14px;
-  margin-top: -22px;
-  margin-left: 5px;
-  margin-right: 5px;
+.video-card .hover-style-info-container {
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
+  margin-bottom: 3.5px;
   position: absolute;
-  display: flex;
-  justify-content: space-between;
-  pointer-events: none;
+  top: 0;
 }
 
-.video-card .info .icon {
-  font-size: 14px;
-}
-
-.video-card .info .danmushu {
-  margin-left: 10px;
-}
-
-.video-card .content {
-  height: 43.125px;
+.video-card .hover-style-info-container .hover-style-info {
+  margin: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin-top: 2px;
 }
 
-.video-card .content .title-container {
+.video-card .hover-style-info-container .hover-style-info .hover-style-info-up {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.video-card .title:hover {
-  font-size: 16px;
-  cursor: pointer;
-  color: #409EFF;
-}
-
-.video-card .up-time-container {
-  color: #909399;
-  font-size: 12px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.video-card .up-time-text {
-  display: flex;
-  align-items: center;
-}
-
-.video-card .up-time-text-span {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.video-card .up-time-text-span:hover {
-  color: #409EFF;
-}
-
-.video-card .up-time-container .icon {
-  font-size: 12px;
-}
-
-.later-container {
-  position: absolute;
-  z-index: 1;
+.video-card .inner-info {
+  margin-top: -22px;
+  /* -22 = -3 + -14 + -5 */
   color: white;
-  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
   display: flex;
-  padding: 5px;
-  margin-left: 235px;
-  margin-top: 5px;
-  border-radius: 5px;
+  pointer-events: none;
+}
+
+.video-card .info {
+  margin-top: -3px;
+}
+
+.video-card .info .title-row {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.video-card .info .title-row .title:hover {
+  cursor: pointer;
+  color: #409EFF;
+}
+
+.video-card .info .util-container {
+  color: #909399;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.video-card .info .util-container .util-row {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.video-card .info .util-container .util-row .util {
+  align-items: center;
+  cursor: default;
+}
+
+.video-card .info .util-container .util-row .util-hl:hover {
+  cursor: pointer;
+  color: #409EFF;
+}
+
+.video-card .info .util-container .diandiandian {
+  display: none;
   cursor: pointer;
 }
 
-.later-container .later-icon {
-  font-size: 20px;
-  font-weight: bold;
-  height: 21px;
-  margin-top: -1px;
-  pointer-events: none;
+.video-card .info:hover .diandiandian {
+  display: inline;
+}
+
+.video-card .info .util-container .diandiandian:hover {
+  color: #409EFF;
+}
+
+.extra-container {
+  font-size: 14px;
+  margin: -7.5px;
+}
+
+.extra-container .extra {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.extra-container .extra:hover {
+  cursor: pointer;
+  color: #409EFF;
+  background-color: #f4f4f5;
 }
 </style>

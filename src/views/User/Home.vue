@@ -9,7 +9,7 @@
           </div>
         </template>
         <div v-if="coinVideoNum > 0" class="video-card-container">
-          <SmallVideoCard v-for="() in coinVideoNum" class="video-card" :data="mockVideo"></SmallVideoCard>
+          <VideoCard v-for=" in coinVideoNum" :data="mockVideo" type="small" class="video-card"></VideoCard>
         </div>
         <el-empty v-else description="暂无视频" />
       </el-card>
@@ -22,7 +22,7 @@
           </div>
         </template>
         <div v-if="likeVideoNum > 0" class="video-card-container">
-          <SmallVideoCard v-for="() in likeVideoNum" class="video-card" :data="mockVideo"></SmallVideoCard>
+          <VideoCard v-for=" in likeVideoNum" :data="mockVideo" type="small" class="video-card"></VideoCard>
         </div>
         <el-empty v-else description="暂无视频" />
       </el-card>
@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import cmjs from '@/cmjs'
-import SmallVideoCard from '@/components/common/SmallVideoCard.vue'
+import VideoCard from '@/components/common/VideoCard.vue'
 import { ElMessageBox } from 'element-plus'
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
@@ -105,13 +105,16 @@ type UserHome = {
 let userHome: UserHome = reactive(getUserHome())
 
 const mockVideo = {
-  "vid": 0,
+  "vid": 1,
   "videoUrl": "",
   "coverUrl": "",
   "playNum": 0,
+  "danmuNum": 0,
   "duration": 0,
   "title": "标题",
-  "date": 1686799558000
+  "uid": 1,
+  "nickname": "Bonnenult",
+  "date": 1685599556000
 }
 const coinVideoNum = 2
 const coinVideoTotalNum = 2
