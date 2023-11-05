@@ -350,7 +350,7 @@ function recImgUploadPercent(iup: number) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .aaw .body>*:not(:last-child),
 .aaw .body .text-content>*:not(:last-child) {
   margin-bottom: 10px;

@@ -9,13 +9,17 @@
     <router-view></router-view>
 
     <div v-if="store.topPath !== 'manage'" class="in-site-message-container">
-      <span @click="store.openFSWindow('站内留言', '#', '有什么问题都可以直接留言，管理员会在24小时内回复的～', '留言不能为空')" v-if="store.isLogin"
+      <span @click="store.openFSWindow('站内留言', '#', {}, '有什么问题都可以直接留言，管理员会在24小时内回复的～', '留言不能为空')" v-if="store.isLogin"
         class="in-site-message">站内留言</span>
     </div>
 
     <FeedbackSubmissionWindow></FeedbackSubmissionWindow>
 
     <PreviewVideoWindow></PreviewVideoWindow>
+
+    <CaptchaWindow></CaptchaWindow>
+
+    <EmailVerifyWindow></EmailVerifyWindow>
   </div>
 
   <div v-else>
@@ -27,13 +31,15 @@
 import TopMenuBar from "@/components/once/TopMenuBar.vue"
 import FeedbackSubmissionWindow from "@/components/window/FeedbackSubmissionWindow.vue"
 import PreviewVideoWindow from "@/components/window/PreviewVideoWindow.vue"
+import CaptchaWindow from "@/components/window/CaptchaWindow.vue"
+import EmailVerifyWindow from "@/components/window/EmailVerifyWindow.vue"
 import { useStore } from "@/store"
 import cmjs from '@/cmjs'
 
 const store = useStore()
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .placeholder {
   margin-top: 57px;
 }

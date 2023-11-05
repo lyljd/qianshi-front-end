@@ -1,5 +1,5 @@
 <template>
-  <ManageTopMenuBar title="审批" icon="review" :item="item.filter(i => store.mui.power >= i.power)"></ManageTopMenuBar>
+  <ManageTopMenuBar title="审批" icon="review" :item="item.filter(i => store.power >= i.power)"></ManageTopMenuBar>
 
   <RouterView></RouterView>
 </template>
@@ -17,4 +17,4 @@ let item = reactive([
 ])
 </script>
 
-<style scoped></style>
+<style lang="less" scoped></style>

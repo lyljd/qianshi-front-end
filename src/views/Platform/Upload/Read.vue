@@ -9,6 +9,6 @@ const store = useStore()
 store.setPlatformItemIndex(1, location.pathname)
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 
 </style>

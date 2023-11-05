@@ -3,7 +3,7 @@
 
   <div class="ms-container">
     <div class="tip">
-      <span style="margin-top: 0;">数据截止时间：{{ cmjs.fmt.tsStandard(timestamp) }}</span>
+      <span style="margin-top: 0; margin-bottom: 3px;">数据截止时间：{{ cmjs.fmt.tsStandard(timestamp) }}</span>
     </div>
 
     <el-card>
@@ -72,9 +72,9 @@ type change = {
 const data: statistic = getData()
 
 const timestamp = Date.now()
-console.log(`statistic timestamp: ${timestamp}`)
 
 function getData(): statistic {
+  // TODO api
   return Data
 }
 
@@ -108,8 +108,8 @@ function calcChange(t: number, y: number): change {
 }
 </script>
 
-<style scoped>
-.ms-container>*:not(:last-child) {
+<style lang="less" scoped>
+.ms-container>*:not(:last-child, :first-child) {
   margin-bottom: 10px;
 }
 

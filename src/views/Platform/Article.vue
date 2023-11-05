@@ -16,7 +16,7 @@ const store = useStore()
 store.setPlatformCurTitle("稿件管理")
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .pa-container .el-menu-item {
   padding: 0;
   height: 30px;

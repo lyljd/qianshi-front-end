@@ -1,63 +1,31 @@
 <template>
-  <div class="pf-tip">每日凌晨4点更新昨日数据</div>
+  <div class="pf-tip">每日凌晨4点更新数据</div>
   <el-tabs class="pf-container">
     <el-tab-pane label="视频数据">
       <el-row>
         <el-col :span="8">
-          <el-statistic :value="pfHome.video.playNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-bofangshu">播放量</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="播放量" icon="bofangshu" :total="data.video.total.playNum" :yesterday="data.video.yesterday.playNum"></StatisticCard>
         </el-col>
-
         <el-col :span="8">
-          <el-statistic :value="pfHome.video.commentNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-pinglun">评论数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="评论数" icon="pinglun" :total="data.video.total.commentNum" :yesterday="data.video.yesterday.commentNum"></StatisticCard>
         </el-col>
-
         <el-col :span="8">
-          <el-statistic :value="pfHome.video.danmuNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-danmushu">弹幕数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="弹幕数" icon="danmushu" :total="data.video.total.danmuNum" :yesterday="data.video.yesterday.danmuNum"></StatisticCard>
         </el-col>
       </el-row>
 
       <el-row>
         <el-col :span="6">
-          <el-statistic :value="pfHome.video.likeNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-good">点赞数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="点赞数" icon="good" :total="data.video.total.likeNum" :yesterday="data.video.yesterday.likeNum"></StatisticCard>
         </el-col>
-
         <el-col :span="6">
-          <el-statistic :value="pfHome.video.coinNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-Bbi">投币数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="投币数" icon="Bbi" :total="data.video.total.coinNum" :yesterday="data.video.yesterday.coinNum"></StatisticCard>
         </el-col>
-
         <el-col :span="6">
-          <el-statistic :value="pfHome.video.starNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-collection">收藏数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="收藏数" icon="collection" :total="data.video.total.starNum" :yesterday="data.video.yesterday.starNum"></StatisticCard>
         </el-col>
-
         <el-col :span="6">
-          <el-statistic :value="pfHome.video.shareNum" :value-style="{ color: '#E6A23C' }"><template #title>
-              <span class="iconfont el-icon-fenxiang">分享数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="分享数" icon="fenxiang" :total="data.video.total.shareNum" :yesterday="data.video.yesterday.shareNum"></StatisticCard>
         </el-col>
       </el-row>
     </el-tab-pane>
@@ -66,44 +34,22 @@
     <el-tab-pane label="专栏数据">
       <el-row>
         <el-col :span="12">
-          <el-statistic :value="pfHome.read.readNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-read">阅读量</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="阅读量" icon="read" :total="data.read.total.readNum" :yesterday="data.read.yesterday.readNum"></StatisticCard>
         </el-col>
-
         <el-col :span="12">
-          <el-statistic :value="pfHome.read.commentNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-pinglun">评论数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="评论数" icon="pinglun" :total="data.read.total.commentNum" :yesterday="data.read.yesterday.commentNum"></StatisticCard>
         </el-col>
       </el-row>
 
       <el-row>
         <el-col :span="8">
-          <el-statistic :value="pfHome.read.likeNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-good">点赞数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="点赞数" icon="good" :total="data.read.total.likeNum" :yesterday="data.read.yesterday.likeNum"></StatisticCard>
         </el-col>
-
         <el-col :span="8">
-          <el-statistic :value="pfHome.read.starNum" :value-style="{ color: '#E6A23C' }">
-            <template #title>
-              <span class="iconfont el-icon-collection">收藏数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="收藏数" icon="collection" :total="data.read.total.starNum" :yesterday="data.read.yesterday.starNum"></StatisticCard>
         </el-col>
-
         <el-col :span="8">
-          <el-statistic :value="pfHome.read.shareNum" :value-style="{ color: '#E6A23C' }"><template #title>
-              <span class="iconfont el-icon-fenxiang">分享数</span>
-            </template>
-          </el-statistic>
+          <StatisticCard title="分享数" icon="fenxiang" :total="data.read.total.shareNum" :yesterday="data.read.yesterday.shareNum"></StatisticCard>
         </el-col>
       </el-row>
     </el-tab-pane>
@@ -113,37 +59,49 @@
 <script setup lang="ts">
 import mockPlatformHome from "@/mock/platform/home.json"
 import { useStore } from "@/store"
+import StatisticCard from '@/components/common/StatisticCard.vue'
 
-type PlatformHome = {
+type Data = {
   video: {
-    playNum: number,
-    commentNum: number,
-    danmuNum: number,
-    likeNum: number,
-    coinNum: number,
-    starNum: number,
-    shareNum: number
+    total: Video,
+    yesterday: Video,
   },
   read: {
-    readNum: number,
-    commentNum: number,
-    likeNum: number,
-    starNum: number,
-    shareNum: number
+    total: Read,
+    yesterday: Read,
   }
+}
+
+type Video = {
+  playNum: number,
+  commentNum: number,
+  danmuNum: number,
+  likeNum: number,
+  coinNum: number,
+  starNum: number,
+  shareNum: number
+}
+
+type Read = {
+  readNum: number,
+  commentNum: number,
+  likeNum: number,
+  starNum: number,
+  shareNum: number
 }
 
 const store = useStore()
 store.setPlatformCurTitle("首页")
 
-let pfHome: PlatformHome = reactive(getPlatformHome())
+let data: Data = reactive(getData())
 
-function getPlatformHome() {
-  return mockPlatformHome //TODO
+function getData() {
+  //TODO api
+  return mockPlatformHome
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .pf-tip {
   width: 948px;
   height: 40px;
@@ -153,20 +111,6 @@ function getPlatformHome() {
   display: flex;
   justify-content: right;
   align-items: center;
-}
-
-.pf-container .el-statistic {
-  text-align: center;
-  border-radius: 10px;
-  margin: 10px;
-  background-color: #f7fcfe;
-  cursor: default;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.pf-container .el-statistic:hover {
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
 }
 </style>
 

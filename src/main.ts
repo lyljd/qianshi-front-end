@@ -13,9 +13,13 @@ import '@/main.css'
 
 import { createApp } from 'vue'
 import App from '@/App.vue'
-import { useStore } from "@/store"
-
 const app = createApp(App)
+
+import { createPinia } from 'pinia'
+const pinia = createPinia()
+app.use(pinia)
+
+import { useStore } from "@/store"
 const store = useStore()
 
 app.directive('blur', {

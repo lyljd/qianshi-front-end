@@ -58,7 +58,7 @@
             data.title
           }}</span>
         <el-tooltip v-else content="因为该视频被up 删除或隐藏" placement="top">
-          <div class="iconfont el-icon-info" style="cursor: default; margin-top: 4px; display: inline-flex;"
+          <div class="iconfont el-icon-info" style="cursor: default; display: inline-flex;"
             :style="{ fontSize: `${cs.bfs}px`, lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">视频为什么会失效？</div>
         </el-tooltip>
       </div>
@@ -268,7 +268,7 @@ function watchLaterFc(vid: number) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .video-card {
   position: relative;
 }
@@ -287,6 +287,11 @@ function watchLaterFc(vid: number) {
 
 .video-card .wli-container .wli {
   pointer-events: none;
+}
+
+.video-card .cover {
+  display: flex;
+  /* el-image下如果有加载失败时的默认图片，由于v-if的注释会有空格，就会导致行间有间距 */
 }
 
 .video-card .cover,
@@ -320,16 +325,12 @@ function watchLaterFc(vid: number) {
 }
 
 .video-card .inner-info {
-  margin-top: -22px;
-  /* -22 = -3 + -14 + -5 */
+  margin-top: -19px;
+  /* -19 = -14 + -5 */
   color: white;
   position: absolute;
   display: flex;
   pointer-events: none;
-}
-
-.video-card .info {
-  margin-top: -3px;
 }
 
 .video-card .info .title-row {

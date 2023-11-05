@@ -33,14 +33,15 @@
       <el-table-column :width="120" label="操作" align="center">
         <template #default="scope">
           <div class="flex-center" style="flex-wrap: wrap; gap: 5px;">
-            <el-button v-blur v-if="store.mui.power > scope.row.power" @click="setPower(scope.$index)" type="danger" size="small">调整权限</el-button>
+            <el-button v-blur v-if="store.power > scope.row.power" @click="setPower(scope.$index)" type="danger"
+              size="small">调整权限</el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-pagination v-model:current-page="curPage" background hide-on-single-page layout="prev, pager, next"
-      :total="result.total" class="page" />
+    <el-pagination class="page" v-model:current-page="curPage" :page-size="10" background layout="prev, pager, next"
+      :total="result.total" hide-on-single-page />
   </div>
 </template>
 
@@ -51,7 +52,7 @@ import { Search } from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
 import { useStore } from "@/store"
 
-type user = {
+type User = {
   id: number,
   nickname: string,
   power: number,
@@ -66,27 +67,26 @@ type user = {
   adjustedTime?: number,
 }
 
-type result = {
+type Result = {
   total: number,
-  data: user[]
+  data: User[]
 }
 
 const store = useStore()
 store.setManegeItemIndex(4, location.pathname)
 
-const timestamp = Date.now()
-console.log(`power timestamp: ${timestamp}`)
-
 let searchKey = ref("")
-let result = ref<any>([])
+let result = ref<Result>({ total: 0, data: [] })
 let curPage = ref(1)
 
 watch(curPage, newVal => {
-  //TODO
-  console.log(`curPage: ${newVal}`)
+  result.value = getData()
 })
 
-function getData(): result {
+function getData(): Result {
+  // TODO api
+  console.log("获取第" + curPage.value + "页的数据")
+  
   return Data
 }
 
@@ -96,7 +96,6 @@ function search() {
     return
   }
 
-  //TODO api请求
   result.value = getData()
 }
 
@@ -106,25 +105,27 @@ function setPower(idx: number) {
     cancelButtonText: '取消',
     showClose: false,
     inputValue: result.value.data[idx].power.toString(),
-    inputPattern: new RegExp(`^[0-${store.mui.power-1}]$`),
-    inputErrorMessage: `请输入整数（0～${store.mui.power-1}）`,
+    inputPattern: new RegExp(`^[0-${store.power - 1}]$`),
+    inputErrorMessage: `请输入整数（0～${store.power - 1}）`,
   })
     .then(({ value }) => {
-      //api请求
+      // TODO api
       console.log(result.value.data[idx].id)
+      const id = 1 // api响应值
+      const nickname = "Bonnenult" // api响应值
 
       result.value.data[idx].power = parseInt(value)
-      
+
       result.value.data[idx].adjustedUser = {
-        id: store.mui.id,
-        nickname: store.mui.nickname
+        id: id,
+        nickname: nickname
       }
       result.value.data[idx].adjustedTime = Date.now()
-      
+
       if (!result.value.data[idx].initUser) {
         result.value.data[idx].initUser = {
-          id: store.mui.id,
-          nickname: store.mui.nickname
+          id: id,
+          nickname: nickname
         }
       }
       cmjs.prompt.success("操作成功")
@@ -140,7 +141,7 @@ function dateFormatter(_: any, __: any, v: number): string {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .mp-container .search-bar {
   display: flex;
   margin-bottom: 20px;

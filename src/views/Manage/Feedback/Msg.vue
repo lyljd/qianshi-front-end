@@ -1,9 +1,10 @@
 <template>
-  <div v-if="rs.length > 0" class="fm-container">
-    <el-card v-for="(r, idx) in rs">
+  <div v-if="data.records.length > 0" class="fm-container">
+    <el-card v-for="(r, idx) in data.records">
       <template #header>
         <div class="header">
-          <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname }}</span></span>
+          <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
+          }}</span></span>
           <span>反馈时间：{{ cmjs.fmt.tsStandard(r.feedbackTime) }}</span>
           <div>
             <el-button v-blur @click="reply(idx)" type="success">回复</el-button>
@@ -13,23 +14,23 @@
       </template>
 
       <div class="body">
-        <FeedbackDescriptions :data="r.feedbackInfo"></FeedbackDescriptions>
+        <FeedbackDescriptions :data="r.feedbackInfo" title=""></FeedbackDescriptions>
       </div>
     </el-card>
 
-    <el-pagination :total="totalPageNum" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
+    <el-pagination :total="data.total" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
       hide-on-single-page background layout="prev, pager, next" />
   </div>
   <el-empty v-else description="暂无待处理的站内留言"></el-empty>
 </template>
 
 <script setup lang="ts">
-import Records from "@/mock/manage/feedback/msg.json"
+import Data from "@/mock/manage/feedback/msg.json"
 import cmjs from '@/cmjs'
 import FeedbackDescriptions from "@/components/util/FeedbackDescriptions.vue"
 import { useStore } from "@/store"
 
-type record = {
+type Record = {
   id: number,
   uid: number,
   nickname: string,
@@ -40,53 +41,47 @@ type record = {
   }
 }
 
+type Data = {
+  total: number,
+  records: Record[]
+}
+
 const store = useStore()
 store.setManegeItemIndex(2, location.pathname)
 
-const timestamp = Date.now()
-console.log(`feedback/msg timestamp: ${timestamp}`)
-
-let rs: record[] = reactive(getRecords())
-
-let totalPageNum = ref(getTotalPageNum())
 let curPage = ref(1)
+let data = ref<Data>(getData())
 
 watch(curPage, newVal => {
-  //TODO
-  console.log(`curPage: ${newVal}`)
+  data.value = getData()
 })
 
-function getTotalPageNum(): number {
-  //TODO
-  return 2
-}
+function getData(): Data {
+  // TODO api
+  console.log("获取第" + curPage.value + "页的数据")
 
-function getRecords(): record[] {
-  return Records
+  return Data
 }
 
 function reply(formIdx: number) {
-  //TODO 需请求后端
-  console.log(rs[formIdx].id)
-
   store.openSMSWindow({
-    to: [rs[formIdx].nickname],
+    to: [{ uid: data.value.records[formIdx].uid, nickname: data.value.records[formIdx].nickname }],
     afterSuccDo: () => {
-      rs.splice(formIdx, 1)
+      data.value.records.splice(formIdx, 1)
     },
   })
 }
 
 function ignore(formIdx: number) {
-  //TODO 需请求后端
-  console.log(rs[formIdx].id)
+  //TODO api
+  console.log(data.value.records[formIdx].id)
 
-  rs.splice(formIdx, 1)
+  data.value.records.splice(formIdx, 1)
   cmjs.prompt.success("已忽略")
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .fm-container {
   cursor: default;
 }

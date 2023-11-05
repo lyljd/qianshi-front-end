@@ -25,10 +25,10 @@
     <div class="row-title">收件人</div>
     <div class="rec-row">
       <el-checkbox v-model="recEveryone" border style="width: 100px; margin-right: 10px;">所有人</el-checkbox>
-      <el-select v-show="!recEveryone" v-model="recipient" multiple filterable remote :remote-method="searchNickname"
-        :loading="loading" loading-text="搜索中，请稍等" :no-data-text="hasSearch ? '无搜索结果' : '等待输入中'" placeholder="请输入收件人昵称关键字"
-        style="width: calc(100% - 110px)">
-        <el-option v-for="nickname in option" :label="nickname" :value="nickname" :key="nickname"></el-option>
+      <el-select v-show="!recEveryone" v-model="recipient" value-key="nickname" multiple filterable remote
+        :remote-method="searchNickname" :loading="loading" loading-text="搜索中，请稍等"
+        :no-data-text="hasSearch ? '无搜索结果' : '等待输入中'" placeholder="请输入收件人昵称关键字" style="width: calc(100% - 110px)">
+        <el-option v-for="o in option" :label="o.nickname" :value="o" :key="o.uid"></el-option>
       </el-select>
     </div>
 
@@ -46,9 +46,14 @@ import cmjs from '@/cmjs'
 import SysMsgCard from "@/components/common/SysMsgCard.vue"
 import ColorPicker from "@/components/common/ColorPicker.vue"
 
-type openPm = {
+type OpenPm = {
   afterSuccDo?: Function
-  to?: string[]
+  to?: Receiver[]
+} // open parameter
+
+type Receiver = {
+  uid: number
+  nickname: string
 }
 
 const store = useStore()
@@ -65,20 +70,24 @@ let title = ref("")
 let msg = ref("")
 let color = ref("#000000")
 let link = ref("")
-let recipient = ref<string[]>([])
+let recipient = ref<Receiver[]>([])
 let recEveryone = ref(false)
-let option = ref<string[]>([])
+let option = ref<Receiver[]>([]) // 远程搜索提供的选项
 let loading = ref(false)
 let hasSearch = ref(false)
 
-function openMainWindow(p?: openPm) {
+function openMainWindow(p?: OpenPm) {
   if (p) {
     if (p.afterSuccDo) {
       afterSuccDo = p.afterSuccDo
     }
     if (p.to) {
-      p.to.forEach(nickname => {
-        recipient.value.push(nickname)
+      p.to.forEach(item => {
+        option.value.push(item) // 如果option没有item，直接push进去的话tag会无法显示
+        recipient.value.push(item)
+        setTimeout(() => {
+          option.value.splice(option.value.indexOf(item)) // 短暂的添加之后再删除即可
+        }, 0)
       })
     }
   }
@@ -115,13 +124,13 @@ function send() {
     return
   }
 
-  //TODO api请求
+  //TODO api
   console.log("标题：" + title.value)
   console.log("内容：" + msg.value)
   if (recEveryone.value) {
     console.log("收件人：所有人")
   } else {
-    console.log("收件人：" + recipient.value)
+    console.log("收件人：", recipient.value)
   }
 
   afterSuccDo()
@@ -165,7 +174,7 @@ function setLink() {
   msg.value = msg.value.substring(0, idx) + fillText + msg.value.substring(idx + selectContent.length)
 }
 
-const mockSearchSource = ["张三", "李四", "王五", "赵六", "Bonnenult", "惜缘灬冷颜"]
+const mockSearchSource: Receiver[] = [{ uid: 1, nickname: "Bonnenult" }, { uid: 2, nickname: "惜缘灬冷颜" }, { uid: 3, nickname: "张三" }, { uid: 4, nickname: "李四" }, { uid: 5, nickname: "王五" }]
 function searchNickname(searchKey: string) {
   hasSearch.value = false
   if (searchKey) {
@@ -173,7 +182,7 @@ function searchNickname(searchKey: string) {
     setTimeout(() => {
       hasSearch.value = true
       loading.value = false
-      option.value = mockSearchSource.filter((item) => { return item.toLowerCase().includes(searchKey.toLowerCase()) })
+      option.value = mockSearchSource.filter((item) => { return item.nickname.toLowerCase().includes(searchKey.toLowerCase()) })
     }, 1000);
   } else {
     option.value = []
@@ -181,7 +190,7 @@ function searchNickname(searchKey: string) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .smsw .fc-bar {
   display: flex;
   align-items: center;

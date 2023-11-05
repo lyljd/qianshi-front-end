@@ -76,7 +76,7 @@ let videoTableEle: HTMLElement
 let switchAsk = ref(false)
 
 function setData() {
-  //TODO api请求
+  //TODO api
   data = reactive(Data)
   dataCopy = reactive({ index: Data.index, video: Data.video })
 }
@@ -142,7 +142,7 @@ function save() {
   }
 
   if (switchAsk.value) {
-    //api请求，只有修改了才请求
+    // TODO api
     console.log(data)
     switchAsk.value = false
   }
@@ -156,25 +156,19 @@ function add() {
     if (activeTab.value === "index") {
       data.index.push(newAdv)
       setTimeout(() => {
-        indexTableEle.scrollTo({
-          top: indexTableEle.scrollHeight,
-          behavior: 'smooth',
-        })
+        cmjs.util.scrollTo(indexTableEle.scrollHeight, indexTableEle)
       }, 0);
     } else if (activeTab.value === "video") {
       data.video.push(newAdv)
       setTimeout(() => {
-        videoTableEle.scrollTo({
-          top: videoTableEle.scrollHeight,
-          behavior: 'smooth',
-        })
+        cmjs.util.scrollTo(videoTableEle.scrollHeight, videoTableEle)
       }, 0);
     }
   }, activeTab.value)
 }
 </script>
 
-<style scoped></style>
+<style lang="less" scoped></style>
 
 <style>
 .saw .el-dialog__header,

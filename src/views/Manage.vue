@@ -12,7 +12,7 @@
             <div @click="cmjs.jump.new('/')" class="open-main-web">打开主站</div>
           </div>
 
-          <el-menu-item v-for="i in item.filter(i => store.mui.power >= i.power)" :index="i.index">
+          <el-menu-item v-for="i in item.filter(i => store.power >= i.power)" :index="i.index">
             <span :class="`el-icon-${i.icon}`" class="iconfont"></span>
             <span class="span">{{ i.content }}</span>
           </el-menu-item>
@@ -52,7 +52,7 @@ function setItemIndex(idx: number, index: string) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .container .page-title {
   height: 83px;
   border-bottom: 1px solid #dcdfe6;

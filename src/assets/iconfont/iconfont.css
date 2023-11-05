@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4087073 */
-  src: url('iconfont.woff2?t=1695351521704') format('woff2'),
-       url('iconfont.woff?t=1695351521704') format('woff'),
-       url('iconfont.ttf?t=1695351521704') format('truetype');
+  src: url('iconfont.woff2?t=1696925024544') format('woff2'),
+       url('iconfont.woff?t=1696925024544') format('woff'),
+       url('iconfont.ttf?t=1696925024544') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,46 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.el-icon-shangyiji:before {
+  content: "\e60e";
+}
+
+.el-icon-xiayiji:before {
+  content: "\e60f";
+}
+
+.el-icon-recall:before {
+  content: "\e643";
+}
+
+.el-icon-good-fill:before {
+  content: "\e83b";
+}
+
+.el-icon-report:before {
+  content: "\e682";
+}
+
+.el-icon-copy:before {
+  content: "\ec7a";
+}
+
+.el-icon-font-set:before {
+  content: "\e662";
+}
+
+.el-icon-dm-set:before {
+  content: "\e609";
+}
+
+.el-icon-dm-close:before {
+  content: "\e60a";
+}
+
+.el-icon-dm-open:before {
+  content: "\e60c";
 }
 
 .el-icon-watch-later:before {
@@ -243,14 +283,6 @@
 
 .el-icon-Bbi:before {
   content: "\e668";
-}
-
-.el-icon-bofangqi-danmuguan:before {
-  content: "\e696";
-}
-
-.el-icon-bofangqi-danmukai:before {
-  content: "\e697";
 }
 
 .el-icon-sixin:before {

@@ -37,7 +37,6 @@ let curTitle = ref("")
 
 function setItemIndex(idx: number, index: string) {
   item.value[idx].index = index
-  console.log(idx, index, item)
 }
 
 function setCurTitle(title: string) {
@@ -45,7 +44,7 @@ function setCurTitle(title: string) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .container {
   width: 1140px;
   margin-inline: auto;

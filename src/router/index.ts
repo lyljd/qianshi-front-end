@@ -1,16 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
-import { ElMessageBox } from 'element-plus'
-import { createApp } from 'vue'
-import App from '@/App.vue'
-import { createPinia } from 'pinia'
 import { useStore } from "@/store"
-
-const app = createApp(App)
-const pinia = createPinia()
-
-app.use(pinia)
-
-const store = useStore()
+import { ElMessageBox } from 'element-plus'
+import cmjs from "@/cmjs"
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,6 +12,15 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/:pathMatch(.*)",
     component: () => import("@/views/Error.vue")
+  },
+
+  {
+    path: "/400",
+    component: () => import("@/views/Error.vue"),
+    meta: {
+      code: 400,
+      msg: "参数异常",
+    }
   },
 
   {
@@ -172,7 +172,7 @@ const routes: Array<RouteRecordRaw> = [
       title: '后台管理',
       needLogin: true,
       power: 1,
-    }
+    },
   },
 ]
 
@@ -182,6 +182,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const store = useStore()
   if (store.switchAsk) {
     ElMessageBox.confirm(
       '你所做的更改可能未保存',
@@ -202,35 +203,36 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-type UserInfo = {
-  id: number,
-  nickname: string,
-  coverUrl: string,
-  power: number
+function getAvatar(): string {
+  // TODO api
+  return "/resource/avatar.jpeg"
 }
-function getCurUserInfo(): UserInfo {
-  // TODO api请求：获取当前用户信息
-  return {
-    id: 1,
-    nickname: "Bonnenult",
-    coverUrl: "/resource/avatar.jpeg",
-    power: 6,
-  }
+
+function getPower(): number {
+  // TODO api
+  return 6
 }
 
 function beforeEach(to: any, from: any, next: Function) {
+  const store = useStore()
   store.topPath = to.path.split('/')[1]
-
-  if (store.topPath === "manage" && store.mui.power === -1) {
-    store.mui = getCurUserInfo()
-  }
 
   if (to.meta.needLogin && !store.isLogin) {
     next(`/401?from=${to.href}`)
     return
   }
 
-  if (to.meta.power && store.mui.power < to.meta.power) {
+  if (store.isLogin && !cmjs.cache.checkCookieExist('avatar')) {
+    const avatar = getAvatar()
+    cmjs.cache.setCookie("avatar", avatar, 3600)
+    store.setTopMenuBarAvatar(avatar)
+  }
+
+  if (store.topPath === 'manage' && store.isLogin && store.power === -1) {
+    store.power = getPower()
+  }
+
+  if (to.meta.power && store.power < to.meta.power) {
     next("/403")
     return
   }

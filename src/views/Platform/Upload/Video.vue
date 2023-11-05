@@ -213,7 +213,7 @@ function uploadVideo() {
     return
   }
 
-  //TODO api请求
+  //TODO api
   console.log(video)
 
   store.switchAsk = false
@@ -222,7 +222,7 @@ function uploadVideo() {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .v-container {
   margin-top: 20px;
 }

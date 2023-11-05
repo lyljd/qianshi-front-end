@@ -3,14 +3,14 @@
     <el-card>
       <div class="avatar-container">
         <div class="left">
-          <el-avatar size="large" class="avatar" :src="store.mui.coverUrl" @error="true">
+          <el-avatar size="large" class="avatar" :src="cmjs.cache.getCookie('avatar')" @error="true">
             <img src="/default-avatar.png" />
           </el-avatar>
         </div>
         <div class="right">
           <div class="nickname">{{ getCurTimePeriod() }}好，<span class="normallight">{{
-            `${store.mui.nickname}` }}</span></div>
-          <div class="power">您的权限等级为：<span class="highlight">{{ store.mui.power }}</span></div>
+            `${hi.nickname}` }}</span></div>
+          <div class="power">您的权限等级为：<span class="highlight">{{ store.power }}</span></div>
         </div>
       </div>
     </el-card>
@@ -58,7 +58,7 @@
       </el-card>
     </div>
 
-    <el-card v-if="store.mui.power >= 5">
+    <el-card v-if="store.power >= 5">
       <template #header>
         <div class="card-header">
           <div class="title">
@@ -77,7 +77,7 @@
       </div>
     </el-card>
 
-    <el-card v-if="store.mui.power >= 4">
+    <el-card v-if="store.power >= 4">
       <template #header>
         <div class="card-header">
           <div class="title">
@@ -106,7 +106,7 @@
         <span>IP封禁</span>
       </el-button>
 
-      <el-button v-blur v-if="store.mui.power >= 5" @click="cmjs.prompt.info('敬请期待')">
+      <el-button v-blur v-if="store.power >= 5" @click="cmjs.prompt.info('敬请期待')">
         <span class="iconfont el-icon-log"></span>
         <span>查看日志</span>
       </el-button>
@@ -129,6 +129,7 @@ import SetAdvertisementWindow from "@/components/window/SetAdvertisementWindow.v
 import IPBanlWindow from "@/components/window/IPBanWindow.vue"
 
 type HomeInfo = {
+  nickname: string,
   review: {
     video: number,
     read: number,
@@ -181,7 +182,9 @@ function getCurTimePeriod() {
 }
 
 function getHomeInfo(): HomeInfo {
+  // TODO api
   return {
+    nickname: "Bonnenult",
     review: {
       video: 2,
       read: 0,
@@ -226,7 +229,7 @@ function processFeedback() {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .m-container {
   font-size: 14px;
 }

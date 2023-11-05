@@ -30,7 +30,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .carousel {
   border-radius: 5px;
 }

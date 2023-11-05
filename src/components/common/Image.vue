@@ -122,7 +122,7 @@ function onImgUploadError() {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .Image-container {
   height: 100%;
 }

@@ -1,0 +1,89 @@
+{
+  "cid": 1,
+  "avatarUrl": "/resource/avatar.jpeg",
+  "uid": 1,
+  "nickname": "Bonnenult",
+  "exp": 23456,
+  "isVip": true,
+  "isUp": true,
+  "isTop": true,
+  "isUpLike": false,
+  "content": "欢迎大家多多评论噢！",
+  "date": 1698076800000,
+  "ipLocation": "重庆",
+  "likeNum": 12345,
+  "isLike": false,
+  "isDislike": false,
+  "isChild": false,
+  "parentCid": 1,
+  "reply": {
+    "total": 3,
+    "data": [
+      {
+        "cid": 3,
+        "avatarUrl": "/resource/avatar2.jpeg",
+        "uid": 2,
+        "nickname": "惜缘灬冷颜",
+        "exp": 2345,
+        "isVip": false,
+        "isUp": false,
+        "isTop": false,
+        "isUpLike": true,
+        "content": "好耶！",
+        "date": 1698109200000,
+        "ipLocation": "四川",
+        "likeNum": 1,
+        "isLike": true,
+        "isDislike": false,
+        "isChild": true,
+        "parentCid": 1
+      },
+      {
+        "cid": 4,
+        "avatarUrl": "/resource/avatar.jpeg",
+        "uid": 1,
+        "nickname": "Bonnenult",
+        "exp": 23456,
+        "isVip": true,
+        "isUp": true,
+        "isTop": false,
+        "isUpLike": false,
+        "content": "😄",
+        "date": 1698109380000,
+        "ipLocation": "重庆",
+        "likeNum": 0,
+        "isLike": false,
+        "isDislike": false,
+        "isChild": true,
+        "parentCid": 1,
+        "to": {
+          "uid": 2,
+          "nickname": "惜缘灬冷颜"
+        }
+      },
+      {
+        "cid": 5,
+        "uid": 2,
+        "avatarUrl": "/resource/avatar2.jpeg",
+        "nickname": "惜缘灬冷颜",
+        "exp": 2345,
+        "isVip": false,
+        "isUp": false,
+        "isTop": false,
+        "isUpLike": false,
+        "content": "嘻嘻😁",
+        "date": 1698109740000,
+        "ipLocation": "四川",
+        "likeNum": 0,
+        "isLike": false,
+        "isDislike": false,
+        "isChild": true,
+        "parentCid": 1,
+        "to": {
+          "uid": 1,
+          "nickname": "Bonnenult"
+        }
+      }
+    ]
+  }
+}

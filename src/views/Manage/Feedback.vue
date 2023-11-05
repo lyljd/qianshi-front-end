@@ -1,5 +1,5 @@
 <template>
-  <ManageTopMenuBar title="反馈" icon="feedback" :item="item.filter(i => store.mui.power >= i.power)"></ManageTopMenuBar>
+  <ManageTopMenuBar title="反馈" icon="feedback" :item="item.filter(i => store.power >= i.power)"></ManageTopMenuBar>
 
   <RouterView></RouterView>
 </template>
@@ -22,4 +22,4 @@ function setItemIndex(idx: number, index: string) {
 }
 </script>
 
-<style scoped></style>
+<style lang="less" scoped></style>

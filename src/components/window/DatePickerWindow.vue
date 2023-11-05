@@ -4,7 +4,7 @@
 
     <div class="body">
       <el-config-provider :locale="locale">
-        <el-date-picker v-model="date" value-format="YYYYMMDD" type="date" placeholder="请选择日期"
+        <el-date-picker v-model="date" value-format="x" type="date" placeholder="请选择日期"
           :disabled-date="dateSelectCheck" :shortcuts="shortcuts" style="width: 100%;" />
       </el-config-provider>
 
@@ -67,10 +67,12 @@ const locale = zhCn
 
 let dialogVisible = ref(false)
 let afterSuccDo: Function = () => { }
-let date = ref("")
+let uid = ref(-1)
+let date = ref()
 
-function openWindow(afterSuccDoP?: Function, dateP?: string) {
+function openWindow(uidP: number, afterSuccDoP?: Function, dateP?: string) {
   dialogVisible.value = true
+  uid.value = uidP
   if (afterSuccDoP) {
     afterSuccDo = afterSuccDoP
   }
@@ -89,7 +91,8 @@ function dateSelectCheck(date: Date) {
 }
 
 function save() {
-  afterSuccDo(date.value ? date.value : "")
+  // TODO api
+  afterSuccDo(date.value ? date.value : 0)
   closeWindow()
   cmjs.prompt.success("保存成功")
 }
@@ -101,8 +104,7 @@ function getVIPDate(day: number): Date {
 }
 </script>
 
-<style scoped>
-</style>
+<style lang="less" scoped></style>
 
 <style>
 .dpw .el-dialog__header,

@@ -36,11 +36,11 @@ store.setMeCurTitle("我的硬币")
 let coinNum = ref(getCoinNum())
 
 function getCoinNum() {
-  return 233 //TODO
+  return 233 //TODO api
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .notice {
   margin-top: 20px;
   font-size: 14px;

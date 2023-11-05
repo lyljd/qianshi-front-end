@@ -43,7 +43,7 @@ let data: string[] = reactive([])
 let dataCopy: string[] = reactive([])
 
 function setData() {
-  //TODO api请求
+  //TODO api
   data = reactive([...Data])
   dataCopy = reactive([...Data])
 }
@@ -89,9 +89,16 @@ function save() {
       cmjs.prompt.error(`"${data[i]}"不符合ip格式`)
       return
     }
+
+    if (data.slice(i + 1).indexOf(data[i]) !== -1) {
+      const lidx = data.lastIndexOf(data[i]);
+      (document.getElementById(`ip-input-${lidx}`) as HTMLElement).focus()
+      cmjs.prompt.error(`"${data[i]}"重复`)
+      return
+    }
   }
 
-  //api请求
+  //TODO api
   console.log(data)
 
   store.switchAsk = false
@@ -113,7 +120,7 @@ function delItem(idx: number) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .row {
   display: flex;
 }

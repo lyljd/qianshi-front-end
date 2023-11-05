@@ -12,7 +12,7 @@ import { useRoute } from "vue-router"
 const route = useRoute()
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .error-container {
   width: 100%;
   height: calc(100vh - 93px);

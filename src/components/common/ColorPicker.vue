@@ -22,7 +22,7 @@ const predefineColors = ref([
 const props = withDefaults(defineProps<{
   modelValue: any
   clear: boolean
-  appendTo: string
+  appendTo: HTMLElement
 }>(), {
   clear: false,
   appendTo: undefined

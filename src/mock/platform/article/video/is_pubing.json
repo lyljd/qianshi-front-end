@@ -1,18 +1,18 @@
 {
-  "num": 2,
+  "total": 2,
   "list": [
     {
       "id": 1,
       "title": "Borrow Your Time",
       "coverUrl": "/resource/cover/2.jpeg",
-      "applyTime": 1685836560156
+      "applyTime": 1698080400000
     },
     {
       "id": 2,
-      "title": "许嵩-雅俗共赏",
+      "title": "雅俗共赏",
       "coverUrl": "/resource/cover/8.jpeg",
-      "applyTime": 1688736560156,
-      "vid": 7,
+      "applyTime": 1698084000000,
+      "vid": 8,
       "modifyInfo": {
         "videoUrl": "/resource/video/8.mp4",
         "coverUrl": "/resource/cover/8.jpeg",

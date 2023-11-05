@@ -10,6 +10,6 @@ store.setManegeItemIndex(2, location.pathname)
 store.setManegeFeedbackItemIndex(0, location.pathname)
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 
 </style>

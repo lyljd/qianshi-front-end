@@ -6,7 +6,7 @@
 
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .am {
   color: #409EFF;
   cursor: pointer;

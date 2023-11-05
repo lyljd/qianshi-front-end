@@ -13,7 +13,8 @@ html {
   overflow-y: scroll;
 }
 
-img {
+img,
+video {
   vertical-align: top;
 }
 

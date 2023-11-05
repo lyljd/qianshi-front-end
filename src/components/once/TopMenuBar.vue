@@ -34,15 +34,15 @@
 
     <el-popover ref="loginPop" :width="400">
       <template #reference>
-        <div @click="openLoginWindow()" v-if="!isLogin" class="login-btn">登录</div>
+        <div @click="openLoginWindow('')" v-if="!isLogin" class="login-btn">登录</div>
       </template>
       <div class="before-login-pop">
         <div class="info1">登录后你可以：</div>
         <div class="good">免费看高清视频</div>
         <div class="good">同步播放记录</div>
         <div class="good">发表弹幕/评论</div>
-        <el-button v-blur @click="openLoginWindow()" class="pop-login-btn" type="primary">立即登录</el-button>
-        <div class="info2">首次使用？<span @click="openLoginWindow()" class="register-span">点我注册</span></div>
+        <el-button v-blur @click="openLoginWindow('')" class="pop-login-btn" type="primary">立即登录</el-button>
+        <div class="info2">首次使用？<span @click="openLoginWindow('')" class="register-span">点我注册</span></div>
       </div>
     </el-popover>
 
@@ -51,36 +51,36 @@
     <div v-if="isLogin" class="after-login-menu">
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
-          <el-avatar @click="toHome" class="avatar" :src="avatarUrl" @error="true">
+          <el-avatar @click="toHome" class="avatar" :src="avatar" @error="true">
             <img @click="toHome" src="/default-avatar.png" />
           </el-avatar>
         </template>
-        <el-button v-blur @click="signin" :type="!signinStatus ? 'success' : 'info'"
-          :style="{ cursor: !signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
+        <el-button v-blur @click="signin" :type="!ahi.signinStatus ? 'success' : 'info'"
+          :style="{ cursor: !ahi.signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
         <ul class="almul">
           <div class="nickname">
             <span @click="toHome" class="nickname-span">{{ ahi.nickname }}</span>
           </div>
           <div class="tags">
-            <span v-show="ahi.isVip" class="vip">会员</span>
+            <VipIco v-if="ahi.isVip" style="margin-right: 5px;"></VipIco>
             <svg @click="cmjs.jump.new('/me')" class="icon-symbol level" aria-hidden="true">
-              <use :xlink:href="'#el-icon-level_' + ahi.level"></use>
+              <use :xlink:href="'#el-icon-level_' + cmjs.biz.expToLevel(ahi.exp)"></use>
             </svg>
           </div>
-          <div class="currency">
-            <span>硬币:<span style="color: black;">{{ ahi.coin }}</span></span>
+          <div class="coin-row">
+            <span @click="cmjs.jump.new('/me/coin')">硬币:<span class="coin">{{ ahi.coin }}</span></span>
           </div>
           <div class="num-container">
             <div class="num">
-              <div class="number">{{ cmjs.fmt.numWE(ahi.focuNum) }}</div>
+              <div class="number" @click="cmjs.jump.follow(ahi.id)">{{ cmjs.fmt.numWE(ahi.focuNum) }}</div>
               <div class="text">关注</div>
             </div>
             <div class="num">
-              <div class="number">{{ cmjs.fmt.numWE(ahi.fanNum) }}</div>
+              <div class="number" @click="cmjs.jump.fan(ahi.id)">{{ cmjs.fmt.numWE(ahi.fanNum) }}</div>
               <div class="text">粉丝</div>
             </div>
             <div class="num">
-              <div class="number">{{ cmjs.fmt.numWE(ahi.trendNum) }}</div>
+              <div class="number" @click="cmjs.jump.dynamic(ahi.id)">{{ cmjs.fmt.numWE(ahi.dynamicNum) }}</div>
               <div class="text">动态</div>
             </div>
           </div>
@@ -90,7 +90,7 @@
         </ul>
       </el-popover>
 
-      <div class="ico-btn">
+      <div @click="cmjs.jump.new('/vip')" class="ico-btn">
         <el-button v-blur class="iconfont el-icon-vip ico" circle></el-button>
         <div class="notice">会员</div>
       </div>
@@ -113,19 +113,19 @@
         </ul>
       </el-popover>
 
-      <div class="ico-btn">
+      <div @click="cmjs.jump.new('/dynamic')" class="ico-btn">
         <el-button v-blur class="iconfont el-icon-fengche ico" circle></el-button>
         <div class="notice">动态</div>
       </div>
 
-      <div class="ico-btn">
+      <div @click="cmjs.jump.favlist(cmjs.biz.getUid())" class="ico-btn">
         <el-button v-blur circle><el-icon class="ico">
             <Star />
           </el-icon></el-button>
         <div class="notice">收藏</div>
       </div>
 
-      <div class="ico-btn">
+      <div @click="cmjs.jump.new('/history')" class="ico-btn">
         <el-button v-blur circle><el-icon class="ico">
             <Clock />
           </el-icon></el-button>
@@ -150,26 +150,30 @@
 <script lang="ts" setup>
 import TopMenuImg from "@/components/once/TopMenuImg.vue"
 import LoginWindow from "@/components/window/LoginWindow.vue"
+import VipIco from '@/components/common/VipIco.vue'
 import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 
 type AvatarHoverInfo = {
+  id: number,
   nickname: string,
   isVip: boolean,
-  level: number,
+  power: number,
+  exp: number,
   coin: number,
   focuNum: number,
   fanNum: number,
-  trendNum: number,
-  power: number,
+  dynamicNum: number,
+  signinStatus: boolean,
 }
 
 const route = useRoute()
 const store = useStore()
 const { isLogin } = storeToRefs(store)
 store.openLoginWindow = openLoginWindow
+store.setTopMenuBarAvatar = setAvatar
 
 const loginWindow = ref<InstanceType<typeof LoginWindow>>()
 const loginPop = ref()
@@ -179,18 +183,19 @@ let menu: HTMLElement
 let searchInput: HTMLElement
 
 let searchKey = ref("")
-let avatarUrl = ref(localStorage.getItem("avatarUrl"))
-let ahi: AvatarHoverInfo = reactive({
-  "nickname": "null",
+let ahi = ref<AvatarHoverInfo>({
+  "id": -1,
+  "nickname": "",
   "isVip": false,
-  "level": 1,
+  "power": 0,
+  "exp": 0,
   "coin": 0,
   "focuNum": 0,
   "fanNum": 0,
-  "trendNum": 0,
-  "power": 6,
+  "dynamicNum": 0,
+  "signinStatus": true,
 })
-let signinStatus = ref(true)
+let avatar = ref(cmjs.cache.getCookie('avatar'))
 
 watch(() => route.path, (newPath) => {
   if (newPath === "/") {
@@ -234,62 +239,65 @@ function scrollListenerHandler() {
   menu.style.marginLeft = -document.documentElement.scrollLeft.toString() + "px"
 }
 
-function openLoginWindow() {
+function openLoginWindow(tip?: string) {
   loginPop.value.hide()
-  loginWindow.value?.show((au: string) => {
-    avatarUrl.value = au
-  })
+  loginWindow.value?.show(tip)
 }
 
-function clearLoginStorage() {
-  localStorage.removeItem("uid")
-  localStorage.removeItem("nickname")
-  localStorage.removeItem("avatarUrl")
-  localStorage.removeItem("token")
-  localStorage.removeItem("refreshToken")
+function clearLoginInfo() {
+  cmjs.cache.delCookie("avatar")
+  cmjs.cache.delLS("token")
+  cmjs.cache.delLS("refreshToken")
 }
 
 function logout() {
   avatarPop.value.hide()
-  clearLoginStorage()
+  clearLoginInfo()
   store.isLogin = false
   if (route.meta.needLogin) {
-    location.href = `/401?from=${location.pathname}`
+    cmjs.jump.error(401)
   }
 }
 
 function onAvatarPopShow() {
-  //<!--TODO
-  signinStatus.value = false
-  ahi.nickname = "Bonnenult"
-  ahi.isVip = true
-  ahi.level = 6
-  ahi.coin = 233
-  ahi.focuNum = 6
-  ahi.fanNum = 2377801
-  ahi.trendNum = 101
-  //-->
+  if (ahi.value.id === -1) {
+    // TODO api
+    ahi.value = {
+      id: 1,
+      nickname: "Bonnenult",
+      isVip: true,
+      power: 6,
+      exp: 23456,
+      coin: 233,
+      focuNum: 6,
+      fanNum: 114514,
+      dynamicNum: 0,
+      signinStatus: false,
+    }
+  }
 }
 
 function signin() {
-  if (signinStatus.value) {
+  if (ahi.value.signinStatus) {
     cmjs.prompt.info("今日已签到，请明日再来")
     return
   }
-  signinStatus.value = true
-  ahi.coin += 5 //TODO
+  // TODO api
+  ahi.value.signinStatus = true
+  ahi.value.coin += 5
   cmjs.prompt.success("签到成功")
 }
 
 function toHome() {
-  let uid = localStorage.getItem("uid")
-  if (uid) {
-    cmjs.jump.user(parseInt(uid))
-  }
+  cmjs.jump.user(ahi.value.id)
 }
 
 function toSearch() {
-  alert(`searchKey: ${searchKey.value}`)
+  cmjs.prompt.info(`searchKey: ${searchKey.value}`)
+}
+
+function setAvatar(url: string) {
+  avatar.value = url
 }
 </script>
 
@@ -449,28 +457,26 @@ function toSearch() {
   justify-content: center;
 }
 
-.almul .tags .vip {
-  font-size: 12px;
-  background-color: #FF6699;
-  color: white;
-  line-height: 12px;
-  padding: 1px;
-  margin-right: 5px;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
 .almul .nickname-span:hover {
   color: #409EFF;
   cursor: pointer;
 }
 
-.almul .currency {
+.almul .coin-row {
   text-align: center;
   font-size: 12px;
   cursor: default;
   color: #909399;
   margin-top: -5px;
+
+  .coin {
+    color: black;
+    cursor: pointer;
+  }
+
+  .coin:hover {
+    color: #409EFF;
+  }
 }
 
 .almul .num-container {
@@ -493,10 +499,10 @@ function toSearch() {
 .almul .num-container .num .number {
   font-size: 16px;
   color: black;
+  cursor: pointer;
 }
 
 .almul .num-container .num .number:hover {
-  cursor: pointer;
   color: #409EFF;
 }
 

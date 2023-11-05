@@ -7,17 +7,17 @@
       "isRestrict": false,
       "isBan": false,
       "coinNum": 233,
-      "exp": 20131,
-      "vipExpireDate": "20230823"
+      "exp": 23456,
+      "vipExpireDate": 1729699200000
     },
     {
       "id": 2,
       "nickname": "惜缘灬冷颜",
       "isRestrict": true,
       "isBan": false,
-      "coinNum": 14,
+      "coinNum": 23,
       "exp": 2345,
-      "vipExpireDate": ""
+      "vipExpireDate": 0
     }
   ]
 }

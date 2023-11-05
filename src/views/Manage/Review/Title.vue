@@ -27,7 +27,7 @@ import cmjs from '@/cmjs'
 import { ElMessageBox } from 'element-plus'
 import { useStore } from "@/store"
 
-type record = {
+type Record = {
   id: number,
   uid: number,
   nickname: string,
@@ -36,15 +36,12 @@ type record = {
   applyTime: number,
 }
 
-const timestamp = Date.now()
-console.log(`review/title timestamp: ${timestamp}`)
-
 const store = useStore()
 store.setManegeItemIndex(1, location.pathname)
 
-let form: record[] = reactive(getForm())
+let form: Record[] = reactive(getForm())
 
-function getForm(): record[] {
+function getForm(): Record[] {
   return Form
 }
 
@@ -53,7 +50,7 @@ function tableTimeFormatter(_: any, __: any, time: number) {
 }
 
 function pass(formIdx: number) {
-  //TODO 需请求后端
+  //TODO api
   console.log(form[formIdx].id)
 
   form.splice(formIdx, 1)
@@ -69,7 +66,7 @@ function deny(formIdx: number) {
     showClose: false,
   })
     .then(({ value }) => {
-      //TODO 需请求后端
+      //TODO api
       console.log(form[formIdx].id)
       console.log("理由：" + value)
 
@@ -80,7 +77,7 @@ function deny(formIdx: number) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .table .user {
   cursor: pointer;
   text-decoration: underline;

@@ -1,9 +1,10 @@
 <template>
-  <div v-if="rs.length > 0" class="frd-container">
-    <el-card v-for="(r, idx) in rs">
+  <div v-if="data.records.length > 0" class="frd-container">
+    <el-card v-for="(r, idx) in data.records">
       <template #header>
         <div class="header">
-          <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname }}</span></span>
+          <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
+          }}</span></span>
           <span>举报时间：{{ cmjs.fmt.tsStandard(r.reportTime) }}</span>
           <div>
             <el-button v-blur @click="del(idx)" type="success">删除弹幕</el-button>
@@ -20,30 +21,31 @@
       </div>
     </el-card>
 
-    <el-pagination :total="totalPageNum" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
+    <el-pagination :total="data.total" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
       hide-on-single-page background layout="prev, pager, next" />
   </div>
   <el-empty v-else description="暂无待处理的弹幕举报"></el-empty>
 </template>
 
 <script setup lang="ts">
-import Records from "@/mock/manage/feedback/report/danmu.json"
+import Data from "@/mock/manage/feedback/report/danmu.json"
 import cmjs from '@/cmjs'
 import FeedbackDescriptions from "@/components/util/FeedbackDescriptions.vue"
 import InfoDescriptions from "@/components/util/InfoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
 import { useStore } from "@/store"
 
-type info = {
+type Info = {
   vid: number,
-  cid: number,
+  did: number,
+  t: number,
   uid: number,
   nickname: string,
   time: number,
   content: string,
 }
 
-type record = {
+type Record = {
   id: number,
   uid: number,
   nickname: string,
@@ -52,33 +54,30 @@ type record = {
     content: string,
     imgs: string[],
   },
-  danmuInfo: info
+  danmuInfo: Info
 }
 
-const timestamp = Date.now()
-console.log(`feedback/report/danmu timestamp: ${timestamp}`)
+type Data = {
+  total: number
+  records: Record[]
+}
 
 const store = useStore()
 store.setManegeItemIndex(2, location.pathname)
 store.setManegeFeedbackItemIndex(2, location.pathname)
 
-let rs: record[] = reactive(getRecords())
-
-let totalPageNum = ref(getTotalPageNum())
 let curPage = ref(1)
+let data = ref<Data>(getData())
 
 watch(curPage, newVal => {
-  //TODO
-  console.log(`curPage: ${newVal}`)
+  data.value = getData()
 })
 
-function getTotalPageNum(): number {
-  //TODO
-  return 2
-}
+function getData(): Data {
+  // TODO api
+  console.log("获取第" + curPage.value + "页的数据")
 
-function getRecords(): record[] {
-  return Records
+  return Data
 }
 
 function del(formIdx: number) {
@@ -92,10 +91,10 @@ function del(formIdx: number) {
     autofocus: false,
   })
     .then(() => {
-      //TODO api request
-      console.log(rs[formIdx].id)
+      //TODO api
+      console.log(data.value.records[formIdx].id)
 
-      rs.splice(formIdx, 1)
+      data.value.records.splice(formIdx, 1)
       cmjs.prompt.success('已删除')
     })
 }
@@ -109,26 +108,26 @@ function deny(formIdx: number) {
     showClose: false,
   })
     .then(({ value }) => {
-      //TODO 需请求后端
-      console.log(rs[formIdx].id)
+      //TODO api
+      console.log(data.value.records[formIdx].id)
       console.log("理由：" + value)
 
-      rs.splice(formIdx, 1)
+      data.value.records.splice(formIdx, 1)
       cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
 }
 
 function ignore(formIdx: number) {
-  //TODO 需请求后端
-  console.log(rs[formIdx].id)
+  //TODO api
+  console.log(data.value.records[formIdx].id)
 
-  rs.splice(formIdx, 1)
+  data.value.records.splice(formIdx, 1)
   cmjs.prompt.success("已忽略")
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .frd-container {
   cursor: default;
 }

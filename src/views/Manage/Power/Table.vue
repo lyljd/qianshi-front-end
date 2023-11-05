@@ -1,19 +1,25 @@
 <template>
   <el-table :data="data" border>
-    <el-table-column prop="level" label="权限等级" align="center" />
-    <el-table-column prop="reviewVR" label="审批视频/专栏" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="appeal" label="处理申诉" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="reviewTitle" label="审批个人认证" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="msg" label="处理站内留言" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="report" label="处理举报" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="power" label="管理权限" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="user" label="管理用户" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="sendSysMsg" label="发送系统消息" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="setCarousel" label="设置轮播图" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="setAdvertisement" label="设置广告" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="ipBan" label="IP封禁" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="log" label="查看日志" :formatter="tfFormatter" align="center" />
-    <el-table-column prop="statistic" label="查看统计" :formatter="tfFormatter" align="center" />
+    <el-table-column fixed prop="level" label="权限等级" :width="90" align="center" :resizable="false" />
+    <el-table-column prop="reviewVR" label="审批视频/专栏" :width="120" :formatter="tfFormatter" align="center"
+      :resizable="false" />
+    <el-table-column prop="appeal" label="处理申诉" :width="90" :formatter="tfFormatter" align="center" :resizable="false" />
+    <el-table-column prop="reviewTitle" label="审批个人认证" :width="110" :formatter="tfFormatter" align="center"
+      :resizable="false" />
+    <el-table-column prop="msg" label="处理站内留言" :width="110" :formatter="tfFormatter" align="center" :resizable="false" />
+    <el-table-column prop="report" label="处理举报" :width="90" :formatter="tfFormatter" align="center" :resizable="false" />
+    <el-table-column prop="power" label="管理权限" :width="90" :formatter="tfFormatter" align="center" :resizable="false" />
+    <el-table-column prop="user" label="管理用户" :width="90" :formatter="tfFormatter" align="center" :resizable="false" />
+    <el-table-column prop="sendSysMsg" label="发送系统消息" :width="110" :formatter="tfFormatter" align="center"
+      :resizable="false" />
+    <el-table-column prop="setCarousel" label="设置轮播图" :width="100" :formatter="tfFormatter" align="center"
+      :resizable="false" />
+    <el-table-column prop="setAdvertisement" label="设置广告" :width="90" :formatter="tfFormatter" align="center"
+      :resizable="false" />
+    <el-table-column prop="ipBan" label="IP封禁" :width="70" :formatter="tfFormatter" align="center" :resizable="false" />
+    <el-table-column prop="log" label="查看日志" :width="90" :formatter="tfFormatter" align="center" :resizable="false" />
+    <el-table-column prop="statistic" label="查看统计" :width="90" :formatter="tfFormatter" align="center"
+      :resizable="false" />
   </el-table>
 </template>
 
@@ -54,4 +60,4 @@ function tfFormatter(_: any, __: any, v: boolean): string {
 }
 </script>
 
-<style scoped></style>
+<style lang="less" scoped></style>

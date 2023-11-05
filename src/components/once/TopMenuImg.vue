@@ -40,7 +40,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 header {
   height: 160px;
   position: relative;

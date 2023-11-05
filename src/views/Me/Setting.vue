@@ -84,7 +84,7 @@ onMounted(()=>{
 })
 
 function getMeSetting() {
-  return mockMeSetting //TODO
+  return mockMeSetting //TODO api
 }
 
 function showNNMDY() {
@@ -129,6 +129,7 @@ function saveSetting() {
   if (saveSettingBtn.disabled) {
     return
   }
+
   meSetting.nickname = meSetting.nickname.trim()
   meSetting.signature = meSetting.signature.trim()
   if (meSetting.nickname.length === 0) {
@@ -143,13 +144,15 @@ function saveSetting() {
     cmjs.prompt.error("签名的长度最大为50")
     return
   }
+
+  // TODO api
   cmjs.util.btnCD(saveSettingBtn, 5)
   nnmdy.value = false
   cmjs.prompt.success("保存成功")
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .set-container {
   width: 800px;
 }

@@ -12,7 +12,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .vt-container .tag-row {
   display: flex;
   flex-wrap: wrap;

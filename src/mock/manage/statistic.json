@@ -1,37 +1,37 @@
 {
-  "total": 11451419,
+  "total": 31415926,
   "items": [
     {
       "label": "今日",
-      "total": 10,
+      "total": 103,
       "unique": {
-        "sum": 5176,
-        "user": 4302,
-        "guest": 874
+        "sum": 57,
+        "user": 49,
+        "guest": 8
       },
-      "video": 23,
+      "video": 3,
       "read": 0
     },
     {
       "label": "昨日",
-      "total": 1,
+      "total": 88,
       "unique": {
-        "sum": 4479,
-        "user": 3831,
-        "guest": 648
+        "sum": 48,
+        "user": 39,
+        "guest": 9
       },
-      "video": 16,
+      "video": 3,
       "read": 0
     },
     {
       "label": "本周",
-      "total": 67321,
+      "total": 1823,
       "unique": {
-        "sum": 54197,
-        "user": 45762,
-        "guest": 8435
+        "sum": 622,
+        "user": 582,
+        "guest": 40
       },
-      "video": 120,
+      "video": 59,
       "read": 0
     }
   ]

@@ -9,4 +9,4 @@ const store = useStore()
 store.setManegeItemIndex(1, location.pathname)
 </script>
 
-<style scoped></style>
+<style lang="less" scoped></style>

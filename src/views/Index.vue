@@ -5,7 +5,7 @@
     </div>
 
     <div :style="{ width: data.carousel.length > 0 ? '560px' : '' }" class="recommendation">
-      <VideoCard v-for=" in data.carousel.length > 0 ? 4 : 8" :data="mockVideo" type="big"></VideoCard>
+      <VideoCard v-for="v in data.recommendation" :data="v" type="big"></VideoCard>
     </div>
 
     <VideoRefreshBtn></VideoRefreshBtn>
@@ -15,10 +15,10 @@
     <Advertisement :data="data.advertisement"></Advertisement>
   </div>
 
-  <div v-for="(item) in 4" class="region">
-    <div class="title-container"><span class="title">分区{{ item }}</span></div>
+  <div v-for="r in data.regions" class="region">
+    <div class="title-container"><span @click="cmjs.jump.region(r.name)" class="title">{{ r.title }}</span></div>
     <div class="region-row">
-      <VideoCard v-for=" in 4" :data="mockVideo" type="big" class="card"></VideoCard>
+      <VideoCard v-for="v in r.videos" :data="v" type="big" class="card"></VideoCard>
 
       <VideoRefreshBtn></VideoRefreshBtn>
     </div>
@@ -36,6 +36,7 @@ import VideoRefreshBtn from "@/components/common/VideoRefreshBtn.vue"
 import Advertisement from "@/components/common/Advertisement.vue"
 import DeveloperInfo from "@/components/once/DeveloperInfo.vue"
 import Data from "@/mock/index.json"
+import cmjs from '@/cmjs'
 
 type carousel = {
   title: string,
@@ -56,23 +57,31 @@ type Text = {
   bgColor: string,
 }
 
-type data = {
-  carousel: carousel[],
-  advertisement: Advertisement,
+type Video = {
+  vid: number
+  videoUrl: string
+  coverUrl: string
+  playNum: number
+  danmuNum: number
+  duration: number
+  title: string
+  uid: number
+  nickname: string
+  date: number
 }
 
-const mockVideo = {
-  "vid": 1,
-  "videoUrl": "",
-  "coverUrl": "",
-  "playNum": 0,
-  "danmuNum": 0,
-  "duration": 0,
-  "title": "标题",
-  "uid": 1,
-  "nickname": "Bonnenult",
-  "date": 1685599556000
-} //TODO
+type Region = {
+  title: string,
+  name: string,
+  videos: Video[],
+}
+
+type data = {
+  carousel: carousel[],
+  recommendation: Video[],
+  advertisement: Advertisement,
+  regions: Region[],
+}
 
 let data = ref(getData())
 
@@ -81,7 +90,7 @@ function getData(): data {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .container {
   width: 1140px;
   height: 420px;

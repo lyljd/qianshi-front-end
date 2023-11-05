@@ -1,6 +1,6 @@
 <template>
   <div class="vd-container">
-    <el-descriptions v-if="data" :title="title" :column="1" border>
+    <el-descriptions :title="title" :column="1" border>
       <template v-if="data.vid" #extra>
         <el-button v-blur @click="cmjs.jump.video(data.vid)" type="primary" size="small">打开视频页</el-button>
       </template>
@@ -33,8 +33,6 @@
         {{ data.empower ? "未经作者授权，禁止转载" : "" }}
       </el-descriptions-item>
     </el-descriptions>
-
-    <div v-else>视频已失效</div>
   </div>
 </template>
 
@@ -45,7 +43,7 @@ import cmjs from '@/cmjs'
 
 const store = useStore()
 
-type video = {
+type Video = {
   vid?: number,
   videoUrl: string,
   coverUrl: string,
@@ -56,12 +54,10 @@ type video = {
   empower: boolean
 }
 
-withDefaults(defineProps<{
+defineProps<{
   title: string
-  data: video
-}>(), {
-  title: "",
-})
+  data: Video
+}>()
 
 function convertRegionName(code: string): string {
   switch (code) {

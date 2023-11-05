@@ -1,11 +1,116 @@
 {
+  "openCoin": true,
+  "totalCoin": 2,
+  "coinVideos": [
+    {
+      "vid": 1,
+      "videoUrl": "/resource/video/1.mp4",
+      "coverUrl": "/resource/cover/1.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 317,
+      "title": "晴天",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    },
+    {
+      "vid": 2,
+      "videoUrl": "/resource/video/2.mp4",
+      "coverUrl": "/resource/cover/2.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 209,
+      "title": "Borrow Your Time",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    }
+  ],
+  "openLike": true,
+  "totalLike": 13,
+  "likeVideos": [
+    {
+      "vid": 3,
+      "videoUrl": "/resource/video/3.mp4",
+      "coverUrl": "/resource/cover/3.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 256,
+      "title": "曼陀山庄",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    },
+    {
+      "vid": 4,
+      "videoUrl": "/resource/video/4.mp4",
+      "coverUrl": "/resource/cover/4.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 222,
+      "title": "Paris",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    },
+    {
+      "vid": 5,
+      "videoUrl": "/resource/video/5.mp4",
+      "coverUrl": "/resource/cover/5.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 103,
+      "title": "Running In The Dark",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    },
+    {
+      "vid": 6,
+      "videoUrl": "/resource/video/6.mp4",
+      "coverUrl": "/resource/cover/6.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 318,
+      "title": "戒烟",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    },
+    {
+      "vid": 7,
+      "videoUrl": "/resource/video/7.mp4",
+      "coverUrl": "/resource/cover/7.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 247,
+      "title": "Closer",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    },
+    {
+      "vid": 8,
+      "videoUrl": "/resource/video/8.mp4",
+      "coverUrl": "/resource/cover/8.jpeg",
+      "playNum": 0,
+      "danmuNum": 0,
+      "duration": 256,
+      "title": "雅俗共赏",
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "date": 1696780800000
+    }
+  ],
   "title": "浅时创始人（站长）",
   "applyTitle": "",
   "notice": "Ciallo～(∠・ω< )⌒☆",
   "uid": 1,
-  "birthday": "11-19",
+  "birthday": "03-01",
   "tag": [
+    "站长sama",
     "柚子厨",
-    "站长sama"
+    "ba"
   ]
 }

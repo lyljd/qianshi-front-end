@@ -4,7 +4,8 @@
 
     <div v-if="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
-    <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false" size="auto">
+    <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false"
+      size="auto">
       <template #default>
         <div class="top-img-container">
           <img v-for="ti in topImgs" :src="ti" @click="user.topImg = ti"
@@ -18,7 +19,8 @@
     </el-drawer>
 
     <div class="info">
-      <Image @recImgUrl="recImgUrl" uploadUrl="/api/resource/avatar" :url="user.avatarUrl" w="60" h="60" avatar></Image>
+      <Image @recImgUrl="recImgUrl" :uploadUrl="isMe ? '/api/resource/avatar' : ''" :url="user.avatarUrl" w="60" h="60"
+        avatar></Image>
 
       <div class="right">
         <div class="head-row">
@@ -28,7 +30,7 @@
           <svg @click="cmjs.jump.new('/me')" class="icon-symbol level" aria-hidden="true">
             <use :xlink:href="'#el-icon-level_' + user.level"></use>
           </svg>
-          <span v-if="user.isVip" class="vip">会员</span>
+          <VipIco v-if="user.isVip" style="margin-left: 5px;"></VipIco>
           <span class="ip-container">
             <span class="iconfont el-icon-ip ip"></span>
             <span>IP属地：{{ user.ipLocation }}</span>
@@ -36,12 +38,12 @@
         </div>
         <input ref="signatureInput" @blur="saveSignature" :readonly="isMe ? false : true"
           :class="{ 'signature-row-me': isMe, 'signature-row': !isMe }" :placeholder="isMe ? '编辑个性签名' : ''"
-          v-model="user.signature" />
+          v-model="signature" />
       </div>
     </div>
 
     <div v-if="!isMe" class="btns">
-      <el-button v-blur @click="focu">{{ focuBtnInnerText }}</el-button>
+      <el-button v-blur @click="focu">{{ !user.isFocu ? "关注" : "已关注" }}</el-button>
       <el-button v-blur @click="sendMessage">发消息</el-button>
     </div>
 
@@ -57,7 +59,7 @@
         <el-menu-item v-if="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
 
         <div class="search-container">
-          <el-input v-model="searchKey" class="search" placeholder="搜索视频、动态" clearable>
+          <el-input v-model="searchKey" @keyup.enter.native="toSearch" class="search" placeholder="搜索视频、动态" clearable>
             <template #prefix><el-icon style="cursor: pointer;">
                 <search />
               </el-icon></template>
@@ -69,12 +71,12 @@
         <div class="num-container">
           <div class="num-box">
             <div class="num-span">关注数</div>
-            <div :title="(user.focuNum).toString()" class="num focu-num">{{
+            <div :title="(user.focuNum).toString()" @click="cmjs.jump.follow(uid)" class="num focu-num">{{
               cmjs.fmt.numWE(user.focuNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">粉丝数</div>
-            <div :title="(user.fanNum).toString()" class="num fan-num">{{
+            <div :title="(user.fanNum).toString()" @click="cmjs.jump.fan(uid)" class="num fan-num">{{
               cmjs.fmt.numWE(user.fanNum) }}</div>
           </div>
           <div class="num-box">
@@ -101,11 +103,12 @@
 </template>
 
 <script setup lang="ts">
+import VipIco from '@/components/common/VipIco.vue'
 import cmjs from '@/cmjs'
-import { ElMessage } from 'element-plus'
 import mockUser from "@/mock/user.json"
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
+import { onBeforeRouteUpdate, useRoute } from "vue-router"
 
 type User = {
   uid: number
@@ -128,14 +131,22 @@ type User = {
   readNum: number
 }
 
+const route = useRoute()
+
+const uid = parseInt(route.params.uid as string)
 let user = ref<User>(getUser())
 document.title = user.value.nickname + "的个人空间 - 浅时"
+
+onBeforeRouteUpdate((to, from, next) => {
+  document.title = user.value.nickname + "的个人空间 - 浅时"
+  next()
+})
 
 const store = useStore()
 let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = cmjs.biz.isMe(user.value.uid)
+    isMe.value = cmjs.biz.verifyLoginUid(uid)
     user.value = getUser()
   } else {
     isMe.value = false
@@ -143,8 +154,9 @@ store.$subscribe((_, state) => {
   }
 })
 
-store.addUserMenuCollectionNum = addMenuCollectionNum
-store.addUserMenuFavlistNum = addMenuFavlistNum
+store.setUserMenuPostNum = setMenuPostNum
+store.setUserMenuCollectionNum = setMenuCollectionNum
+store.setUserMenuFavlistNum = setMenuFavlistNum
 
 const signatureInput = ref<HTMLInputElement>()
 const topImgs: string[] = [
@@ -154,11 +166,11 @@ const topImgs: string[] = [
   "/userhome-top-img/4.png",
 ]
 
-let isMe = ref(cmjs.biz.isMe(user.value.uid))
+let isMe = ref(cmjs.biz.verifyLoginUid(uid))
+let signature = ref(user.value.signature)
 let searchKey = ref("")
 let oldTopImg = ref("")
 let replaceTopImgDrawerShow = ref(false)
-let focuBtnInnerText = ref(!user.value.isFocu ? "关注" : "已关注")
 
 function getUser() {
   return mockUser //TODO
@@ -169,11 +181,15 @@ function recImgUrl(imgUrl: string) {
 }
 
 function saveSignature() {
-  user.value.signature = user.value.signature.trim()
-  if (user.value.signature.length > 50) {
+  signature.value = signature.value.trim()
+  if (signature.value.length > 50) {
     cmjs.prompt.info("签名的长度最大为50，超出部分已自动选中")
     signatureInput.value!.focus()
-    signatureInput.value!.setSelectionRange(50, user.value.signature.length)
+    signatureInput.value!.setSelectionRange(50, signature.value.length)
+  } else if (signature.value !== user.value.signature) {
+    // TODO api
+    user.value.signature = signature.value
+    cmjs.prompt.success('保存成功')
   }
 }
 
@@ -194,49 +210,45 @@ function saveTopImg() {
 
 function focu() {
   if (!isLogin.value) {
-    openLoginWindow()
+    store.openLoginWindow()
     return
   }
   if (isMe) {
     cmjs.prompt.info("不能关注自己")
     return
   }
-  if (!user.value.isFocu) {
-    user.value.isFocu = true
-    focuBtnInnerText.value = "已关注"
-  } else {
-    user.value.isFocu = false
-    focuBtnInnerText.value = "关注"
-  }
+
+  // TODO api
+  user.value.isFocu = !user.value.isFocu
+  cmjs.prompt.success(`${user.value.isFocu ? '关注' : '取关'}成功`)
 }
 
 function sendMessage() {
   if (!isLogin.value) {
-    openLoginWindow()
+    store.openLoginWindow()
     return
   }
-  alert("敬请期待")
+  cmjs.prompt.info("敬请期待")
 }
 
-function openLoginWindow() {
-  ElMessage({
-    "message": "请登录后再操作",
-    "offset": 77,
-    "customClass": "zIndex999",
-  })
-  store.openLoginWindow()
+function setMenuPostNum(newNum: number) {
+  user.value.postNum = newNum
 }
 
-function addMenuCollectionNum(incr: number) {
-  user.value.collectionNum += incr
+function setMenuCollectionNum(newNum: number) {
+  user.value.collectionNum = newNum
 }
 
-function addMenuFavlistNum(incr: number) {
-  user.value.favlistNum += incr
+function setMenuFavlistNum(newNum: number) {
+  user.value.favlistNum = newNum
+}
+
+function toSearch() {
+  cmjs.prompt.info(`searchKey: ${searchKey.value}`)
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .container {
   width: 1140px;
   margin-inline: auto;
@@ -315,17 +327,6 @@ function addMenuFavlistNum(incr: number) {
 
 .info .right .level {
   font-size: 27.5px;
-  margin-left: 5px;
-  cursor: pointer;
-}
-
-.info .right .vip {
-  background-color: #FF6699;
-  color: white;
-  padding: 1px;
-  border-radius: 3px;
-  font-size: 12px;
-  line-height: 12px;
   margin-left: 5px;
   cursor: pointer;
 }

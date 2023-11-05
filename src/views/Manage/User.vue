@@ -47,7 +47,8 @@
               :title="!scope.row.isRestrict ? '你确认要限制该用户吗？' : '你确认要取消限制该用户吗？'" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
-                <el-button v-blur :type="!scope.row.isRestrict ? 'success' : 'danger'" size="small">{{ !scope.row.isRestrict ?
+                <el-button v-blur :type="!scope.row.isRestrict ? 'success' : 'danger'" size="small">{{
+                  !scope.row.isRestrict ?
                   "限制交互" : "取消限制交互" }}</el-button>
               </template>
             </el-popconfirm>
@@ -56,7 +57,8 @@
               :title="!scope.row.isBan ? '你确认要封禁该用户吗？' : '你确认要取消封禁该用户吗？'" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
-                <el-button v-blur :type="!scope.row.isBan ? 'success' : 'danger'" size="small">{{ !scope.row.isBan ? "封禁账号" :
+                <el-button v-blur :type="!scope.row.isBan ? 'success' : 'danger'" size="small">{{ !scope.row.isBan ?
+                  "封禁账号" :
                   "取消封禁账号" }}</el-button>
               </template>
             </el-popconfirm>
@@ -70,10 +72,11 @@
       </el-table-column>
     </el-table>
 
-    <el-pagination v-model:current-page="curPage" background hide-on-single-page layout="prev, pager, next"
-      :total="result.total" class="page" />
+    <el-pagination class="page" v-model:current-page="curPage" :page="10" background layout="prev, pager, next"
+      :total="result.total" hide-on-single-page />
 
-    <DatePickerWindow @open="getOpenDPWindow" title="调整会员过期日期" :tips="tips"></DatePickerWindow>
+    <DatePickerWindow @open="getOpenDPWindow" title="调整会员过期日期" :tips="[' 过期日期固定为每天0点', '右侧快捷选项以明天0点为基础开始计算']">
+    </DatePickerWindow>
 
     <UserInfoSysSetWindow @open="getOpenUISSWindow"></UserInfoSysSetWindow>
   </div>
@@ -88,19 +91,19 @@ import { ElMessageBox } from 'element-plus'
 import DatePickerWindow from "@/components/window/DatePickerWindow.vue"
 import UserInfoSysSetWindow from "@/components/window/UserInfoSysSetWindow.vue"
 
-type user = {
+type User = {
   id: number,
   nickname: string,
   isRestrict: boolean,
   isBan: boolean,
   coinNum: number,
   exp: number,
-  vipExpireDate: string
+  vipExpireDate: number
 }
 
-type result = {
+type Result = {
   total: number,
-  data: user[]
+  data: User[]
 }
 
 type UserInfo = {
@@ -112,23 +115,14 @@ type UserInfo = {
   tags: string[],
 }
 
-const timestamp = Date.now()
-console.log(`user timestamp: ${timestamp}`)
-
-const tips = [
-  "过期日期固定为每天0点",
-  "右侧快捷选项以明天0点为基础开始计算"
-]
-
 let searchKey = ref("")
-let result = ref<any>([])
+let result = ref<Result>({ total: 0, data: [] })
 let curPage = ref(1)
-let openDPWindow: Function
-let openUISSWindow: Function
+let openDPWindow: Function // DatePickerWindow
+let openUISSWindow: Function // UserInfoSysSetWindow
 
 watch(curPage, newVal => {
-  //TODO
-  console.log(`curPage: ${newVal}`)
+  result.value = getData()
 })
 
 function getOpenDPWindow(f: Function) {
@@ -139,7 +133,10 @@ function getOpenUISSWindow(f: Function) {
   openUISSWindow = f
 }
 
-function getData(): result {
+function getData(): Result {
+  // TODO api
+  console.log("获取第" + curPage.value + "页的数据")
+
   return Data
 }
 
@@ -149,7 +146,7 @@ function search() {
     return
   }
 
-  //TODO api请求
+  //TODO api
   result.value = getData()
 }
 
@@ -157,12 +154,12 @@ function tfFormatter(_: any, __: any, v: boolean): string {
   return v ? '✓' : '✕'
 }
 
-function vipExpireDateFormatter(_: any, __: any, v: string): string {
-  return v !== "" ? `${v.substring(0, 4)}-${v.substring(4, 6)}-${v.substring(6)}` : "无会员"
+function vipExpireDateFormatter(_: any, __: any, v: number): string {
+  return v > 0 ? cmjs.fmt.tsTmpl(v, "YYYY-MM-DD") : "无会员"
 }
 
 function restrict(idx: number) {
-  //api请求
+  // TODO api
   console.log(result.value.data[idx].id)
 
   result.value.data[idx].isRestrict = !result.value.data[idx].isRestrict
@@ -170,7 +167,7 @@ function restrict(idx: number) {
 }
 
 function ban(idx: number) {
-  //api请求
+  // TODO api
   console.log(result.value.data[idx].id)
 
   result.value.data[idx].isBan = !result.value.data[idx].isBan
@@ -179,7 +176,6 @@ function ban(idx: number) {
 
 function setInfo(idx: number) {
   openUISSWindow(result.value.data[idx].id, (userInfo: UserInfo) => {
-    //TODO api请求
     console.log(userInfo)
 
     result.value.data[idx].nickname = userInfo.nickname
@@ -196,7 +192,7 @@ function setCoinNum(idx: number) {
     inputErrorMessage: '请输入整数',
   })
     .then(({ value }) => {
-      //api请求
+      // TODO api
       console.log(result.value.data[idx].id)
 
       result.value.data[idx].coinNum = parseInt(value)
@@ -225,16 +221,13 @@ function setExp(idx: number) {
 }
 
 function setvipExpireDate(idx: number) {
-  openDPWindow((newVal: string) => {
-    //api请求
-    console.log(result.value.data[idx].id)
-
+  openDPWindow(result.value.data[idx].id, (newVal: number) => {
     result.value.data[idx].vipExpireDate = newVal
   }, result.value.data[idx].vipExpireDate)
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .mu-container .search-bar {
   display: flex;
   margin-bottom: 20px;

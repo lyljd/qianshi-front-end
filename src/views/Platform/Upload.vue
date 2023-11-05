@@ -1,5 +1,5 @@
 <template>
-  <div class="pa-container">
+  <div class="pu-container">
     <el-menu :default-active="$route.path" router mode="horizontal">
       <el-menu-item v-show="uploadItem === 'video' || uploadItem === ''"
         index="/platform/upload/video">视频投稿</el-menu-item>
@@ -29,16 +29,16 @@ function getUploadItem() {
 }
 </script>
 
-<style scoped>
-.pa-container .el-menu-item {
+<style lang="less" scoped>
+.pu-container .el-menu-item {
   padding: 0;
   height: 30px;
   margin-right: 20px;
   font-size: 20px;
 }
 
-.pa-container .el-menu-item:hover,
-.pa-container .el-menu-item:focus {
+.pu-container .el-menu-item:hover,
+.pu-container .el-menu-item:focus {
   background-color: transparent !important;
 }
 </style>

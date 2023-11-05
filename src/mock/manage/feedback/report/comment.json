@@ -1,40 +1,25 @@
-[
-  {
-    "id": 1,
-    "uid": 1,
-    "nickname": "Bonnenult",
-    "reportTime": 1689576192517,
-    "reportInfo": {
-      "content": "这条评论涉及引战",
-      "imgs": [
-        "/resource/壁纸/锁屏1.jpg"
-      ]
-    },
-    "commentInfo": {
-      "cid": 1,
-      "vid": 5,
-      "uid": 2,
-      "nickname": "惜缘灬冷颜",
-      "time": 1689512390183,
-      "content": "这个视频不如xx的视频好看"
+{
+  "total": 2,
+  "records": [
+    {
+      "id": 1,
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "reportTime": 1698889800000,
+      "reportInfo": {
+        "content": "测试下评论举报",
+        "imgs": [
+          "/resource/壁纸/锁屏1.jpg"
+        ]
+      },
+      "commentInfo": {
+        "cid": 1,
+        "vid": 1,
+        "uid": 1,
+        "nickname": "Bonnenult",
+        "time":1698076800000,
+        "content": "欢迎大家多多评论噢！"
+      }
     }
-  },
-  {
-    "id": 2,
-    "uid": 1,
-    "nickname": "Bonnenult",
-    "reportTime": 1689578232517,
-    "reportInfo": {
-      "content": "这条评论与该专栏无关",
-      "imgs": []
-    },
-    "commentInfo": {
-      "cid": 2,
-      "rid": 6,
-      "uid": 2,
-      "nickname": "惜缘灬冷颜",
-      "time": 1612376396727,
-      "content": "你们觉得xxx怎么样？"
-    }
-  }
-]
+  ]
+}

@@ -65,7 +65,7 @@ import { useStore } from "@/store"
 import { ElMessageBox } from "element-plus"
 import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 
-type user = {
+type User = {
   coverUrl: string,
   nickname: string,
   signature: string,
@@ -86,8 +86,8 @@ stf('open', openWindow)
 const newTagInput = ref<HTMLInputElement>()
 
 let dialogVisible = ref(false)
-let data: user
-let dataCopy: user
+let data: User
+let dataCopy: User
 let afterSuccDo: Function = () => { }
 let newTagInputValue = ref("")
 let newTagInputVisible = ref(false)
@@ -101,8 +101,8 @@ function recImgUploadPercent(imgUploadPercent: number) {
   uploadPercent.value = imgUploadPercent
 }
 
-function userDataDeepCopy(up: user): user {
-  let u: user = {
+function userDataDeepCopy(up: User): User {
+  let u: User = {
     coverUrl: up.coverUrl,
     nickname: up.nickname,
     signature: up.signature,
@@ -113,8 +113,8 @@ function userDataDeepCopy(up: user): user {
   return u
 }
 
-function getUserData(uid: number): user {
-  //api请求
+function getUserData(uid: number): User {
+  // TODO api
   console.log(uid)
 
   return userDataDeepCopy(Data)
@@ -158,6 +158,7 @@ function closeWindow() {
 }
 
 function save() {
+  // TODO api
   afterSuccDo(data)
   store.switchAsk = false
   closeWindow()
@@ -194,7 +195,7 @@ function newTag() {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .uissw .body>div {
   display: flex;
   align-items: center;

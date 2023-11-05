@@ -32,7 +32,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .adv {
   position: relative;
 }

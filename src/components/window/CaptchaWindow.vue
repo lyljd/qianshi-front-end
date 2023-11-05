@@ -3,7 +3,7 @@
     <el-dialog @close="clearInput" v-model="dialogVisible" title="人机验证" :width="360" :close-on-press-escape=false
       :close-on-click-modal=false :align-center=true>
       <div style="display: flex;">
-        <el-input @keyup.enter.native="verify" maxlength="4" v-model="input" />
+        <el-input @keyup.enter.native="verify" maxlength="4" v-model="input" class="vi" />
         <Image :url="captchaUrl" :w="100" :h="30" border :round="false"></Image>
       </div>
       <template #footer>
@@ -15,6 +15,10 @@
 
 <script setup lang="ts">
 import cmjs from '@/cmjs'
+import { useStore } from '@/store'
+
+const store = useStore()
+store.openCaptchaWindow = show
 
 defineExpose({
   show
@@ -41,20 +45,21 @@ function checkCaptchaInput(): boolean {
 }
 
 function verify() {
-  if (input.value.length !== 4) {
-    return
-  }
-
   if (!checkCaptchaInput()) {
     cmjs.prompt.error("请输入4位数字")
     return
   }
+  // TODO api
   dialogVisible.value = false
-  afterSuccDo(180)
+  afterSuccDo()
 }
 </script>
 
-<style scoped></style>
+<style lang="less" scoped>
+.cw-container .vi :deep(.el-input__wrapper) {
+  border-radius: unset;
+}
+</style>
 
 <style>
 .cw-container .el-dialog.is-align-center {

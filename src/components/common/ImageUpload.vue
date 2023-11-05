@@ -115,7 +115,7 @@ function onImgUploadError() {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .iu-container .upload-div {
   border-radius: 5px;
   cursor: pointer;

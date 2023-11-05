@@ -1,17 +1,16 @@
 <template>
   <div class="avatar-container">
     <div class="left">
-      <el-avatar size="large" class="avatar" :src="meHome.avatarUrl" @error="true">
+      <el-avatar size="large" class="avatar" :src="cmjs.cache.getCookie('avatar')" @error="true">
         <img src="/default-avatar.png" />
       </el-avatar>
     </div>
     <div class="right">
       <div class="nickname">{{ meHome.nickname }}</div>
       <div class="level-bar">
-        <span class="level">LV{{ meHome.level }}</span>
-        <el-progress :percentage="meHome.exp / meHome.reqExp * 100" stroke-width="20" color="#ff905a"
-          :show-text="false" />
-        <div class="exp">{{ meHome.exp }} /<span style="color: #909399;">&nbsp;{{ meHome.reqExp }}</span></div>
+        <span class="level">LV{{ level }}</span>
+        <el-progress :percentage="meHome.exp / reqExp * 100" stroke-width="20" color="#ff905a" :show-text="false" />
+        <div class="exp">{{ meHome.exp }} /<span style="color: #909399;">&nbsp;{{ reqExp }}</span></div>
       </div>
     </div>
   </div>
@@ -40,7 +39,7 @@
     <strong style="margin-bottom: 5px;">如何获得经验？</strong>
     <div class="item">
       <span class="iconfont el-icon-dian dian"></span>
-      每次给视频投币后增加10点经验
+      每次给视频投币后增加10点经验（每日最多可获得50点）
     </div>
   </div>
 </template>
@@ -48,26 +47,26 @@
 <script setup lang="ts">
 import mockMeHome from "@/mock/me/home.json"
 import { useStore } from "@/store"
+import cmjs from '@/cmjs'
 
 type MeHome = {
-  avatarUrl: string
   nickname: string
-  level: number
   exp: number
-  reqExp: number
 }
 
 const store = useStore()
 store.setMeCurTitle("首页")
 
 let meHome: MeHome = reactive(getMeHome())
+const level = cmjs.biz.expToLevel(meHome.exp)
+const reqExp = cmjs.biz.levelReqExp(level)
 
 function getMeHome() {
-  return mockMeHome //TODO
+  return mockMeHome //TODO api
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .avatar-container {
   display: flex;
   height: 56px;

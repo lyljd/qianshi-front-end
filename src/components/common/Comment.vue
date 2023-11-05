@@ -1,5 +1,5 @@
 <template>
-  <div :id="'container-' + data.cid" class="container">
+  <div :id="`comment-${data.cid}`" class="comment-container">
     <Image :customClick="() => { cmjs.jump.user(data.uid) }" :url="data.avatarUrl" :w="40" :h="40" customClass="avatar"
       avatar>
     </Image>
@@ -10,7 +10,7 @@
           }}</span>
 
           <svg class="icon-symbol level" aria-hidden="true">
-            <use :xlink:href="'#el-icon-level_' + data.level"></use>
+            <use :xlink:href="`#el-icon-level_${cmjs.biz.expToLevel(data.exp)}`"></use>
           </svg>
 
           <svg v-if="data.isUp" style="font-size: 25px;" class="icon-symbol" aria-hidden="true">
@@ -21,7 +21,7 @@
         <div class="to" v-if="data.to !== undefined">回复 @<span @click="cmjs.jump.user(data.to.uid)" class="nickname">{{
           data.to?.nickname }}</span>：</div>
 
-        <textarea :id="'comment-' + data.cid" class="comment" rows="1" readonly>{{ data.content }}</textarea>
+        <textarea :id="`content-${data.cid}`" class="comment" rows="1" readonly>{{ data.content }}</textarea>
 
         <div class="comment-info">
           <span>
@@ -29,14 +29,14 @@
 
             <span class="ip-location">IP属地：{{ data.ipLocation }}</span>
 
-            <span @click="like" :style="{ color: data.isLike ? '#409EFF' : '' }" :title="data.likeNum.toString()"
-              class="iconfont el-icon-zan like-btn">{{ cmjs.fmt.numWE(data.likeNum)
+            <span @click="like" :style="{ color: data.isLike && isLogin ? '#409EFF' : '' }"
+              :title="data.likeNum.toString()" class="iconfont el-icon-zan like-btn">{{ cmjs.fmt.numWE(data.likeNum)
               }}</span>
 
-            <span @click="dislike" :style="{ color: data.isDislike ? '#409EFF' : '' }"
+            <span @click="dislike" :style="{ color: data.isDislike && isLogin ? '#409EFF' : '' }"
               class="iconfont el-icon-cai dislike-btn"></span>
 
-            <span @click="openChildSendArea(data.parentCid, data.cid, data.nickname, data.isChild)"
+            <span @click="openCommentSendArea(data.parentCid, data.cid, data.nickname, data.isChild)"
               class="reply-btn">回复</span>
           </span>
 
@@ -45,7 +45,7 @@
               <span class="iconfont el-icon-diandiandianshu extra"></span>
             </template>
             <div class="extra-container">
-              <div v-if="isUp" @click="setTop" class="comment-top"><span
+              <div class="item" v-if="isUp && !props.data.isChild" @click="setTop"><span
                   :class="!data.isTop ? 'el-icon-zhiding' : 'el-icon-quxiaozhiding'" class="iconfont em-icon"></span>{{
                     !data.isTop ? '置顶' : '取消置顶' }}</div>
 
@@ -53,12 +53,11 @@
                 :title="!data.isChild ? '删除评论后，评论下所有回复都会被删除，是否继续?' : '你确认要删除该评论吗？'" confirm-button-text="确认"
                 cancel-button-text="取消">
                 <template #reference>
-                  <div v-if="isMe || isUp" class="comment-detele"><span class="iconfont el-icon-ashbin em-icon"></span>删除
-                  </div>
+                  <div class="item" v-if="isMe || isUp"><span class="iconfont el-icon-ashbin em-icon"></span>删除</div>
                 </template>
               </el-popconfirm>
 
-              <div @click="report" class="comment-report"><span class="iconfont el-icon-jubao em-icon"></span>举报</div>
+              <div class="item" @click="report"><span class="iconfont el-icon-jubao em-icon"></span>举报</div>
             </div>
           </el-popover>
         </div>
@@ -69,29 +68,28 @@
         </div>
       </div>
 
-      <div v-for="(item) in data.reply?.value">
-        <ChildComment :vAuthorUid="vAuthorUid" :openChildSendArea="openChildSendArea" :deleteComment="deleteChildComment"
-          :scrollId="scrollId" :data="item"></ChildComment>
+      <div v-for="c in data.reply?.data">
+        <ChildComment :data="c" :openCommentSendArea="openCommentSendArea" :deleteComment="deleteChildComment"
+          :authorUid="authorUid"></ChildComment>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
 import cmjs from '@/cmjs'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 
 type Comment = {
   cid: number
-  uid: number
   avatarUrl: string
+  uid: number
   nickname: string
-  level: number
+  exp: number
   isVip: boolean
-  isTop: boolean
   isUp: boolean
+  isTop: boolean
   isUpLike: boolean
   content: string
   date: number
@@ -99,103 +97,71 @@ type Comment = {
   likeNum: number
   isLike: boolean
   isDislike: boolean
+  isChild: boolean
+  parentCid: number
   to?: {
     uid: number
     nickname: string
   }
   reply?: {
-    num: number
-    isOpen?: boolean
-    value: Comment[]
+    total: number
+    data: Comment[]
   }
-  height?: string
-  isChild: boolean
-  parentCid: number
 }
 
 let props = defineProps<{
   data: Comment
-  scrollId: number
+  openCommentSendArea: Function
   deleteComment: Function
-  openChildSendArea: Function
-  vAuthorUid: number
+  authorUid: number
 }>()
 
 const store = useStore()
 let { isLogin } = storeToRefs(store)
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = cmjs.biz.isMe(props.data.uid)
-    isUp.value = cmjs.biz.isMe(props.vAuthorUid)
-    init()
+    isMe.value = cmjs.biz.verifyLoginUid(props.data.uid)
+    isUp.value = cmjs.biz.verifyLoginUid(props.authorUid)
   } else {
     isMe.value = false
     isUp.value = false
-    reset()
   }
 })
 
 const extraPop = ref()
-let commentEle: HTMLTextAreaElement
 
-let isMe = ref(cmjs.biz.isMe(props.data.uid))
-let isUp = ref(cmjs.biz.isMe(props.vAuthorUid))
+let isMe = ref(cmjs.biz.verifyLoginUid(props.data.uid))
+let isUp = ref(cmjs.biz.verifyLoginUid(props.authorUid))
 
 onMounted(() => {
-  commentEle = document.getElementById("comment-" + props.data.cid) as HTMLTextAreaElement
-  props.data.height = commentEle.scrollHeight.toString() + "px"
-  commentEle.style.height = props.data.height
-
-  if (props.scrollId > -2) {
-    if (props.scrollId === -1) {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-    } else {
-      let ele: HTMLDivElement = document.getElementById("container-" + props.scrollId) as HTMLDivElement
-      ele.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
-    }
-  }
-
-  //<!--解决在视频的父级评论区新发一条评论后，最后一个按钮没有被禁止的bug
-  let sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
-  let lastSendBtn = sendBtns[sendBtns.length - 1]
-  if (!lastSendBtn.disabled) {
-    cmjs.util.btnCD(lastSendBtn, 10)
-  }
-  //-->
+  const contentContainer = document.getElementById(`content-${props.data.cid}`) as HTMLTextAreaElement
+  contentContainer.style.height = contentContainer.scrollHeight + "px"
 })
 
-function init() {
-  //TODO request API
-}
-
-function reset() {
-  //TODO Re request API
-}
-
 function deleteChildComment(cid: number) {
-  let deleteIndex = -1
-  for (let i = 0; i < props.data.reply!.value.length; i++) {
-    if (deleteIndex == -1) {
-      if (props.data.reply?.value[i].cid === cid) {
-        deleteIndex = i
-      }
-    } else {
-      let ele: HTMLTextAreaElement = document.getElementById("comment-" + props.data.reply?.value[i - 1].cid) as HTMLTextAreaElement
-      ele.style.height = props.data.reply?.value[i].height as string
+  // TODO api
+  for (let i = 0; i < props.data.reply!.data.length; i++) {
+    if (props.data.reply!.data[i].cid === cid) {
+      props.data.reply!.data.splice(i, 1)
+      props.data.reply!.total--
+      // TODO api：若还有评论，则向后端再请求一条评论补充进来
+      return
     }
   }
-  props.data.reply?.value.splice(deleteIndex, 1)
 }
 
 function like() {
   if (!isLogin.value) {
-    openLoginWindow()
+    store.openLoginWindow()
     return
   }
+
   if (isMe.value) {
     cmjs.prompt.info("不能给自己的评论点赞")
     return
   }
+
+  // TODO api
   if (!props.data.isLike) {
     props.data.isLike = true
     props.data.likeNum++
@@ -203,21 +169,24 @@ function like() {
     props.data.isLike = false
     props.data.likeNum--
   }
+  props.data.isDislike = false
   if (isUp) {
     props.data.isUpLike = props.data.isLike
   }
-  props.data.isDislike = false
 }
 
 function dislike() {
   if (!isLogin.value) {
-    openLoginWindow()
+    store.openLoginWindow()
     return
   }
+
   if (isMe.value) {
     cmjs.prompt.info("不能给自己的评论点踩")
     return
   }
+
+  // TODO api
   if (props.data.isLike) {
     props.data.likeNum--
     props.data.isLike = false
@@ -227,27 +196,19 @@ function dislike() {
   props.data.isDislike = !props.data.isDislike
 }
 
-function openLoginWindow() {
-  ElMessage({
-    "message": "请登录后再操作",
-    "offset": 77,
-    "customClass": "zIndex999",
-  })
-  store.openLoginWindow()
-}
-
 function report() {
   extraPop.value.hide()
 
   if (!isLogin.value) {
-    openLoginWindow()
+    store.openLoginWindow()
     return
   }
 
-  store.openFSWindow('评论举报', '#', "请输入举报理由", "理由不能为空", "举报成功")
+  store.openFSWindow('评论举报', '#', {cid: props.data.cid}, "请输入举报理由", "理由不能为空", "举报成功")
 }
 
 function setTop() {
+  // TODO api
   extraPop.value.hide()
   props.data.isTop = !props.data.isTop
   cmjs.prompt.success(props.data.isTop ? '置顶成功' : '取消置顶成功')
@@ -256,175 +217,176 @@ function setTop() {
 
 <script lang="ts">
 export default {
-  name: "ChildComment" //由于Comment和type名重复，所以重定义组件名
+  name: "ChildComment" // 需要在组件内嵌套本身，但由于"Comment"和type名重复，所以就得重定义组件名
 }
 </script>
 
-<style scoped>
-.container {
+<style lang="less" scoped>
+.comment-container {
   display: flex;
   margin-top: 20px;
   width: 100%;
-}
 
-.container .right {
-  width: 100%;
-}
+  .right {
+    width: 100%;
 
-.container .user-info {
-  display: flex;
-  align-items: center;
-}
+    .main {
+      display: flex;
+      flex-direction: column;
 
-.container .user-info .nickname {
-  color: #606266;
-  font-size: 14px;
-}
+      .user-info {
+        display: flex;
+        align-items: center;
 
-.container .user-info .nickname:hover {
-  color: #409EFF;
-  cursor: pointer;
-}
+        .nickname {
+          color: #606266;
+          font-size: 14px;
+        }
 
-.container .user-info .nicknameVip {
-  color: #FF6699;
-}
+        .nickname:hover {
+          color: #409EFF;
+          cursor: pointer;
+        }
 
-.container .user-info .level {
-  font-size: 25px;
-  margin-left: 7.5px;
-}
+        .nicknameVip {
+          color: #FF6699;
+        }
 
-.container .to {
-  margin-bottom: 7.5px;
-  color: #b1b3b8;
-  font-size: 14px;
-}
+        .level {
+          font-size: 25px;
+          margin-left: 7.5px;
+        }
+      }
 
-.container .to .nickname {
-  color: #73767a;
-  cursor: pointer;
-}
+      .to {
+        margin-bottom: 4.5px;
+        color: #b1b3b8;
+        font-size: 14px;
 
-.container .to .nickname:hover {
-  color: #409EFF;
-}
+        .nickname {
+          color: #73767a;
+          cursor: pointer;
+        }
 
-.container .comment {
-  resize: none;
-  border: none;
-  padding: 0;
-  box-sizing: border-box;
-  width: 100%;
-  overflow: hidden;
-}
+        .nickname:hover {
+          color: #409EFF;
+        }
+      }
 
-.container .comment:focus {
-  outline: none;
-}
+      .comment {
+        resize: none;
+        border: none;
+        padding: 0;
+        box-sizing: border-box;
+        width: 100%;
+        overflow: hidden;
+      }
 
-.container .comment-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #909399;
-  margin-top: 3px;
-}
+      .comment:focus {
+        outline: none;
+      }
 
-.comment-info .date,
-.comment-info .ip-location,
-.comment-info .reply-btn {
-  font-size: 13px;
-  cursor: default;
-}
+      .comment-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #909399;
+        margin-top: 3px;
 
-.main:hover .extra {
-  display: inline;
-}
+        .date,
+        .ip-location,
+        .reply-btn {
+          font-size: 13px;
+          cursor: default;
+        }
 
-.comment-info .extra {
-  display: none;
-  font-size: 13px;
-}
+        .like-btn,
+        .dislike-btn {
+          font-size: 15px;
+        }
 
-.comment-info .extra:hover {
-  color: #409EFF;
-  cursor: pointer;
+        .reply-btn:hover,
+        .like-btn:hover,
+        .dislike-btn:hover {
+          color: #409EFF;
+          cursor: pointer;
+        }
+
+        .date,
+        .ip-location,
+        .dislike-btn {
+          margin-right: 15px;
+        }
+
+        .like-btn {
+          margin-right: 7.5px;
+        }
+
+        .extra {
+          display: none;
+          font-size: 13px;
+          cursor: pointer;
+        }
+
+        .extra:hover {
+          color: #409EFF;
+        }
+      }
+
+      .status {
+        font-size: 13px;
+        margin-top: 10.5px;
+
+        .top {
+          color: #F56C6C;
+          background-color: #fde2e2;
+          padding: 3px;
+          cursor: default;
+          margin-right: 10.5px;
+        }
+
+        .up-like {
+          color: #909399;
+          background-color: #e9e9eb;
+          padding: 3px;
+          cursor: default;
+        }
+      }
+    }
+
+    .main:hover .extra {
+      display: inline;
+    }
+  }
 }
 
 .extra-container {
   font-size: 14px;
   margin: -7.5px;
-}
 
-.extra-container .comment-top,
-.extra-container .comment-detele,
-.extra-container .comment-report {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  .item {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
 
-.extra-container .comment-top:hover,
-.extra-container .comment-detele:hover,
-.extra-container .comment-report:hover {
-  cursor: pointer;
-  color: #409EFF;
-  background-color: #f4f4f5;
-}
+  .item:hover {
+    color: #409EFF;
+    background-color: #f4f4f5;
+  }
 
-.extra-container .em-icon {
-  font-size: 20px;
-  margin-right: 5px;
-}
-
-.comment-info .date,
-.comment-info .ip-location,
-.comment-info .dislike-btn {
-  margin-right: 15px;
-}
-
-.comment-info .like-btn {
-  margin-right: 5px;
-}
-
-.comment-info .like-btn,
-.comment-info .dislike-btn {
-  font-size: 15px;
-}
-
-.comment-info .reply-btn:hover,
-.comment-info .like-btn:hover,
-.comment-info .dislike-btn:hover {
-  color: #409EFF;
-  cursor: pointer;
-}
-
-.container .status {
-  font-size: 13px;
-  margin-top: 12.5px;
-}
-
-.status .top {
-  color: #F56C6C;
-  background-color: #fde2e2;
-  padding: 3px;
-  margin-right: 10px;
-  cursor: default;
-}
-
-.status .up-like {
-  color: #909399;
-  background-color: #e9e9eb;
-  padding: 3px;
-  cursor: default;
+  .em-icon {
+    font-size: 20px;
+    margin-right: 5px;
+  }
 }
 </style>
 
 <style>
 .container .avatar {
-  margin-right: 10px;
+  margin-right: 7.5px;
 }
 </style>

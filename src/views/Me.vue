@@ -43,7 +43,7 @@ function setCurTitle(title: string) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .container {
   width: 1140px;
   margin-inline: auto;

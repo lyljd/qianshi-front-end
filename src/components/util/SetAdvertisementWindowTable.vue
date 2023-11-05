@@ -137,7 +137,7 @@ function getPageSize(): PageSize {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .table {
   max-height: 300px;
   overflow: auto;

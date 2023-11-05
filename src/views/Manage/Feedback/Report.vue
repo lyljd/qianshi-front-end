@@ -28,7 +28,7 @@ function tabChange(tbn: string) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .tabs-container {
   position: fixed;
   width: calc(100% - 170px);

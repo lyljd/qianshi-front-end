@@ -96,7 +96,7 @@ watch(viewItem, newVal => {
 })
 
 function setData() {
-  //TODO api请求
+  //TODO api
   data = reactive([...Data])
   dataCopy = reactive([...Data])
 }
@@ -154,7 +154,7 @@ function save() {
     }
   }
 
-  //api请求
+  // TODO api
   console.log(data)
 
   store.switchAsk = false
@@ -203,7 +203,7 @@ function moveDown() {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .scw .body {
   display: flex;
   gap: 20px;

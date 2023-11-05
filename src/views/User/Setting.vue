@@ -1,6 +1,5 @@
 <template>
-  <el-card v-if="isMe"
-    header="隐私设置">
+  <el-card v-if="isMe" header="隐私设置">
     <div class="column">
       <div class="option">
         <span>公开我投币的视频</span>
@@ -27,6 +26,7 @@
 import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
 import mockUserSetting from "@/mock/user/setting.json"
+import { useStore } from '@/store'
 
 type UserSetting = {
   openStar: boolean,
@@ -35,22 +35,30 @@ type UserSetting = {
   openFan: boolean,
 }
 
-let userSetting: UserSetting = reactive(getUserSetting())
-
-let route: any
-let isMe = ref(false)
-
-onMounted(()=>{
-  route = useRoute();
-  isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
+const route = useRoute()
+const store = useStore()
+store.$subscribe((_, state) => {
+  if (state.isLogin) {
+    isMe.value = cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string))
+  } else {
+    isMe.value = false
+  }
+  userSetting = reactive(getUserSetting())
 })
 
-function getUserSetting() {
-  return mockUserSetting //TODO
+let userSetting: UserSetting = reactive(getUserSetting())
+let isMe = ref(cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string)))
+
+function getUserSetting(): UserSetting {
+  if (store.isLogin) {
+    //TODO api
+    return mockUserSetting
+  }
+  return { openStar: false, openCoin: false, openLike: false, openFan: false }
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .column {
   width: 176px;
 }

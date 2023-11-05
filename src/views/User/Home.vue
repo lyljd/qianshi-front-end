@@ -4,27 +4,29 @@
       <el-card>
         <template #header>
           <div class="header">
-            <span>投币的视频 {{ coinVideoTotalNum }}</span>
-            <el-button v-blur v-if="coinVideoTotalNum > 6">更多</el-button>
+            <span class="title">投币的视频<span class="num" v-if="userHome.openCoin">{{ userHome.totalCoin }}</span></span>
+            <el-button v-blur @click="cmjs.jump.coinVideos(uid)"
+              v-if="userHome.coinVideos.length < userHome.totalCoin">更多</el-button>
           </div>
         </template>
-        <div v-if="coinVideoNum > 0" class="video-card-container">
-          <VideoCard v-for=" in coinVideoNum" :data="mockVideo" type="small" class="video-card"></VideoCard>
+        <div v-if="userHome.coinVideos.length > 0" class="video-card-container">
+          <VideoCard v-for="v in userHome.coinVideos" :data="v" type="small" class="video-card"></VideoCard>
         </div>
-        <el-empty v-else description="暂无视频" />
+        <el-empty v-else :description="userHome.openCoin || isMe ? '暂无视频' : '用户未公开'" :image-size="100" />
       </el-card>
 
       <el-card>
         <template #header>
           <div class="header">
-            <span>点赞的视频 {{ likeVideoTotalNum }}</span>
-            <el-button v-blur v-if="likeVideoTotalNum > 6">更多</el-button>
+            <span class="title">点赞的视频<span class="num" v-if="userHome.openLike">{{ userHome.totalLike }}</span></span>
+            <el-button v-blur @click="cmjs.jump.likeVideos(uid)"
+              v-if="userHome.likeVideos.length < userHome.totalLike">更多</el-button>
           </div>
         </template>
-        <div v-if="likeVideoNum > 0" class="video-card-container">
-          <VideoCard v-for=" in likeVideoNum" :data="mockVideo" type="small" class="video-card"></VideoCard>
+        <div v-if="userHome.likeVideos.length > 0" class="video-card-container">
+          <VideoCard v-for="v in userHome.likeVideos" :data="v" type="small" class="video-card"></VideoCard>
         </div>
-        <el-empty v-else description="暂无视频" />
+        <el-empty v-else :description="userHome.openLike || isMe ? '暂无视频' : '用户未公开'" :image-size="100" />
       </el-card>
     </div>
 
@@ -38,8 +40,7 @@
               }}</el-button>
               <div v-else>
                 <el-tooltip :content="userHome.applyTitle" placement="top">
-                  <span class="iconfont el-icon-info"
-                    style="font-size: 14px; margin-right: 10px; cursor: default;">申请中</span>
+                  <span class="iconfont el-icon-info applyIngTip">申请中</span>
                 </el-tooltip>
                 <el-button v-blur @click="cancelApply">取消申请</el-button>
               </div>
@@ -47,12 +48,12 @@
           </div>
         </template>
         <span v-if="userHome.title !== ''" class="iconfont el-icon-renzheng title">{{ userHome.title }}</span>
-        <el-empty v-else style="padding: 0;" description="暂无称号" :image-size="100" />
+        <el-empty v-else description="暂无认证" :image-size="75" />
       </el-card>
 
       <el-card v-if="userHome.notice != '' || isMe" header="公告">
-        <div :class="{ 'space-notice-gap': isMe }">
-          <textarea :class="{ 'space-notice-me': isMe, 'space-notice': !isMe }" v-model="userHome.notice"
+        <div>
+          <textarea :class="isMe ? 'space-notice-me' : 'space-notice'" v-model="spaceNotice"
             :readonly="isMe ? false : true" ref="noticeTextarea" @blur="saveSpaceNotice"
             placeholder="编辑我的空间公告"></textarea>
         </div>
@@ -62,7 +63,7 @@
         <template #header>
           <div class="header">
             <span>个人资料</span>
-            <el-button v-blur @click="toMeSetting" v-if="isMe">修改资料</el-button>
+            <el-button v-blur @click="cmjs.jump.new('/me/setting')" v-if="isMe">修改资料</el-button>
           </div>
         </template>
         <div class="info-row">
@@ -94,6 +95,12 @@ import { useStore } from "@/store"
 import mockUserHome from "@/mock/user/home.json"
 
 type UserHome = {
+  openCoin: boolean,
+  totalCoin: number,
+  coinVideos: Video[],
+  openLike: boolean,
+  totalLike: number,
+  likeVideos: Video[],
   title: string
   applyTitle: string
   notice: string
@@ -102,56 +109,40 @@ type UserHome = {
   tag: string[]
 }
 
-let userHome: UserHome = reactive(getUserHome())
-
-const mockVideo = {
-  "vid": 1,
-  "videoUrl": "",
-  "coverUrl": "",
-  "playNum": 0,
-  "danmuNum": 0,
-  "duration": 0,
-  "title": "标题",
-  "uid": 1,
-  "nickname": "Bonnenult",
-  "date": 1685599556000
+type Video = {
+  vid: number
+  videoUrl: string
+  coverUrl: string
+  playNum: number
+  danmuNum: number
+  duration: number
+  title: string
+  uid: number
+  nickname: string
+  date: number
 }
-const coinVideoNum = 2
-const coinVideoTotalNum = 2
-const likeVideoNum = 6
-const likeVideoTotalNum = 13
 
 const store = useStore()
 store.$subscribe((_, state) => {
   if (state.isLogin) {
-    isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
+    isMe.value = cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
   }
+  userHome.value = getUserHome()
 })
 
 const noticeTextarea = ref<HTMLTextAreaElement>()
 
-let route: any
-let isMe = ref(false)
-let newTitle = ref("")
+const route = useRoute()
+const uid = parseInt(route.params.uid as string)
+let userHome = ref<UserHome>(getUserHome())
+let isMe = ref(cmjs.biz.verifyLoginUid(uid))
+let newTitle = ref(userHome.value.applyTitle)
+let spaceNotice = ref(userHome.value.notice)
 
-onMounted(() => {
-  route = useRoute()
-  isMe.value = cmjs.biz.isMe(parseInt(route.params.uid as string))
-})
-
-function getUserHome() {
+function getUserHome(): UserHome {
   return mockUserHome //TODO
-}
-
-function saveSpaceNotice() {
-  userHome.notice = userHome.notice.trim()
-  if (userHome.notice.length > 150) {
-    cmjs.prompt.info("公告的字数最多为150，超出部分已自动选中")
-    noticeTextarea.value!.focus()
-    noticeTextarea.value!.setSelectionRange(150, userHome.notice.length)
-  }
 }
 
 function apply() {
@@ -179,10 +170,10 @@ function apply() {
 
 function onNewTitleChange() {
   newTitle.value = (document.getElementById("new-title") as HTMLInputElement).value;
-  checkInput()
+  checkNewTitleInput()
 }
 
-function checkInput() {
+function checkNewTitleInput() {
   if (newTitle.value.length >= 1 && newTitle.value.length <= 50) {
     (document.getElementById("notice") as HTMLSpanElement).style.display = "none"
     return true
@@ -194,27 +185,38 @@ function checkInput() {
 function beforeNewTitleWindowClose(action: string, _: any, done: Function) {
   if (action === "confirm") {
     newTitle.value = newTitle.value.trim();
-    if (!checkInput()) {
+    if (!checkNewTitleInput()) {
       return
     }
+    // TODO api
     cmjs.prompt.success("已提交申请")
-    userHome.applyTitle = newTitle.value
+    userHome.value.applyTitle = newTitle.value
   }
   newTitle.value = ""
   done()
 }
 
 function cancelApply() {
+  // TODO api
   cmjs.prompt.success("已取消申请")
-  userHome.applyTitle = ""
+  userHome.value.applyTitle = ""
 }
 
-function toMeSetting() {
-  window.open("/me/setting", "_blank")
+function saveSpaceNotice() {
+  spaceNotice.value = spaceNotice.value.trim()
+  if (spaceNotice.value.length > 150) {
+    cmjs.prompt.info("公告的字数最多为150，超出部分已自动选中")
+    noticeTextarea.value!.focus()
+    noticeTextarea.value!.setSelectionRange(150, spaceNotice.value.length)
+  } else if (spaceNotice.value !== userHome.value.notice) {
+    // TODO api
+    userHome.value.notice = spaceNotice.value
+    cmjs.prompt.success('保存成功')
+  }
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .home-container {
   display: flex;
 }
@@ -259,6 +261,21 @@ function toMeSetting() {
   outline: none;
 }
 
+.home-container .right .space-notice::-webkit-scrollbar,
+.home-container .right .space-notice-me::-webkit-scrollbar {
+  width: 5px;
+}
+
+.home-container .right .space-notice::-webkit-scrollbar-thumb,
+.home-container .right .space-notice-me::-webkit-scrollbar-thumb {
+  background-color: #666;
+}
+
+.home-container .right .space-notice::-webkit-scrollbar-track,
+.home-container .right .space-notice-me::-webkit-scrollbar-track {
+  background-color: #ccc;
+}
+
 .home-container .right .space-notice-me:hover {
   border: 1px solid #dedfe0;
   padding: 5px;
@@ -281,18 +298,29 @@ function toMeSetting() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    .num {
+      font-size: 14px;
+      color: #909399;
+    }
+  }
+
+  .applyIngTip {
+    font-size: 14px;
+    margin-right: 10px;
+    cursor: default;
+  }
 }
 
 .home-container .video-card-container {
   display: flex;
   flex-wrap: wrap;
-  margin-right: -15px;
-  margin-bottom: -15px;
-}
-
-.video-card-container .video-card {
-  margin-right: 15px;
-  margin-bottom: 15px;
+  gap: 15px;
 }
 
 .home-container .right .info-row {
@@ -325,6 +353,10 @@ function toMeSetting() {
   font-size: 14px;
   line-height: 14px;
   color: #73767a;
+}
+
+.el-empty {
+  padding: 0;
 }
 </style>
 

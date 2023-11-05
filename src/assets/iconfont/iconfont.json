@@ -6,6 +6,76 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "31314866",
+      "name": "上一集",
+      "font_class": "shangyiji",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "31314867",
+      "name": "下一集",
+      "font_class": "xiayiji",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "12097377",
+      "name": "撤回",
+      "font_class": "recall",
+      "unicode": "e643",
+      "unicode_decimal": 58947
+    },
+    {
+      "icon_id": "34452999",
+      "name": "good-fill",
+      "font_class": "good-fill",
+      "unicode": "e83b",
+      "unicode_decimal": 59451
+    },
+    {
+      "icon_id": "15838551",
+      "name": "warning",
+      "font_class": "report",
+      "unicode": "e682",
+      "unicode_decimal": 59010
+    },
+    {
+      "icon_id": "5993150",
+      "name": "复制",
+      "font_class": "copy",
+      "unicode": "ec7a",
+      "unicode_decimal": 60538
+    },
+    {
+      "icon_id": "4248410",
+      "name": "字体样式",
+      "font_class": "font-set",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    },
+    {
+      "icon_id": "31314861",
+      "name": "弹幕设置",
+      "font_class": "dm-set",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "31314863",
+      "name": "关闭弹幕",
+      "font_class": "dm-close",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "31314869",
+      "name": "弹幕",
+      "font_class": "dm-open",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    },
+    {
       "icon_id": "26968451",
       "name": "schedule",
       "font_class": "watch-later",
@@ -410,20 +480,6 @@
       "font_class": "Bbi",
       "unicode": "e668",
       "unicode_decimal": 58984
-    },
-    {
-      "icon_id": "2154820",
-      "name": "播放器-弹幕（关）_44",
-      "font_class": "bofangqi-danmuguan",
-      "unicode": "e696",
-      "unicode_decimal": 59030
-    },
-    {
-      "icon_id": "2154821",
-      "name": "播放器-弹幕（开）_44",
-      "font_class": "bofangqi-danmukai",
-      "unicode": "e697",
-      "unicode_decimal": 59031
     },
     {
       "icon_id": "2377004",

@@ -1,9 +1,10 @@
 <template>
-  <div v-if="rs.length > 0" class="rv-container">
-    <el-card v-for="(r, idx) in rs">
+  <div v-if="data.records.length > 0" class="rv-container">
+    <el-card v-for="(r, idx) in data.records">
       <template #header>
         <div class="header">
-          <span class="flex-center">作者：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname }}</span></span>
+          <span class="flex-center">作者：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
+          }}</span></span>
           <span>申请时间：{{ cmjs.fmt.tsStandard(r.applyTime) }}</span>
           <div class="flex-center">
             <span>操作：{{ r.vid ? "修改" : "新发布" }}</span>
@@ -17,27 +18,27 @@
       </template>
 
       <div class="body">
-        <VideoDescriptions class="vd" v-if="r.infoOld" title="原信息" :data="(r.infoOld as video)"></VideoDescriptions>
+        <VideoDescriptions class="vd" v-if="r.infoOld" title="原信息" :data="r.infoOld"></VideoDescriptions>
 
-        <VideoDescriptions :class="{ vd: r.infoOld, vdFull: !r.infoOld }" :title="r.infoOld ? '新信息' : ''"
-          :data="(r.info)"></VideoDescriptions>
+        <VideoDescriptions :class="r.infoOld ? 'vd' : 'vdFull'" :title="r.infoOld ? '新信息' : ''" :data="r.info">
+        </VideoDescriptions>
       </div>
     </el-card>
 
-    <el-pagination :total="totalPageNum" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
+    <el-pagination :total="data.total" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
       hide-on-single-page background layout="prev, pager, next" />
   </div>
   <el-empty v-else description="暂无待处理的视频"></el-empty>
 </template>
 
 <script setup lang="ts">
-import Records from "@/mock/manage/review/video.json"
+import Data from "@/mock/manage/review/video.json"
 import cmjs from '@/cmjs'
 import VideoDescriptions from "@/components/util/VideoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
 import { useStore } from "@/store"
 
-type video = {
+type Video = {
   videoUrl: string,
   coverUrl: string,
   title: string,
@@ -47,46 +48,43 @@ type video = {
   empower: boolean
 }
 
-type record = {
+type Record = {
   id: number,
   vid?: number,
   uid: number,
   nickname: string,
   applyTime: number,
-  infoOld?: video,
-  info: video
+  infoOld?: Video,
+  info: Video
 }
 
-const timestamp = Date.now()
-console.log(`review/video timestamp: ${timestamp}`)
+type Data = {
+  total: number,
+  records: Record[]
+}
 
 const store = useStore()
 store.setManegeItemIndex(1, location.pathname)
 
-let rs: record[] = reactive(getRecords())
-
-let totalPageNum = ref(getTotalPageNum())
 let curPage = ref(1)
+let data = ref<Data>(getData())
 
 watch(curPage, newVal => {
-  //TODO
-  console.log(`curPage: ${newVal}`)
+  data.value = getData()
 })
 
-function getTotalPageNum(): number {
-  //TODO
-  return 2
-}
+function getData(): Data {
+  // TODO api
+  console.log("获取第" + curPage.value + "页的数据")
 
-function getRecords(): record[] {
-  return Records
+  return Data
 }
 
 function pass(formIdx: number) {
-  //TODO 需请求后端
-  console.log(rs[formIdx].id)
+  //TODO api
+  console.log(data.value.records[formIdx].id)
 
-  rs.splice(formIdx, 1)
+  data.value.records.splice(formIdx, 1)
   cmjs.prompt.success("已通过")
 }
 
@@ -99,18 +97,18 @@ function deny(formIdx: number) {
     showClose: false,
   })
     .then(({ value }) => {
-      //TODO 需请求后端
-      console.log(rs[formIdx].id)
+      //TODO api
+      console.log(data.value.records[formIdx].id)
       console.log("理由：" + value)
 
-      rs.splice(formIdx, 1)
+      data.value.records.splice(formIdx, 1)
       cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .rv-container {
   cursor: default;
 }

@@ -1,22 +1,22 @@
 {
-  "num": 2,
+  "total": 2,
   "list": [
     {
       "id": 1,
       "title": "Closer",
       "coverUrl": "/resource/cover/7.jpeg",
-      "applyTime": 1685836580156,
-      "processTime": 1685838580156,
+      "applyTime": 1698076860000,
+      "processTime": 1698109200000,
       "reason": "修改内容与视频不符",
       "appealStatus": false,
-      "vid": 8
+      "vid": 7
     },
     {
       "id": 2,
       "title": "戒烟-李荣浩",
       "coverUrl": "/resource/cover/6.jpeg",
-      "applyTime": 1686846580156,
-      "processTime": 1686848580156,
+      "applyTime": 1698076920000,
+      "processTime": 1698109230000,
       "reason": "站内存在相同视频",
       "appealStatus": true
     }

@@ -1,22 +1,21 @@
 import { defineStore } from 'pinia'
-import cmjs from '@/cmjs'
 
 export const useStore = defineStore("qianshi", {
   state: () => ({
-    isLogin: cmjs.biz.isLogin(),
+    isLogin: localStorage.getItem("token") !== null && localStorage.getItem("token") !== "",
     switchAsk: false,
     topPath: '',
-    mui: {
-      id: -1,
-      nickname: '',
-      coverUrl: '',
-      power: -1,
-    }, //manage user info
+    power: -1,
+  }),
 
-    openLoginWindow: () => { },
-    openFSWindow: (title: string, bzUrl: string, placeholder?: string, failMsg?: string, succMsg?: string, afterSuccDo?: Function) => { },
+  actions: {
+    openLoginWindow: (tip?: string) => { },
+    setTopMenuBarAvatar: (avatar: string) => { },
+    openCaptchaWindow: (afterSuccDo: Function) => { },
+    openEVWindow: (email: string, afterSuccDo: Function) => { },
+    openFSWindow: (title: string, bzUrl: string, dataP: object, placeholder?: string, failMsg?: string, succMsg?: string, afterSuccDo?: Function, afterDo?: Function) => { },
     openPVWindow: (videoUrl: string) => { },
-    openSMSWindow: (openParameter?: { afterSuccDo?: Function, to?: string[] }) => { },
+    openSMSWindow: (openParameter?: { afterSuccDo?: Function, to?: Receiver[] }) => { },
     setPlatformCurTitle: (title: string) => { },
     setMeCurTitle: (title: string) => { },
     setUploadItem: (item: string) => { },
@@ -24,7 +23,13 @@ export const useStore = defineStore("qianshi", {
     setManegeItemIndex: (idx: number, index: string) => { },
     setManegeFeedbackItemIndex: (idx: number, index: string) => { },
     setPlatformItemIndex: (idx: number, index: string) => { },
-    addUserMenuCollectionNum: (incr: number) => { },
-    addUserMenuFavlistNum: (incr: number) => { },
-  }),
+    setUserMenuPostNum: (newNum: number) => { },
+    setUserMenuCollectionNum: (newNum: number) => { },
+    setUserMenuFavlistNum: (newNum: number) => { },
+  }
 })
+
+type Receiver = {
+  uid: number
+  nickname: string
+}

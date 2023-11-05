@@ -14,4 +14,4 @@ let item = reactive([
 ])
 </script>
 
-<style scoped></style>
+<style lang="less" scoped></style>

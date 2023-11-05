@@ -22,7 +22,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .smc-header {
   display: flex;
   justify-content: space-between;

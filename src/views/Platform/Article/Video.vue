@@ -33,8 +33,8 @@
         </el-table>
 
         <div v-if="listNum.pubedNum > 10" class="page-container">
-          <el-pagination :total="listNum.pubedNum" v-model:current-page="pubedCurPage" hide-on-single-page background
-            layout="prev, pager, next" />
+          <el-pagination :total="listNum.pubedNum" v-model:current-page="pubedCurPage" :page-size="10" hide-on-single-page
+            background layout="prev, pager, next" />
         </div>
       </el-tab-pane>
 
@@ -44,7 +44,7 @@
           border :data="isPubing.list">
           <el-table-column label="修改后信息" :width="100" type="expand">
             <template #default="props"> <!--数据默认懒加载-->
-              <VideoDescriptions :data="(props.row.modifyInfo)"></VideoDescriptions>
+              <VideoDescriptions :data="(props.row.modifyInfo)" title=""></VideoDescriptions>
             </template>
           </el-table-column>
 
@@ -79,8 +79,8 @@
         </el-table>
 
         <div v-if="listNum.isPubingNum > 10" class="page-container">
-          <el-pagination :total="listNum.isPubingNum" v-model:current-page="isPubingCurPage" hide-on-single-page
-            background layout="prev, pager, next" />
+          <el-pagination :total="listNum.isPubingNum" v-model:current-page="isPubingCurPage" :page-size="10"
+            hide-on-single-page background layout="prev, pager, next" />
         </div>
       </el-tab-pane>
 
@@ -132,8 +132,8 @@
         </el-table>
 
         <div v-if="listNum.notPubedNum > 10" class="page-container">
-          <el-pagination :total="listNum.notPubedNum" v-model:current-page="notPubedCurPage" hide-on-single-page
-            background layout="prev, pager, next" />
+          <el-pagination :total="listNum.notPubedNum" v-model:current-page="notPubedCurPage" :page-size="10"
+            hide-on-single-page background layout="prev, pager, next" />
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -217,7 +217,7 @@
 </template>
 
 <script setup lang="ts">
-import mockListNum from "@/mock/platform/article/video.json"
+import mockNum from "@/mock/platform/article/num.json"
 import mockPubed from "@/mock/platform/article/video/pubed.json"
 import mockIsPubing from "@/mock/platform/article/video/is_pubing.json"
 import mockNotPubed from "@/mock/platform/article/video/not_pubed.json"
@@ -229,14 +229,14 @@ import VideoDescriptions from "@/components/util/VideoDescriptions.vue"
 import ImageUpload from "@/components/common/ImageUpload.vue"
 import Agreement from '@/components/common/Agreement.vue'
 
-type ListNum = {
+type Num = {
   pubedNum: number,
   isPubingNum: number,
   notPubedNum: number
 }
 
 type Pubed = {
-  num: number,
+  total: number,
   list: {
     id: number,
     coverUrl: string,
@@ -246,7 +246,7 @@ type Pubed = {
 }
 
 type IsPubing = {
-  num: number,
+  total: number,
   list: {
     id: number,
     coverUrl: string,
@@ -266,7 +266,7 @@ type IsPubing = {
 }
 
 type NotPubed = {
-  num: number,
+  total: number,
   list: {
     id: number,
     coverUrl: string,
@@ -296,14 +296,18 @@ const videoUpload = ref<UploadInstance>()
 const newTagInput = ref<HTMLInputElement>()
 const titleInput = ref<InstanceType<typeof ElInput>>()
 
-let listNum: ListNum = reactive(getListNum())
+let pubedCurPage = ref(1)
+let isPubingCurPage = ref(1)
+let notPubedCurPage = ref(1)
+
+let listNum: Num = reactive(getNum())
 let pubed: Pubed = reactive(getPubed())
 let isPubing: IsPubing = reactive({
-  num: 0,
+  total: 0,
   list: []
 })
 let notPubed: NotPubed = reactive({
-  num: 0,
+  total: 0,
   list: []
 })
 let viewItem = ref("pubed")
@@ -337,9 +341,6 @@ let newTagInputVisible = ref(false)
 let editWindowVisible = ref(false)
 let editEmpowerDisabled = ref(false)
 let hasEdit = ref(false)
-let pubedCurPage = ref(1)
-let isPubingCurPage = ref(1)
-let notPubedCurPage = ref(1)
 
 watch(video, (newV) => {
   if (newV.videoUrl !== videoCopy.videoUrl || newV.coverUrl !== videoCopy.coverUrl || newV.title !== videoCopy.title || newV.region !== videoCopy.region || JSON.stringify(newV.tags) !== JSON.stringify(videoCopy.tags) || newV.intro !== videoCopy.intro || newV.empower !== videoCopy.empower) {
@@ -351,57 +352,76 @@ watch(video, (newV) => {
   }
 })
 watch(pubedCurPage, (newV) => {
-  console.log(`现在访问的是【已通过】的第${newV}页`)
+  pubed = reactive(getPubed())
 })
 watch(isPubingCurPage, (newV) => {
-  console.log(`现在访问的是【进行中】的第${newV}页`)
+  isPubing = reactive(getIsPubing())
 })
 watch(notPubedCurPage, (newV) => {
-  console.log(`现在访问的是【未通过】的第${newV}页`)
+  notPubed = reactive(getNotPubed())
 })
 
 function tabChange() {
   switch (viewItem.value) {
     case "pubed": {
-      pubed = reactive(getPubed())
-      listNum.pubedNum = pubed.num
+      if (pubedCurPage.value === 1) {
+        pubed = reactive(getPubed())
+      } else {
+        pubedCurPage.value = 1
+      }
       break
     }
     case "isPubing": {
-      isPubing = reactive(getIsPubing())
-      listNum.isPubingNum = isPubing.num
+      if (isPubingCurPage.value === 1) {
+        isPubing = reactive(getIsPubing())
+      } else {
+        isPubingCurPage.value = 1
+      }
       break
     }
     case "notPubed": {
-      notPubed = reactive(getNotPubed())
-      listNum.notPubedNum = notPubed.num
+      if (notPubedCurPage.value === 1) {
+        notPubed = reactive(getNotPubed())
+      } else {
+        notPubedCurPage.value = 1
+      }
       break
     }
   }
 }
 
-function getListNum(): ListNum {
-  return mockListNum
+function getNum(): Num {
+  // TODO api
+  return mockNum
 }
 
 function getPubed(): Pubed {
+  // TODO api
+  // listNum.pubedNum = pubed.total
+  listNum.pubedNum = mockPubed.total
+  console.log(`获取【视频-已通过】第${pubedCurPage.value}页数据`)
   return mockPubed
 }
 
 function getIsPubing(): IsPubing {
+  // TODO api
+  // listNum.isPubingNum = isPubing.total
+  listNum.isPubingNum = mockIsPubing.total
+  console.log(`获取【视频-进行中】第${isPubingCurPage.value}页数据`)
   return mockIsPubing
 }
 
 function getNotPubed(): NotPubed {
+  // TODO api
+  // listNum.notPubedNum = notPubed.total
+  listNum.notPubedNum = mockNotPubed.total
+  console.log(`获取【视频-未发布】第${notPubedCurPage.value}页数据`)
   return mockNotPubed
 }
 
-function tableTimeFormatter(_: any, __: any, time: number) {
-  return cmjs.fmt.tsStandard(time)
-}
-
 function search() {
-  alert(`type: ${viewItem.value}\nsearchKey: ${searchKey.value}`)
+  // TODO api
+  cmjs.prompt.info(`type: ${viewItem.value}; searchKey: ${searchKey.value}`)
 }
 
 function deleteItem(idx: number) {
@@ -415,22 +435,22 @@ function deleteItem(idx: number) {
     autofocus: false,
   })
     .then(() => {
-      //TODO api request
+      //TODO api
       switch (viewItem.value) {
         case "pubed": {
           pubed.list.splice(idx, 1)
-          pubed.num--
+          pubed.total--
           listNum.pubedNum--
           break
         }
         case "isPubing": {
           isPubing.list.splice(idx, 1)
-          isPubing.num--
+          isPubing.total--
           listNum.isPubingNum--
           break
         }
         case "notPubed": {
-          notPubed.num--
+          notPubed.total--
           notPubed.list.splice(idx, 1)
           listNum.notPubedNum--
           break
@@ -440,116 +460,17 @@ function deleteItem(idx: number) {
     })
 }
 
-function cancelModify(idx: number) {
-  ElMessageBox.confirm('你确认要取消修改该视频吗？', '确认提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    showClose: false,
-    type: 'warning',
-    autofocus: false,
-  })
-    .then(() => {
-      //TODO api request
-      if (viewItem.value === "isPubing") {
-        pubed.list.push({
-          id: isPubing.list[idx].id,
-          coverUrl: isPubing.list[idx].coverUrl,
-          title: isPubing.list[idx].title,
-          vid: isPubing.list[idx].vid as number
-        })
-        isPubing.list.splice(idx, 1)
-        isPubing.num--
-        listNum.isPubingNum--
-      } else if (viewItem.value === "notPubed") {
-        pubed.list.push({
-          id: notPubed.list[idx].id,
-          coverUrl: notPubed.list[idx].coverUrl,
-          title: notPubed.list[idx].title,
-          vid: notPubed.list[idx].vid as number
-        })
-        notPubed.list.splice(idx, 1)
-        notPubed.num--
-        listNum.notPubedNum--
-      }
-
-      cmjs.util.scrollToTopSmoothly()
-      pubed = reactive(getPubed())
-      pubed.num = pubed.list.length
-      listNum.pubedNum = pubed.list.length
-      //<!--mock
-      pubed.num++
-      listNum.pubedNum++
-      //-->
-      viewItem.value = "pubed"
-      cmjs.prompt.success('取消修改成功')
-    })
-}
-
 function appeal() {
   if (notPubed.list[appealIdx.value].appealStatus) {
     cmjs.prompt.info("你已申诉，请耐心等待！管理员会尽快处理的，请留意系统消息")
     return
   }
 
-  store.openFSWindow('申诉', '#', '请输入申诉理由', '理由不能为空', "提交成功！管理员会尽快处理的，请留意系统消息", () => { notPubed.list[appealIdx.value].appealStatus = true })
-}
-
-function pubedCellClick(row: any, column: any) {
-  if (column.label === "封面" || column.label === "标题") {
-    cmjs.jump.video(row.vid)
-  }
-}
-
-function pubedCellStyle(cell: any) {
-  if (cell.columnIndex === 0 || cell.columnIndex === 1) {
-    return { cursor: "pointer" }
-  }
-  return {}
-}
-
-function isPubingCellClick(row: any, column: any) {
-  if (row.vid !== undefined && (column.label === "封面" || column.label === "标题")) {
-    cmjs.jump.video(row.vid)
-  }
-
-}
-
-function isPubingCellStyle(cell: any) {
-  if (isPubing.list[cell.rowIndex].vid !== undefined) {
-    if (cell.columnIndex === 1 || cell.columnIndex === 2) {
-      return { cursor: "pointer" }
-    }
-  } else if (cell.columnIndex === 0) {
-    return { cursor: "not-allowed" }
-  }
-  return {}
-}
-
-function isPubingCellClassName(cell: any) {
-  if (isPubing.list[cell.rowIndex].vid === undefined && cell.columnIndex === 0) {
-    return "no-vid"
-  }
-  return ""
-}
-
-function notPubedCellClick(row: any, column: any) {
-  if (row.vid !== undefined && (column.label === "封面" || column.label === "标题")) {
-    cmjs.jump.video(row.vid)
-  }
-
-}
-
-function notPubedCellStyle(cell: any) {
-  if (notPubed.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
-    return { cursor: "pointer" }
-  }
-  return {}
+  store.openFSWindow('申诉', '#', { id: notPubed.list[appealIdx.value].id }, '请输入申诉理由', '理由不能为空', "提交成功！管理员会尽快处理的，请留意系统消息", () => { notPubed.list[appealIdx.value].appealStatus = true })
 }
 
 function getVideo(id: number): Video {
-  //TODO 通过id和viewItem去请求后端获取数据
+  //TODO api（通过id和viewItem去请求后端获取数据）
   console.log(id, viewItem.value)
 
   return {
@@ -630,6 +551,66 @@ function beforeEditWindowClose(done: Function) {
   }
 }
 
+function modifyVideo() {
+  video.title = video.title.trim()
+  video.intro = video.intro.trim()
+
+  if (video.title.length === 0) {
+    cmjs.prompt.error("请输入标题")
+    titleInput.value?.focus()
+    return
+  }
+
+  // TODO api
+  // TODO 若在pubed页则需删除该条数据并跳转到isPubing
+
+  editWindowVisible.value = false
+  store.switchAsk = false
+
+  cmjs.prompt.success("修改成功")
+}
+
+function cancelModify(idx: number) {
+  ElMessageBox.confirm('你确认要取消修改该视频吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+  })
+    .then(() => {
+      //TODO api
+      if (viewItem.value === "isPubing") {
+        pubed.list.push({
+          id: isPubing.list[idx].id,
+          coverUrl: isPubing.list[idx].coverUrl,
+          title: isPubing.list[idx].title,
+          vid: isPubing.list[idx].vid as number
+        })
+        isPubing.list.splice(idx, 1)
+        isPubing.total--
+        listNum.isPubingNum--
+      } else if (viewItem.value === "notPubed") {
+        pubed.list.push({
+          id: notPubed.list[idx].id,
+          coverUrl: notPubed.list[idx].coverUrl,
+          title: notPubed.list[idx].title,
+          vid: notPubed.list[idx].vid as number
+        })
+        notPubed.list.splice(idx, 1)
+        notPubed.total--
+        listNum.notPubedNum--
+      }
+
+      pubed.total++
+      listNum.pubedNum++
+      viewItem.value = "pubed"
+      cmjs.prompt.success('取消修改成功')
+    })
+}
+
 function recImgUploadPercent(imgUploadPercent: number) {
   coverUploadPercent.value = imgUploadPercent
 }
@@ -702,26 +683,64 @@ function newTag() {
   newTagInputValue.value = ""
 }
 
-function modifyVideo() {
-  video.title = video.title.trim()
-  video.intro = video.intro.trim()
+function tableTimeFormatter(_: any, __: any, time: number) {
+  return cmjs.fmt.tsStandard(time)
+}
 
-  if (video.title.length === 0) {
-    cmjs.prompt.error("请输入标题")
-    titleInput.value?.focus()
-    return
+function pubedCellClick(row: any, column: any) {
+  if (column.label === "封面" || column.label === "标题") {
+    cmjs.jump.video(row.vid)
+  }
+}
+
+function pubedCellStyle(cell: any) {
+  if (cell.columnIndex === 0 || cell.columnIndex === 1) {
+    return { cursor: "pointer" }
+  }
+  return {}
+}
+
+function isPubingCellClick(row: any, column: any) {
+  if (row.vid !== undefined && (column.label === "封面" || column.label === "标题")) {
+    cmjs.jump.video(row.vid)
   }
 
-  //TODO 根据当前viewItem做不同的事：pubed：将记录转移并跳转到isPubing；isPubing：修改modifyInfo
+}
 
-  editWindowVisible.value = false
-  store.switchAsk = false
+function isPubingCellStyle(cell: any) {
+  if (isPubing.list[cell.rowIndex].vid !== undefined) {
+    if (cell.columnIndex === 1 || cell.columnIndex === 2) {
+      return { cursor: "pointer" }
+    }
+  } else if (cell.columnIndex === 0) {
+    return { cursor: "not-allowed" }
+  }
+  return {}
+}
 
-  cmjs.prompt.success("修改成功")
+function isPubingCellClassName(cell: any) {
+  if (isPubing.list[cell.rowIndex].vid === undefined && cell.columnIndex === 0) {
+    return "no-vid"
+  }
+  return ""
+}
+
+function notPubedCellClick(row: any, column: any) {
+  if (row.vid !== undefined && (column.label === "封面" || column.label === "标题")) {
+    cmjs.jump.video(row.vid)
+  }
+
+}
+
+function notPubedCellStyle(cell: any) {
+  if (notPubed.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
+    return { cursor: "pointer" }
+  }
+  return {}
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .v-container .cover {
   width: 210px;
   height: 118.125px;

@@ -42,16 +42,19 @@ let placeholder = ref("")
 let failMsg = ref("内容不能为空")
 let succMsg = ref("提交成功")
 let afterSuccDo: Function = () => { }
+let afterDo: Function = () => { }
 
 let mainWindowVisible = ref(false)
 let previewWindowVisible = ref(false)
 let msg = ref("")
+let data = ref<object>({})
 let fileList = ref([])
 let previewImgUrl = ref("")
 
-function openMainWindow(titleP: string, bzUrlP: string, placeholderP?: string, failMsgP?: string, succMsgP?: string, afterSuccDoP?: Function) {
+function openMainWindow(titleP: string, bzUrlP: string, dataP: object, placeholderP?: string, failMsgP?: string, succMsgP?: string, afterSuccDoP?: Function, afterDoP?: Function) {
   title.value = titleP
   bzUrl.value = bzUrlP
+  data.value = dataP
 
   if (placeholderP) {
     placeholder.value = placeholderP
@@ -65,6 +68,9 @@ function openMainWindow(titleP: string, bzUrlP: string, placeholderP?: string, f
   if (afterSuccDoP) {
     afterSuccDo = afterSuccDoP
   }
+  if (afterDoP) {
+    afterDo = afterDoP
+  }
 
   mainWindowVisible.value = true
 }
@@ -73,6 +79,8 @@ function closeMainWindow() {
   mainWindowVisible.value = false
   msg.value = ""
   fileList.value = []
+
+  afterDo()
 }
 
 function openPreviewWindow(imgUrl: string) {
@@ -89,11 +97,17 @@ function submit() {
     return
   }
 
+  // TODO api
   // 1.向后端某一接口获取oss签名上传链接数组和文件名数组
   // 2.遍历该数组，每上传一张图片则修改一次upload的action（上传过程中禁止掉下方的按钮）
   // 3.向bzUrl(实际业务接口)发起post请求上传msg和文件名数组
 
-  console.log(msg.value)
+  const uploadPayload = {
+    msg: msg.value,
+    data: data.value
+  }
+  // uploadPayload还有上传成功后的文件名列表
+  console.log(uploadPayload)
 
   afterSuccDo()
   closeMainWindow()
@@ -112,8 +126,7 @@ function onChange(file: any) {
 }
 </script>
 
-<style scoped>
-</style>
+<style lang="less" scoped></style>
 
 <style>
 .main .el-dialog__header,

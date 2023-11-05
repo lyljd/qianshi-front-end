@@ -1,18 +1,38 @@
 {
   "video": {
-    "playNum": 268500000,
-    "commentNum": 1375002,
-    "danmuNum": 690671,
-    "likeNum": 46732,
-    "coinNum": 56890,
-    "starNum": 8978,
-    "shareNum": 3670
+    "total": {
+      "playNum": 31415926,
+      "commentNum": 300000,
+      "danmuNum": 114514,
+      "likeNum": 5201314,
+      "coinNum": 2345678,
+      "starNum": 1234567,
+      "shareNum": 888888
+    },
+    "yesterday": {
+      "playNum": 100000,
+      "commentNum": 1500,
+      "danmuNum": 750,
+      "likeNum": 10000,
+      "coinNum": 5000,
+      "starNum": 1000,
+      "shareNum": 500
+    }
   },
   "read": {
-    "readNum": 0,
-    "commentNum": 0,
-    "likeNum": 0,
-    "starNum": 0,
-    "shareNum": 0
+    "total": {
+      "readNum": 0,
+      "commentNum": 0,
+      "likeNum": 0,
+      "starNum": 0,
+      "shareNum": 0
+    },
+    "yesterday": {
+      "readNum": 0,
+      "commentNum": 0,
+      "likeNum": 0,
+      "starNum": 0,
+      "shareNum": 0
+    }
   }
 }

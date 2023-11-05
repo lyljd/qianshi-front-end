@@ -35,7 +35,7 @@ withDefaults(defineProps<{
 })
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .s-container {
   cursor: default;
 }

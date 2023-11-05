@@ -1,9 +1,12 @@
 <template>
   <div class="lw-container">
-    <el-dialog @close="clearInput" v-model="dialogVisible" :width="480" :close-on-press-escape=false
+    <el-dialog @close="beforeClose" v-model="dialogVisible" :width="480" :close-on-press-escape=false
       :close-on-click-modal=false :align-center=true>
       <el-tabs @tab-change="tabChange" v-model="option">
-        <el-tab-pane label="邮箱登录/注册" name="vcode">
+        <el-tab-pane name="vcode">
+          <template #label>
+            <span :style="{ cursor: option === 'vcode' ? 'not-allowed' : 'pointer' }">邮箱登录/注册</span>
+          </template>
           <div class="input-box">
             <div class="row">
               <span class="tag">邮箱</span>
@@ -18,7 +21,10 @@
           </div>
         </el-tab-pane>
 
-        <el-tab-pane label="密码登录" name="password">
+        <el-tab-pane name="password">
+          <template #label>
+            <span :style="{ cursor: option === 'password' ? 'not-allowed' : 'pointer' }">密码登录</span>
+          </template>
           <div class="input-box">
             <div class="row">
               <span class="tag">邮箱</span>
@@ -37,19 +43,15 @@
       </template>
     </el-dialog>
   </div>
-
-  <CaptchaWindow ref="captchaWindow"></CaptchaWindow>
 </template>
 
 <script setup lang="ts">
 import cmjs from '@/cmjs'
-import CaptchaWindow from "@/components/window/CaptchaWindow.vue"
 import { useStore } from "@/store"
 import { useRouter } from "vue-router"
 import { ElNotification } from 'element-plus'
 
 type LoginInfo = {
-  uid: number,
   nickname: string,
   avatarUrl: string,
   token: string,
@@ -63,20 +65,29 @@ defineExpose({
 const store = useStore()
 const router = useRouter()
 
-const captchaWindow = ref<InstanceType<typeof CaptchaWindow>>()
-
+// TODO 接入后端接口后清除预填充数据
 let dialogVisible = ref(false)
-let afterSuccDo: Function
-let option = ref("vcode")
+// let option = ref("vcode")
+let option = ref("password")
 let btnText = ref("登录/注册")
-let email = ref("")
+// let email = ref("")
+let email = ref("test@qianshi.fun")
 let vcode = ref("")
-let password = ref("")
+// let password = ref("")
+let password = ref("123456")
 let hasVerify = ref(false)
+let resetGetCaptchaBtn: Function
 
-function show(afterSuccDoP: Function) {
+function show(tip?: string) {
   dialogVisible.value = true
-  afterSuccDo = afterSuccDoP
+
+  if (tip === undefined) {
+    tip = "请登录后再操作"
+  }
+  tip = tip.trim()
+  if (tip.length > 0) {
+    cmjs.prompt.info(tip)
+  }
 }
 
 function tabChange(newTabName: string) {
@@ -93,17 +104,19 @@ function tabChange(newTabName: string) {
 }
 
 function openCaptchaWindow() {
-  captchaWindow.value?.show((cdTime: number) => {
-    let btn = document.getElementById("get-captcha-btn") as HTMLButtonElement
-    cmjs.util.btnCD(btn, cdTime)
+  const btn = document.getElementById("get-captcha-btn") as HTMLButtonElement
+  store.openCaptchaWindow(() => {
+    // TODO api：发送验证码（若发送失败时则检查响应值是否有ttl(表示欲发送邮箱目前还处于cd中，还有ttl秒才能发送)，若有则直接让按钮进入cd ttl秒）
+    resetGetCaptchaBtn = cmjs.util.btnCD(btn, 180, () => { hasVerify.value = false })
     hasVerify.value = true
     cmjs.prompt.success("验证码已发送")
   })
 }
 
-function clearInput() {
-  vcode.value = ""
-  password.value = ""
+function beforeClose() {
+  // TODO 接入后端接口后解除下方两行代码的注释
+  // vcode.value = ""
+  // password.value = ""
 }
 
 function checkEmailValid(): boolean {
@@ -139,22 +152,22 @@ function loginBtnCheck(): boolean {
 }
 
 function mockLogin(): LoginInfo {
+  // TODO api
   let li: LoginInfo = {
-    "uid": 1,
-    "nickname": "ljd",
+    "nickname": "Bonnenult",
     "avatarUrl": "/resource/avatar.jpeg",
-    "token": "payload.signature-token",
-    "refreshToken": "payload.signature-refreshToken",
+    "token": "1",
+    "refreshToken": "1",
   }
   return li
 }
 
 function saveLoginInfo(li: LoginInfo) {
-  localStorage.setItem("uid", li.uid.toString())
-  localStorage.setItem("nickname", li.nickname)
-  localStorage.setItem("avatarUrl", li.avatarUrl)
-  localStorage.setItem("token", li.token)
-  localStorage.setItem("refreshToken", li.refreshToken)
+  const avatar = li.avatarUrl
+  cmjs.cache.setCookie("avatar", avatar, 3600)
+  store.setTopMenuBarAvatar(avatar)
+  cmjs.cache.setLS("token", li.token)
+  cmjs.cache.setLS("refreshToken", li.refreshToken)
 }
 
 function login() {
@@ -163,10 +176,12 @@ function login() {
   }
 
   let li = mockLogin()
-  afterSuccDo(li.avatarUrl, li.nickname)
   saveLoginInfo(li)
 
   dialogVisible.value = false
+  if (resetGetCaptchaBtn) {
+    resetGetCaptchaBtn()
+  }
   store.isLogin = true
 
   let index = location.href.lastIndexOf("from=")
@@ -188,7 +203,7 @@ function showLoginSuccess(nickname: string) {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .lw-container .input-box {
   border: 1px solid #c8c9cc;
   border-radius: 5px;
