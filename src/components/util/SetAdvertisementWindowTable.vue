@@ -171,4 +171,8 @@ function getPageSize(): PageSize {
   padding: 0;
   width: auto;
 }
+
+.table .el-table__empty-block {
+  width: 100% !important;
+}
 </style>

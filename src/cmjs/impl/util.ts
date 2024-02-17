@@ -1,6 +1,25 @@
 import prompt from "./prompt"
+import cache from "./cache"
+import { ElMessageBox } from 'element-plus'
 
 export default {
+  browserAlert() {
+    if (cache.checkCookieExist('browserAlert')) {
+      return
+    }
+
+    ElMessageBox.alert('', '', {
+      title: '浏览器建议',
+      message: '使用Edge或Safari访问以获得最好的体验',
+      confirmButtonText: '确认',
+      autofocus: false,
+      showClose: false,
+      callback: () => {
+        cache.setCookie('browserAlert', 'confirm', 604800) // 7d * 24h * 3600s
+      },
+    })
+  },
+
   isMobile(): boolean {
     return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i) !== null
   },

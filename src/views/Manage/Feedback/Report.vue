@@ -5,6 +5,7 @@
       <el-tab-pane label="专栏" name="read"></el-tab-pane>
       <el-tab-pane label="评论" name="comment"></el-tab-pane>
       <el-tab-pane label="弹幕" name="danmu"></el-tab-pane>
+      <el-tab-pane label="用户" name="user"></el-tab-pane>
     </el-tabs>
   </div>
 

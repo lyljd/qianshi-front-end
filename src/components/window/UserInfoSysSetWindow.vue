@@ -5,8 +5,7 @@
     <div class="body">
       <div>
         <div class="span">头像：</div>
-        <Image @recImgUploadPercent="recImgUploadPercent" @recImgUrl="recImgUrl" uploadUrl="/api/resource/avatar"
-          :url="data.coverUrl" w="40" h="40" avatar></Image>
+        <Avatar :url="data.coverUrl" size="medium" :upload="{ handler: avatarHandler }"></Avatar>
       </div>
 
       <div>
@@ -52,13 +51,14 @@
     </div>
 
     <template #footer>
-      <el-button v-blur :disabled="uploadPercent !== 0" @click="closeWindow">取消</el-button>
-      <el-button v-blur :disabled="uploadPercent !== 0" @click="save" type="primary">保存</el-button>
+      <el-button v-blur :disabled="uploading" @click="closeWindow">取消</el-button>
+      <el-button v-blur :disabled="uploading" @click="save" type="primary">保存</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
+import Avatar from '@/components/common/Avatar.vue'
 import cmjs from '@/cmjs'
 import Data from "@/mock/manage/userInfo.json"
 import { useStore } from "@/store"
@@ -91,14 +91,17 @@ let dataCopy: User
 let afterSuccDo: Function = () => { }
 let newTagInputValue = ref("")
 let newTagInputVisible = ref(false)
-let uploadPercent = ref(0)
+let uploading = ref(false)
 
-function recImgUrl(imgUrl: string) {
-  data.coverUrl = imgUrl
-}
-
-function recImgUploadPercent(imgUploadPercent: number) {
-  uploadPercent.value = imgUploadPercent
+function avatarHandler(file: File, succ: Function, fail: Function) {
+  // TODO api
+  uploading.value = true
+  console.log(file)
+  setTimeout(() => {
+    succ()
+    // fail()
+    uploading.value = false
+  }, 2000)
 }
 
 function userDataDeepCopy(up: User): User {

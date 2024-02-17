@@ -11,15 +11,11 @@
       </div>
     </el-tooltip>
 
-    <el-image v-if="!data.expire" v-show="!playStatus" @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
-      @click="cmjs.jump.video(data.vid)" :src="data.coverUrl" class="cover"
-      :style="{ width: `${cs.w}px`, height: `${cs.ch}px` }">
-      <template #error>
-        <div @click="cmjs.jump.video(data.vid)" class="default" :style="{ fontSize: `${cs.bfs}px` }">封面加载失败</div>
-      </template>
-    </el-image>
-    <div v-else class="default" style="border-radius: 5px; cursor: default;"
-      :style="{ width: `${cs.w}px`, height: `${cs.ch}px`, fontSize: `${cs.bfs}px` }">视频已失效</div>
+    <Image v-show="!playStatus" :url="data.coverUrl" :w="cs.w" :h="cs.ch" :errorText="!data.expire ? '封面加载失败' : '视频已失效'"
+      :errorTextFontSize="cs.bfs" class="cover" @click="!data.expire ? cmjs.jump.video(data.vid) : undefined"
+      @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
+      :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
+    </Image>
 
     <video v-if="hoverStyleSwitch === 'preview'" v-show="playStatus" @mouseenter="videoMouseEnter"
       @mouseleave="videoMouseLeave" @click="cmjs.jump.video(data.vid)"
@@ -57,7 +53,7 @@
           :style="{ fontSize: `${cs.bfs}px` }">{{
             data.title
           }}</span>
-        <el-tooltip v-else content="因为该视频被up 删除或隐藏" placement="top">
+        <el-tooltip v-else content="因为该视频已被删除或隐藏" placement="top">
           <div class="iconfont el-icon-info" style="cursor: default; display: inline-flex;"
             :style="{ fontSize: `${cs.bfs}px`, lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">视频为什么会失效？</div>
         </el-tooltip>

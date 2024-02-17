@@ -10,7 +10,7 @@
 
     <el-table-column prop="newTitle" label="新个人认证" align="center" />
 
-    <el-table-column sortable :formatter="tableTimeFormatter" prop="applyTime" label="申请时间" align="center" />
+    <el-table-column :formatter="tableTimeFormatter" prop="applyTime" label="申请时间" align="center" />
 
     <el-table-column label="操作" align="center">
       <template #default="scope">

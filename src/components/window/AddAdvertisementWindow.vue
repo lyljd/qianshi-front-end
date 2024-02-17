@@ -19,9 +19,9 @@
         <span>内容：</span>
         <div class="content">
           <div v-if="data.type === 'image'">
-            <ImageUpload @recImgUrl="recImgUrl" @recImgUploadPercent="recImgUploadPercent"
-              uploadUrl="/api/resource/advertisement" :imgUrl="imageContent" :width="iup.width" :height="iup.height"
-              :proportion="iup.proportion"></ImageUpload>
+            <ImageUpload @setImgUrl="(f: Function) => { setImgUrl = f }" :initImgUrl="imageContent"
+              :proportion="iup.proportion" :w="iup.width" :h="iup.height" :uploadHandler="imageUploadHandler">
+            </ImageUpload>
           </div>
 
           <div class="text-content" v-if="data.type === 'text'">
@@ -61,8 +61,8 @@
     </div>
 
     <template #footer>
-      <el-button :disabled="imgUploadPercent !== 0" v-blur @click="closeMainWindow">取消</el-button>
-      <el-button :disabled="imgUploadPercent !== 0" v-blur @click="confirm" type="primary">确定</el-button>
+      <el-button :disabled="uploading" v-blur @click="closeMainWindow">取消</el-button>
+      <el-button :disabled="uploading" v-blur @click="confirm" type="primary">确定</el-button>
     </template>
   </el-dialog>
 </template>
@@ -101,6 +101,8 @@ const stf = defineEmits<{
 }>()
 stf('open', openMainWindow)
 
+let setImgUrl: Function
+
 let mainWindowVisible = ref(false)
 let data = ref<Advertisement>({
   type: "image",
@@ -130,7 +132,7 @@ let textContent = ref<Text>({
 let callback: Function
 let pageLabel: string
 let iup: ImgUploadPara
-let imgUploadPercent = ref(0)
+let uploading = ref(false)
 let dataChange = ref(false)
 let icChange = ref(false)
 let tcChange = ref(false)
@@ -193,17 +195,8 @@ function listenChange() {
     deep: true,
   })
 
-  watch(imageContent, newVal => {
-    if (newVal !== dataCopy.value.content) {
-      icChange.value = true
-    } else {
-      icChange.value = false
-    }
-  }, {
-    deep: true,
-  })
-
   watch(textContent, newVal => {
+    cmjs.prompt.info("text change")
     const dcc = dataCopy.value.content as Text
     if (newVal.text !== dcc.text || newVal.fontSize !== dcc.fontSize || newVal.fontColor !== dcc.fontColor || newVal.bgColor !== dcc.bgColor) {
       tcChange.value = true
@@ -271,9 +264,11 @@ function resetVar() {
     fontColor: "#FFFFFF",
     bgColor: "#909399"
   })
-  dataChange.value = false
-  icChange.value = false
-  tcChange.value = false
+  setTimeout(() => {
+    dataChange.value = false
+    icChange.value = false
+    tcChange.value = false
+  }, 0) // 有时候就是这种莫名其妙的bug浪费时间，真的烦
 }
 
 function confirm() {
@@ -341,12 +336,27 @@ function confrimCheck(): string {
   return ""
 }
 
-function recImgUrl(imgUrl: string) {
-  imageContent.value = imgUrl
-}
+function imageUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  uploading.value = true
 
-function recImgUploadPercent(iup: number) {
-  imgUploadPercent.value = iup
+  // TODO api
+
+  const url = URL.createObjectURL(file)
+  setImgUrl(url)
+  const timer = setInterval(() => {
+    const randPercent = Math.floor(Math.random() * 26) + 25 // [25,50]，整数
+    if (percent.value + randPercent < 100) {
+      percent.value += randPercent
+    } else {
+      percent.value = 100
+      clearInterval(timer)
+      uploading.value = false
+      icChange.value = true
+      imageContent.value = url // fail时不能设置！！
+      succ()
+      // fail()
+    }
+  }, 1000)
 }
 </script>
 
@@ -359,11 +369,6 @@ function recImgUploadPercent(iup: number) {
 .aaw .body .text-content .text {
   display: flex;
   align-items: center;
-}
-
-.aaw .content {
-  margin-left: 10px;
-  width: calc(100% - 52px);
 }
 
 .aaw .row {

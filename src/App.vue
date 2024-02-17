@@ -6,24 +6,25 @@
 
     <div v-if="$route.path !== '/' && store.topPath !== 'manage'" class="placeholder"></div>
 
-    <router-view></router-view>
+    <div>
+      <router-view></router-view>
 
-    <div v-if="store.topPath !== 'manage'" class="in-site-message-container">
-      <span @click="store.openFSWindow('站内留言', '#', {}, '有什么问题都可以直接留言，管理员会在24小时内回复的～', '留言不能为空')" v-if="store.isLogin"
-        class="in-site-message">站内留言</span>
+      <div v-if="store.topPath !== 'manage'" class="in-site-message-container">
+        <span @click="inSiteMessage" v-if="store.isLogin" class="in-site-message">站内留言</span>
+      </div>
+
+      <FeedbackSubmissionWindow></FeedbackSubmissionWindow>
+
+      <PreviewVideoWindow></PreviewVideoWindow>
+
+      <CaptchaWindow></CaptchaWindow>
+
+      <EmailVerifyWindow></EmailVerifyWindow>
     </div>
-
-    <FeedbackSubmissionWindow></FeedbackSubmissionWindow>
-
-    <PreviewVideoWindow></PreviewVideoWindow>
-
-    <CaptchaWindow></CaptchaWindow>
-
-    <EmailVerifyWindow></EmailVerifyWindow>
   </div>
 
   <div v-else>
-    目前未做移动端适配，请用PC端访问（推荐使用Edge浏览器）
+    目前未做移动端适配，请用PC端访问（建议使用Edge或Safari浏览器访问以获得最好的体验）
   </div>
 </template>
 
@@ -37,6 +38,24 @@ import { useStore } from "@/store"
 import cmjs from '@/cmjs'
 
 const store = useStore()
+
+function inSiteMessage() {
+  store.openFSWindow({
+    title: "站内留言",
+    placeholder: "有什么问题都可以直接留言，管理员会尽快回复的！",
+    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+      // TODO api
+      console.log({
+        "msg": msg,
+        "fileList": fileList,
+      }),
+        cmjs.prompt.success("提交成功")
+      closeWindow()
+    },
+  })
+}
+
+cmjs.util.browserAlert()
 </script>
 
 <style lang="less" scoped>

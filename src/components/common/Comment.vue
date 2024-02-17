@@ -1,19 +1,15 @@
 <template>
   <div :id="`comment-${data.cid}`" class="comment-container">
-    <Image :customClick="() => { cmjs.jump.user(data.uid) }" :url="data.avatarUrl" :w="40" :h="40" customClass="avatar"
-      avatar>
-    </Image>
+    <Avatar :url="data.avatarUrl" size="medium" :home="{ uid: data.uid }"></Avatar>
     <div class="right">
       <div class="main">
         <div class="user-info">
           <span :class="{ nicknameVip: data.isVip }" @click="cmjs.jump.user(data.uid)" class="nickname">{{ data.nickname
           }}</span>
 
-          <svg class="icon-symbol level" aria-hidden="true">
-            <use :xlink:href="`#el-icon-level_${cmjs.biz.expToLevel(data.exp)}`"></use>
-          </svg>
+          <LevelIco :level="cmjs.biz.expToLevel(data.exp)" style="margin-left: 6px;"></LevelIco>
 
-          <svg v-if="data.isUp" style="font-size: 25px;" class="icon-symbol" aria-hidden="true">
+          <svg v-if="data.isUp" style="font-size: 27.5px;" class="icon-symbol" aria-hidden="true">
             <use xlink:href="#el-icon-UPzhu-copy"></use>
           </svg>
         </div>
@@ -77,6 +73,8 @@
 </template>
 
 <script setup lang="ts">
+import Avatar from '@/components/common/Avatar.vue'
+import LevelIco from '@/components/common/LevelIco.vue'
 import cmjs from '@/cmjs'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
@@ -118,8 +116,8 @@ let props = defineProps<{
 
 const store = useStore()
 let { isLogin } = storeToRefs(store)
-store.$subscribe((_, state) => {
-  if (state.isLogin) {
+watch(() => store.isLogin, (newVal: boolean) => {
+  if (newVal) {
     isMe.value = cmjs.biz.verifyLoginUid(props.data.uid)
     isUp.value = cmjs.biz.verifyLoginUid(props.authorUid)
   } else {
@@ -204,7 +202,22 @@ function report() {
     return
   }
 
-  store.openFSWindow('评论举报', '#', {cid: props.data.cid}, "请输入举报理由", "理由不能为空", "举报成功")
+  store.openFSWindow({
+    title: "评论举报",
+    placeholder: "请输入举报理由",
+    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+      // TODO api
+      console.log({
+        "msg": msg,
+        "fileList": fileList,
+        "data": {
+          cid: props.data.cid,
+        },
+      })
+      cmjs.prompt.success("提交成功")
+      closeWindow()
+    },
+  })
 }
 
 function setTop() {
@@ -229,6 +242,7 @@ export default {
 
   .right {
     width: 100%;
+    margin-left: 7.5px;
 
     .main {
       display: flex;
@@ -250,11 +264,6 @@ export default {
 
         .nicknameVip {
           color: #FF6699;
-        }
-
-        .level {
-          font-size: 25px;
-          margin-left: 7.5px;
         }
       }
 
@@ -382,11 +391,5 @@ export default {
     font-size: 20px;
     margin-right: 5px;
   }
-}
-</style>
-
-<style>
-.container .avatar {
-  margin-right: 7.5px;
 }
 </style>

@@ -1,46 +1,27 @@
 <template>
   <div class="v-container">
-    <div v-show="store.getUploadItem() === ''">
-      <el-upload :before-upload="beforeVideoUpload" :on-remove="onVideoUploadRemove" :on-change="onVideoUploadChange"
-        :on-progress="onVideoUploadProgress" :on-success="onVideoUploadSuccess" :on-error="onVideoUploadError"
-        ref="videoUpload" action="/api/resource/video" accept="video/*" drag :show-file-list="false">
-        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-        <div class="el-upload__text">
-          拖拽到此处上传 或 <em>点击此处选择文件上传</em>
-        </div>
-      </el-upload>
-      <div class="tip" style="margin-left: 0;">
-        <span>上传的视频大小上限为1G</span>
-        <span>上传视频，即表示您已同意 <Agreement></Agreement> ，请勿上传色情，反动等违法视频。</span>
-      </div>
-    </div>
-
-    <div v-show="store.getUploadItem() === 'video'" class="setting">
-      <div>
-        <span class="notice"><span style="color: red;">*</span>视频：</span>
-        <el-button v-blur :disabled="videoUploadPercent !== 0 || video.videoUrl === ''"
-          @click="store.openPVWindow(video.videoUrl)">预览</el-button>
-        <el-button v-blur :disabled="videoUploadPercent !== 0" @click="openVideoUpload">重新上传</el-button>
-      </div>
-      <el-progress v-show="videoUploadPercent !== 0" :percentage="videoUploadPercent" class="prg" :stroke-width="10" />
-      <div class="tip">
-        <span>上传的视频大小上限为1G</span>
-        <span>上传视频，即表示您已同意 <Agreement></Agreement> ，请勿上传色情，反动等违法视频。</span>
+    <div class="upload-form">
+      <div class="row">
+        <span class="notice"><span class="require">*</span>视频：</span>
+        <VideoUpload style="width: 100%;" @setVideoUrl="(f: Function) => { setVideoUrl = f }"
+          :uploadHandler="videoUploadHandler">
+        </VideoUpload>
       </div>
 
-      <div>
-        <span class="notice"><span style="color: red;">*</span>封面：</span>
-        <ImageUpload @recImgUrl="recImgUrl" @recImgUploadPercent="recImgUploadPercent" uploadUrl="/api/resource/cover">
+      <div class="row">
+        <span class="notice"><span class="require">*</span>封面：</span>
+        <ImageUpload @setImgUrl="(f: Function) => { setCoverUrl = f }" :w="270" :h="151.88" proportion="16:9"
+          :uploadHandler="coverUploadHandler">
         </ImageUpload>
       </div>
 
-      <div>
-        <span class="notice"><span style="color: red;">*</span>标题：</span>
-        <el-input ref="titleInput" v-model="video.title" maxlength="50" placeholder="请输入标题" show-word-limit />
+      <div class="row">
+        <span class="notice"><span class="require">*</span>标题：</span>
+        <el-input ref="titleInputRef" v-model="video.title" maxlength="50" placeholder="请输入标题" show-word-limit />
       </div>
 
-      <div>
-        <span class="notice"><span style="color: red;">*</span>分区：</span>
+      <div class="row">
+        <span class="notice"><span class="require">*</span>分区：</span>
         <el-select ref="regionSelect" v-model="video.region" placeholder="请选择分区">
           <el-option label="番剧" value="anime" />
           <el-option label="游戏" value="game" />
@@ -50,50 +31,44 @@
         </el-select>
       </div>
 
-      <div>
+      <div class="row">
         <span class="notice">标签：</span>
-        <div class="tag-container">
-          <el-tag class="tag" v-for="tag in video.tags" closable @close="delTag(tag)">
-            {{ tag }}
-          </el-tag>
-          <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
-            @keyup.enter="newTag" @blur="newTag">
-          <el-button v-blur class="new-tag-btn" v-else size="small" @click="showNewTagInput">
-            + New Tag
-          </el-button>
+        <TagInput :tags="video.tags" :limit="10"></TagInput>
+      </div>
+
+      <div class="row">
+        <span class="notice">简介：</span>
+        <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="请输入简介" type="textarea" show-word-limit />
+      </div>
+
+      <div class="row">
+        <span class="notice">权益声明：</span>
+        <div>
+          <el-checkbox v-model="video.empower" label="未经作者授权，禁止转载" />
+          <div class="tip">
+            <span>勾选后该文案会显示在视频播放页中</span>
+            <span style="color: #FF6699;">若在初次投稿时未勾选该项，后续在编辑时将不能勾选。</span>
+          </div>
         </div>
       </div>
 
-      <div>
-        <span class="notice">简介：</span>
-        <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="填写更全面的相关信息，让更多的人能找到你的视频吧" type="textarea"
-          show-word-limit />
-      </div>
-
-      <div>
-        <span class="notice">权益声明：</span>
-        <el-checkbox v-model="video.empower" label="未经作者授权，禁止转载" />
-      </div>
-      <div class="tip">
-        <span>勾选后该文案会显示在视频播放页中，此选项可以在再次编辑时取消。<span style="color: #FF6699;">一旦取消勾选操作，不可再次勾选。</span></span>
-      </div>
-
-      <div style="justify-content: center;">
+      <div class="row" style="justify-content: center;">
         <el-button v-blur
-          :disabled="videoUploadPercent !== 0 || coverUploadPercent !== 0 || video.videoUrl === '' || video.coverUrl === '' || video.title === '' || video.region === ''"
-          @click="uploadVideo" type="primary" size="large">投稿</el-button>
+          :disabled="videoUploading || coverUploading || video.videoUrl === '' || video.coverUrl === '' || video.title === '' || video.region === ''"
+          @click="submit" type="primary" size="large">投稿</el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { UploadInstance, ElSelect, ElInput } from 'element-plus'
+import { ElSelect, ElInput } from 'element-plus'
 import { useStore } from "@/store"
+import { useRouter } from "vue-router"
 import cmjs from '@/cmjs'
 import ImageUpload from "@/components/common/ImageUpload.vue"
-import { useRouter } from "vue-router"
-import Agreement from '@/components/common/Agreement.vue'
+import VideoUpload from "@/components/common/VideoUpload.vue"
+import TagInput from '@/components/common/TagInput.vue'
 
 type Video = {
   videoUrl: string,
@@ -109,9 +84,7 @@ const store = useStore()
 const router = useRouter()
 store.setPlatformItemIndex(1, location.pathname)
 
-const videoUpload = ref<UploadInstance>()
-const newTagInput = ref<HTMLInputElement>()
-const titleInput = ref<InstanceType<typeof ElInput>>()
+const titleInputRef = ref<InstanceType<typeof ElInput>>()
 
 let video: Video = reactive({
   videoUrl: "",
@@ -122,94 +95,67 @@ let video: Video = reactive({
   intro: "",
   empower: false
 })
-let preVideoId = ref(0)
-let preVideoUrl = ref("")
-let videoUploadPercent = ref(0)
-let coverUploadPercent = ref(0)
-let newTagInputValue = ref("")
-let newTagInputVisible = ref(false)
+let coverUploading = ref(false)
+let videoUploading = ref(false)
+let setCoverUrl: Function
+let setVideoUrl: Function
 
-function openVideoUpload() {
-  videoUpload.value?.$el.querySelector('input').click()
-}
-
-function recImgUploadPercent(imgUploadPercent: number) {
-  coverUploadPercent.value = imgUploadPercent
-}
-
-function recImgUrl(imgUrl: string) {
-  video.coverUrl = imgUrl
-}
-
-function beforeVideoUpload(rawFile: any) {
-  if (rawFile.size / 1024 / 1024 / 1024 > 1) {
-    cmjs.prompt.error("上传的视频大小不能超过1G")
-    return false
-  }
-  store.setUploadItem("video")
+const unwatch = watch(video, () => {
   store.switchAsk = true
-  return true
-}
+  unwatch()
+})
 
-function onVideoUploadRemove() {
-  video.videoUrl = preVideoUrl.value
-}
+function coverUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  coverUploading.value = true
 
-function onVideoUploadChange(file: any) {
-  if (file.uid !== preVideoId.value) {
-    preVideoId.value = file.uid
-    video.videoUrl = URL.createObjectURL(file.raw)
-  }
-}
+  // TODO api
 
-function onVideoUploadProgress(event: any) {
-  videoUploadPercent.value = Math.floor(event.percent)
-}
-
-function onVideoUploadSuccess() {
-  preVideoUrl.value = video.videoUrl
-  videoUploadPercent.value = 0
-  cmjs.prompt.success("视频上传成功")
-}
-
-function onVideoUploadError() {
-  video.videoUrl = preVideoUrl.value
-  videoUploadPercent.value = 0
-  cmjs.prompt.error("视频上传失败")
-}
-
-function delTag(tag: string) {
-  video.tags.splice(video.tags.indexOf(tag), 1)
-}
-
-function showNewTagInput() {
-  newTagInputVisible.value = true
-  nextTick(() => {
-    newTagInput.value!.focus()
-  })
-}
-
-function newTag() {
-  let val = newTagInputValue.value
-  if (val) {
-    if (video.tags.includes(val)) {
-      cmjs.prompt.error("该标签已存在")
-      newTagInput.value!.focus()
-      return
+  const url = URL.createObjectURL(file)
+  setCoverUrl(url)
+  const timer = setInterval(() => {
+    const randPercent = Math.floor(Math.random() * 26) + 25 // [25,50]，整数
+    if (percent.value + randPercent < 100) {
+      percent.value += randPercent
+    } else {
+      percent.value = 100
+      clearInterval(timer)
+      coverUploading.value = false
+      video.coverUrl = url // fail时不能设置！！
+      succ()
+      // fail()
     }
-    video.tags.push(val)
-  }
-  newTagInputVisible.value = false
-  newTagInputValue.value = ""
+  }, 1000)
 }
 
-function uploadVideo() {
+function videoUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  videoUploading.value = true
+
+  // TODO api
+
+  const url = URL.createObjectURL(file)
+  setVideoUrl(url)
+  const timer = setInterval(() => {
+    const randPercent = Math.floor(Math.random() * 11) + 10 // [10,20]，整数
+    if (percent.value + randPercent < 100) {
+      percent.value += randPercent
+    } else {
+      percent.value = 100
+      clearInterval(timer)
+      videoUploading.value = false
+      video.videoUrl = url // fail时不能设置！！
+      succ()
+      // fail()
+    }
+  }, 1000)
+}
+
+function submit() {
   video.title = video.title.trim()
   video.intro = video.intro.trim()
 
   if (video.title.length === 0) {
     cmjs.prompt.error("请输入标题")
-    titleInput.value?.focus()
+    titleInputRef.value?.focus()
     return
   }
 
@@ -218,110 +164,31 @@ function uploadVideo() {
 
   store.switchAsk = false
   cmjs.prompt.success("投稿成功")
-  router.push("../article/video")
+  router.push("../article/video?tab=isPubing")
 }
 </script>
 
 <style lang="less" scoped>
 .v-container {
   margin-top: 20px;
-}
 
-.setting {
-  margin-top: 20px;
-  width: 800px;
-}
+  .upload-form {
+    .row {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
 
-.setting>div:not(.tip) {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-}
+      .notice {
+        font-size: 14px;
+        margin-right: 10px;
+        min-width: 75px;
+        text-align: right;
 
-.tip {
-  margin-left: 85px;
-}
-
-.setting .notice {
-  font-size: 14px;
-  margin-right: 10px;
-  min-width: 75px;
-  text-align: right;
-}
-
-.setting .upload-cover-div {
-  width: 210px;
-  height: 116.125px;
-  /* 这里的高度必须比cover的高度少2px，因为上下的border还占了2px */
-  border-radius: 5px;
-  cursor: pointer;
-  border: 1px dashed #909399;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
-  font-size: 14px;
-}
-
-.setting .cover {
-  width: 210px;
-  height: 118.125px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.setting .tag-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.setting .tag,
-.setting .new-tag-btn {
-  min-width: 100px;
-  height: 30px;
-  font-size: 14px;
-  border-radius: 5px;
-}
-
-.setting .new-tag-input {
-  width: 78px;
-  height: 18px;
-  font-size: 14px;
-  border-radius: 5px;
-  outline: none;
-  border: 1px solid #409EFF;
-  padding: 5px 10px;
-}
-
-.setting .prg {
-  margin-top: 0 !important;
-  margin-left: 85px;
-}
-</style>
-
-<style>
-.setting .prg .el-progress__text {
-  font-size: 14px !important;
-  display: flex;
-  justify-content: right;
-  margin-left: -10px;
-}
-
-.v-container .el-tabs__nav {
-  z-index: inherit;
-}
-
-.v-container .el-tabs__nav-wrap::after {
-  z-index: inherit;
-}
-
-.v-container .el-form-item {
-  margin-bottom: 10px;
-}
-
-.v-container .el-image {
-  vertical-align: top;
+        .require {
+          color: red;
+        }
+      }
+    }
+  }
 }
 </style>

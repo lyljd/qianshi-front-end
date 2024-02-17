@@ -21,19 +21,19 @@ const route = useRoute()
   align-items: center;
   justify-content: center;
   flex-direction: column;
-}
 
-.error-container .ico {
-  font-size: 250px;
-  margin-bottom: -20px;
-}
+  .ico {
+    font-size: 250px;
+    margin-bottom: -20px;
+  }
 
-.error-container .code {
-  font-size: 100px;
-}
+  .code {
+    font-size: 100px;
+  }
 
-.error-container .msg {
-  font-size: 25px;
-  color: #909399;
+  .msg {
+    font-size: 25px;
+    color: #909399;
+  }
 }
 </style>

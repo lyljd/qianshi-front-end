@@ -1,30 +1,23 @@
 <template>
-  <div class="iu-container">
-    <div :style="{ width: `${width - 2}px`, height: `${height - 2}px` }" v-show="imgUrl === ''" @click="openImgUpload"
-      class="upload-div">
-      <span style="font-size: 30px;">+</span>
-      <span>上传图片</span>
+  <div>
+    <div @click="onClick" class="payload"
+      :style="{ width: w - 2 + 'px', height: h - 2 + 'px', cursor: uploading ? 'not-allowed' : 'pointer' }">
+      <div v-show="imgUrl === ''" class="upload-box">
+        <span class="plus">+</span>
+        <span>点击选择图片上传</span>
+      </div>
+
+      <Image v-show="imgUrl !== ''" :url="imgUrl" :w="w" :h="h" round :opacity="uploading ? 0.5 : 1"></Image>
+
+      <el-progress v-show="uploading" class="progress" :width="Math.min(w, h) - 2" :percentage="uploadPercent"
+        type="circle" />
     </div>
 
-    <div v-show="imgUrl !== ''" class="img-container">
-      <el-image :style="{ width: `${width}px`, height: `${height}px`, opacity: imgUploadPercent !== 0 ? 0.25 : 1 }"
-        @click="openImgUpload" :src="imgUrl" class="img">
-        <template #error>
-          <div @click="openImgUpload" style="font-size: 16px;" class="default">加载失败</div>
-        </template>
-      </el-image>
-
-      <el-progress :style="{ marginLeft: `${(width - height) / 2}px` }" v-show="imgUploadPercent !== 0"
-        :percentage="imgUploadPercent" :width="height" type="circle" class="progress" />
-    </div>
-
-    <el-upload :before-upload="beforeImgUpload" :on-remove="onImgUploadRemove" :on-change="onImgUploadChange"
-      :on-progress="onImgUploadProgress" :on-success="onImgUploadSuccess" :on-error="onImgUploadError" ref="imgUpload"
-      :action="uploadUrl" accept="image/*" v-show="false"></el-upload>
+    <el-upload ref="uploadRef" accept="image/*" :before-upload="beforeUpload" v-show="false"></el-upload>
 
     <div class="tip">
-      <span>上传的图片大小上限为{{ maxSize }}M</span>
-      <span>推荐使用{{ proportion }}的图片</span>
+      <span>上传的单张图片大小上限为{{ maxSize }}M</span>
+      <span v-if="proportion">推荐使用{{ proportion }}的图片</span>
     </div>
   </div>
 </template>
@@ -33,114 +26,121 @@
 import { UploadInstance } from 'element-plus'
 import cmjs from '@/cmjs'
 
-const imgUpload = ref<UploadInstance>()
-
-const stf = defineEmits<{
-  (cen: "recImgUrl", imgUrl: string): void
-  (cen: "recSetImgUrlFc", f: Function): void
-  (cen: "recImgUploadPercent", imgUploadPercent: number): void
-}>()
-stf('recSetImgUrlFc', setImgUrl)
-
 const data = withDefaults(defineProps<{
-  width: number,
-  height: number,
-  proportion: string
-  maxSize: number //单位：MB
-  uploadUrl: string
-  imgUrl: string
+  initImgUrl: string,
+  w: number,
+  h: number,
+  proportion?: string, // 上传图片推荐尺寸
+  maxSize: number, // 单位：MB
+  uploadHandler: (file: File, percent: Ref<number>, succ: Function, fail: Function) => void,
 }>(), {
-  width: 210,
-  height: 118.125,
-  proportion: "16:9",
-  maxSize: 10,
-  imgUrl: "",
+  initImgUrl: "",
+  maxSize: 5,
 })
 
-let imgUrl = ref(data.imgUrl)
-let preImgUrl = ref(data.imgUrl)
-let preImgId = ref(0)
-let imgUploadPercent = ref(0)
+const stf = defineEmits<{
+  (cen: "setImgUrl", f: Function): void
+}>()
+
+const uploadRef = ref<UploadInstance>()
+
+let imgUrl = ref(data.initImgUrl)
+let preImgUrl = ""
+let imgHash = "" // 自定义hash；用于避免重复上传图片
+let preImgHash = ""
+let uploading = ref(false) // 当前是否处于上传中状态
+let uploadPercent = ref(0)
+
+function onClick() {
+  if (uploading.value) {
+    return
+  }
+
+  uploadRef.value?.$el.querySelector('input').click()
+}
+
+function beforeUpload(file: File) {
+  if (file.size / 1024 / 1024 > data.maxSize) {
+    cmjs.prompt.error(`上传的单张图片大小不能超过${data.maxSize}M`)
+    return false
+  }
+
+  imgHash = calcHash(file)
+  if (imgHash === preImgHash) {
+    cmjs.prompt.warning("请勿重复上传图片")
+    return false
+  }
+
+  startUpload(file)
+  return false
+}
+
+function startUpload(file: File) {
+  preImgUrl = imgUrl.value
+  uploading.value = true
+  data.uploadHandler(file, uploadPercent, succ, fail)
+}
+
+function endUpload() {
+  uploading.value = false
+  uploadPercent.value = 0
+}
 
 function setImgUrl(url: string) {
   imgUrl.value = url
-  preImgUrl.value = url
 }
 
-function openImgUpload() {
-  if (imgUploadPercent.value !== 0) {
-    cmjs.prompt.error("图片上传时禁止修改")
-    return
-  }
-  imgUpload.value?.$el.querySelector('input').click()
+stf('setImgUrl', setImgUrl)
+
+function succ() {
+  preImgHash = imgHash
+  endUpload()
 }
 
-function beforeImgUpload(rawFile: any) {
-  if (rawFile.size / 1024 / 1024 > data.maxSize) {
-    cmjs.prompt.error(`上传的图片大小不能超过${data.maxSize}M`)
-    return false
-  }
-  return true
+function fail() {
+  cmjs.prompt.error("上传失败")
+  imgUrl.value = preImgUrl
+  imgHash = preImgHash
+  endUpload()
 }
 
-function onImgUploadRemove() {
-  imgUrl.value = preImgUrl.value
-}
-
-function onImgUploadChange(file: any) {
-  if (file.uid !== preImgId.value) {
-    preImgId.value = file.uid
-    imgUrl.value = URL.createObjectURL(file.raw)
-  }
-}
-
-function onImgUploadProgress(event: any) {
-  imgUploadPercent.value = Math.floor(event.percent)
-  stf('recImgUploadPercent', imgUploadPercent.value)
-}
-
-function onImgUploadSuccess() {
-  preImgUrl.value = imgUrl.value
-  imgUploadPercent.value = 0
-
-  stf('recImgUrl', imgUrl.value)
-  stf('recImgUploadPercent', 0)
-}
-
-function onImgUploadError() {
-  imgUrl.value = preImgUrl.value
-  imgUploadPercent.value = 0
-  stf('recImgUploadPercent', 0)
-  cmjs.prompt.error("图片上传失败")
+function calcHash(file: File): string {
+  return file.lastModified + file.name + file.size
 }
 </script>
 
 <style lang="less" scoped>
-.iu-container .upload-div {
-  border-radius: 5px;
-  cursor: pointer;
-  border: 1px dashed #909399;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
-  font-size: 14px;
-}
+.payload {
+  position: relative;
 
-.iu-container .img-container {
-  display: flex;
-}
+  .upload-box {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    border: 1px dashed #909399;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #909399;
+    font-size: 14px;
 
-.iu-container .img-container .img {
-  width: 210px;
-  height: 118.125px;
-  border-radius: 5px;
-  cursor: pointer;
-  vertical-align: top;
-}
+    .plus {
+      font-size: 30px;
+      line-height: 30px;
+      margin-top: -3px;
+    }
+  }
 
-.iu-container .img-container .progress {
-  position: absolute;
+  .upload-box:hover {
+    border-color: #409EFF;
+  }
+
+  .progress {
+    position: absolute;
+    top: calc(50% + 1px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 </style>

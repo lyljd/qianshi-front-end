@@ -10,7 +10,7 @@
       </el-descriptions-item>
 
       <el-descriptions-item label="封面">
-        <Image :url="data.coverUrl" :w="210" :h="118.125" preview></Image>
+        <Image :url="data.coverUrl" :w="210" :h="118.13" preview round></Image>
       </el-descriptions-item>
 
       <el-descriptions-item label="视频">

@@ -10,16 +10,14 @@ export const useStore = defineStore("qianshi", {
 
   actions: {
     openLoginWindow: (tip?: string) => { },
-    setTopMenuBarAvatar: (avatar: string) => { },
+    setTopMenuBarAvatar: (avatarUrl: string) => { },
     openCaptchaWindow: (afterSuccDo: Function) => { },
     openEVWindow: (email: string, afterSuccDo: Function) => { },
-    openFSWindow: (title: string, bzUrl: string, dataP: object, placeholder?: string, failMsg?: string, succMsg?: string, afterSuccDo?: Function, afterDo?: Function) => { },
+    openFSWindow: (opt: FSOpt) => { },
     openPVWindow: (videoUrl: string) => { },
     openSMSWindow: (openParameter?: { afterSuccDo?: Function, to?: Receiver[] }) => { },
     setPlatformCurTitle: (title: string) => { },
     setMeCurTitle: (title: string) => { },
-    setUploadItem: (item: string) => { },
-    getUploadItem: (): string => { return "" },
     setManegeItemIndex: (idx: number, index: string) => { },
     setManegeFeedbackItemIndex: (idx: number, index: string) => { },
     setPlatformItemIndex: (idx: number, index: string) => { },
@@ -28,6 +26,16 @@ export const useStore = defineStore("qianshi", {
     setUserMenuFavlistNum: (newNum: number) => { },
   }
 })
+
+type FSOpt = {
+  title: string,
+  placeholder?: string,
+  msgMaxlength?: number,
+  fileSize?: number,
+  fileNum?: number,
+  submitHandler: (msg: string, fileList: File[], closeWindow: Function) => void,
+  cancelHandler?: Function,
+}
 
 type Receiver = {
   uid: number

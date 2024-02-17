@@ -24,26 +24,17 @@
     <div>
       <span class="notice">出生日期：</span>
       <el-config-provider :locale="locale">
-        <el-date-picker v-model="meSetting.birthday" value-format="YYYYMMDD" type="date"
-          placeholder="选择日期" :disabled-date="birthdaySelectCheck" />
+        <el-date-picker v-model="meSetting.birthday" value-format="YYYYMMDD" type="date" placeholder="选择日期"
+          :disabled-date="birthdaySelectCheck" />
       </el-config-provider>
       <span class="info">注：可直接输入，格式为：YYYY-MM-DD</span>
     </div>
 
-    <div class="personal-tag-row">
+    <div>
       <span style="min-width: 75px;" class="notice">个人标签：</span>
-      <div class="tag-container">
-        <el-tag class="tag" v-for="tag in meSetting.tag" closable @close="delTag(tag)">
-          {{ tag }}
-        </el-tag>
-        <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
-          @keyup.enter="newTag" @blur="newTag">
-        <el-button v-blur class="new-tag-btn" v-else size="small" @click="showNewTagInput">
-          + New Tag
-        </el-button>
-      </div>
+      <TagInput :tags="meSetting.tags" :limit="10"></TagInput>
     </div>
-    
+
     <div class="btn-row">
       <el-button v-blur @click="saveSetting" id="sava-setting-btn" type="primary" size="large">保存</el-button>
     </div>
@@ -55,13 +46,14 @@ import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 import mockMeSetting from "@/mock/me/setting.json"
 import cmjs from '@/cmjs'
 import { useStore } from "@/store"
+import TagInput from '@/components/common/TagInput.vue'
 
 type MeSetting = {
   nickname: string
   signature: string
   gender: string
   birthday: string
-  tag: string[]
+  tags: string[]
 }
 
 const store = useStore()
@@ -72,14 +64,11 @@ let meSetting: MeSetting = reactive(getMeSetting())
 const locale = zhCn
 const oldNickname = meSetting.nickname
 
-const newTagInput = ref<HTMLInputElement>()
 let saveSettingBtn: HTMLButtonElement
 
 let nnmdy = ref(false)
-let newTagInputValue = ref("")
-let newTagInputVisible = ref(false)
 
-onMounted(()=>{
+onMounted(() => {
   saveSettingBtn = document.getElementById("sava-setting-btn") as HTMLButtonElement
 })
 
@@ -98,31 +87,6 @@ function showNNMDY() {
 
 function birthdaySelectCheck(date: Date) {
   return date.getTime() > Date.now()
-}
-
-function delTag(tag: string) {
-  meSetting.tag.splice(meSetting.tag.indexOf(tag), 1)
-}
-
-function showNewTagInput() {
-  newTagInputVisible.value = true
-  nextTick(() => {
-    newTagInput.value!.focus()
-  })
-}
-
-function newTag() {
-  let val = newTagInputValue.value
-  if (val) {
-    if (meSetting.tag.includes(val)) {
-      cmjs.prompt.error("该标签已存在")
-      newTagInput.value!.focus()
-      return
-    }
-    meSetting.tag.push(val)
-  }
-  newTagInputVisible.value = false
-  newTagInputValue.value = ""
 }
 
 function saveSetting() {
@@ -186,29 +150,6 @@ function saveSetting() {
 
 .set-container .signature {
   width: 695px;
-}
-
-.set-container .personal-tag-row {
-  margin-top: -5px;
-}
-
-.set-container .tag-container {
-  margin-left: -5px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.set-container .tag,
-.set-container .new-tag-btn {
-  min-width: 100px;
-  height: 30px;
-  font-size: 14px;
-  border-radius: 5px;
-}
-
-.set-container .new-tag-input {
-  width: 78px;
 }
 
 .set-container .btn-row {

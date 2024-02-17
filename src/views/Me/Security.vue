@@ -23,6 +23,8 @@
       <span class="info">{{ meSecurity.email }}</span>
       <span @click="setEmail" class="btn">更换邮箱</span>
     </div>
+
+    <el-divider />
   </div>
 
   <el-dialog :width="400" v-model="setPwdWindowVisible" :title="meSecurity.isSetPassword ? '修改密码' : '设置密码'"

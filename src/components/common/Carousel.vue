@@ -2,11 +2,8 @@
   <el-carousel v-if="data.length > 0" class="carousel" trigger="click" :height="`${height}px`">
     <el-carousel-item v-for="c in data">
       <a :href="c.linkUrl !== '' ? c.linkUrl : undefined" target="_blank">
-        <el-image class="image" :src="c.imgUrl">
-          <template #error>
-            <div style="font-size: 18px;" class="default">轮播图加载失败</div>
-          </template>
-        </el-image>
+        <Image class="image" :url="c.imgUrl" errorText="轮播图加载失败" :errorTextFontSize="18" :lazy="false"></Image>
+        <!-- 轮播图开启lazy时会导致部分图片无法直接加载出来，原因未知 -->
         <div v-if="c.title" class="title">
           <span class="info">{{ c.title }}</span>
         </div>
@@ -55,6 +52,7 @@ defineProps<{
   white-space: nowrap;
   text-overflow: ellipsis;
   position: absolute;
+  pointer-events: none;
 }
 
 .carousel .title .info {

@@ -3,12 +3,11 @@
 
   <el-menu id="menu" class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
     <div class="logo">
-      <img class="icon" src="/favicon.png">
-      <span class="notice">浅时</span>
+      <Image url="/favicon.png" :w="40" :h="40"></Image>
     </div>
 
-    <el-menu-item index="/">首页</el-menu-item>
-    <el-menu-item index="/hot">热门</el-menu-item>
+    <el-menu-item v-blur index="/">首页</el-menu-item>
+    <el-menu-item v-blur index="/hot">热门</el-menu-item>
     <el-sub-menu>
       <template #title>分区</template>
       <el-menu-item index="/region/anime">番剧</el-menu-item>
@@ -17,8 +16,8 @@
       <el-menu-item index="/region/tech">科技</el-menu-item>
       <el-menu-item index="/region/other">其它</el-menu-item>
     </el-sub-menu>
-    <el-menu-item index="/read">专栏</el-menu-item>
-    <el-menu-item index="/live">直播</el-menu-item>
+    <el-menu-item v-blur index="/read">专栏</el-menu-item>
+    <el-menu-item v-blur index="/live">直播</el-menu-item>
 
     <div class="flex-grow" />
 
@@ -51,21 +50,18 @@
     <div v-if="isLogin" class="after-login-menu">
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
-          <el-avatar @click="toHome" class="avatar" :src="avatar" @error="true">
-            <img @click="toHome" src="/default-avatar.png" />
-          </el-avatar>
+          <Avatar @setUrl="(f: Function) => { recSetAvatar(f) }" :url="avatar" size="medium" :home="{ uid: ahi.id }"
+            style="margin-right: 10px;"></Avatar>
         </template>
         <el-button v-blur @click="signin" :type="!ahi.signinStatus ? 'success' : 'info'"
           :style="{ cursor: !ahi.signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
         <ul class="almul">
           <div class="nickname">
-            <span @click="toHome" class="nickname-span">{{ ahi.nickname }}</span>
+            <span @click="cmjs.jump.user(ahi.id)" class="nickname-span">{{ ahi.nickname }}</span>
           </div>
           <div class="tags">
             <VipIco v-if="ahi.isVip" style="margin-right: 5px;"></VipIco>
-            <svg @click="cmjs.jump.new('/me')" class="icon-symbol level" aria-hidden="true">
-              <use :xlink:href="'#el-icon-level_' + cmjs.biz.expToLevel(ahi.exp)"></use>
-            </svg>
+            <LevelIco :level="cmjs.biz.expToLevel(ahi.exp)"></LevelIco>
           </div>
           <div class="coin-row">
             <span @click="cmjs.jump.new('/me/coin')">硬币:<span class="coin">{{ ahi.coin }}</span></span>
@@ -150,7 +146,9 @@
 <script lang="ts" setup>
 import TopMenuImg from "@/components/once/TopMenuImg.vue"
 import LoginWindow from "@/components/window/LoginWindow.vue"
+import Avatar from '@/components/common/Avatar.vue'
 import VipIco from '@/components/common/VipIco.vue'
+import LevelIco from '@/components/common/LevelIco.vue'
 import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
@@ -173,7 +171,6 @@ const route = useRoute()
 const store = useStore()
 const { isLogin } = storeToRefs(store)
 store.openLoginWindow = openLoginWindow
-store.setTopMenuBarAvatar = setAvatar
 
 const loginWindow = ref<InstanceType<typeof LoginWindow>>()
 const loginPop = ref()
@@ -288,16 +285,12 @@ function signin() {
   cmjs.prompt.success("签到成功")
 }
 
-function toHome() {
-  cmjs.jump.user(ahi.value.id)
-}
-
 function toSearch() {
   cmjs.prompt.info(`searchKey: ${searchKey.value}`)
 }
 
-function setAvatar(url: string) {
-  avatar.value = url
+function recSetAvatar(f: Function) {
+  store.setTopMenuBarAvatar = f as () => void
 }
 </script>
 
@@ -334,11 +327,6 @@ function setAvatar(url: string) {
   margin-right: -12.5px;
 }
 
-.el-menu-item:focus {
-  background-color: transparent !important;
-  color: inherit !important;
-}
-
 .el-menu-item:hover,
 .el-sub-menu:hover,
 .el-sub-menu :deep(.el-sub-menu__title:hover) {
@@ -351,16 +339,6 @@ function setAvatar(url: string) {
 
 .logo {
   margin-right: 10px;
-}
-
-.logo .icon {
-  width: 37.5px;
-  vertical-align: top;
-}
-
-.logo .notice {
-  font-size: 30px;
-  cursor: default;
 }
 
 .search {
@@ -436,11 +414,6 @@ function setAvatar(url: string) {
   list-style: none;
   margin: -7px;
   padding: 0;
-}
-
-.almul .level {
-  font-size: 27.5px;
-  cursor: pointer;
 }
 
 .almul .nickname {
@@ -520,11 +493,6 @@ function setAvatar(url: string) {
 
 .almul li:hover {
   background-color: #e9e9eb;
-}
-
-.avatar {
-  margin-right: 10px;
-  cursor: pointer;
 }
 
 .ico-btn:hover {

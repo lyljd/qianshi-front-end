@@ -1,5 +1,5 @@
 <template>
-  <el-card v-if="isMe" header="隐私设置">
+  <el-card v-if="isMe" header="隐私设置" style="cursor: default;">
     <div class="column">
       <div class="option">
         <span>公开我投币的视频</span>
@@ -37,8 +37,8 @@ type UserSetting = {
 
 const route = useRoute()
 const store = useStore()
-store.$subscribe((_, state) => {
-  if (state.isLogin) {
+watch(() => store.isLogin, (newVal: boolean) => {
+  if (newVal) {
     isMe.value = cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
@@ -68,5 +68,6 @@ function getUserSetting(): UserSetting {
   align-items: center;
   justify-content: space-between;
   font-size: 14px;
+  cursor: default;
 }
 </style>

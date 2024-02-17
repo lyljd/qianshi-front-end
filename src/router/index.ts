@@ -67,6 +67,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: "/me/setting", component: () => import("@/views/Me/Setting.vue") },
       { path: "/me/security", component: () => import("@/views/Me/Security.vue") },
       { path: "/me/coin", component: () => import("@/views/Me/Coin.vue") },
+      { path: "/me/blacklist", component: () => import("@/views/Me/Blacklist.vue") },
     ],
     meta: {
       title: '个人中心',
@@ -143,6 +144,7 @@ const routes: Array<RouteRecordRaw> = [
               { path: "/manage/feedback/report/read", component: () => import("@/views/Manage/Feedback/Report/Read.vue") },
               { path: "/manage/feedback/report/comment", component: () => import("@/views/Manage/Feedback/Report/Comment.vue") },
               { path: "/manage/feedback/report/danmu", component: () => import("@/views/Manage/Feedback/Report/Danmu.vue") },
+              { path: "/manage/feedback/report/user", component: () => import("@/views/Manage/Feedback/Report/User.vue") },
             ],
             meta: {
               power: 3,

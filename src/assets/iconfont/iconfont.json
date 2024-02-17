@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "8820131",
+      "name": "举报",
+      "font_class": "jubao2",
+      "unicode": "e6c4",
+      "unicode_decimal": 59076
+    },
+    {
+      "icon_id": "10156208",
+      "name": "拉黑",
+      "font_class": "lahei",
+      "unicode": "e627",
+      "unicode_decimal": 58919
+    },
+    {
       "icon_id": "31314866",
       "name": "上一集",
       "font_class": "shangyiji",

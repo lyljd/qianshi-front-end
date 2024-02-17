@@ -1,9 +1,8 @@
 <template>
   <div class="pu-container">
     <el-menu :default-active="$route.path" router mode="horizontal">
-      <el-menu-item v-show="uploadItem === 'video' || uploadItem === ''"
-        index="/platform/upload/video">视频投稿</el-menu-item>
-      <el-menu-item v-show="uploadItem === 'read' || uploadItem === ''" index="/platform/upload/read">专栏投稿</el-menu-item>
+      <el-menu-item index="/platform/upload/video">视频投稿</el-menu-item>
+      <el-menu-item index="/platform/upload/read">专栏投稿</el-menu-item>
     </el-menu>
   </div>
 
@@ -15,18 +14,6 @@ import { useStore } from "@/store"
 
 const store = useStore()
 store.setPlatformCurTitle("投稿")
-store.setUploadItem = setUploadItem
-store.getUploadItem = getUploadItem
-
-let uploadItem = ref("")
-
-function setUploadItem(item: string) {
-  uploadItem.value = item
-}
-
-function getUploadItem() {
-  return uploadItem.value
-}
 </script>
 
 <style lang="less" scoped>

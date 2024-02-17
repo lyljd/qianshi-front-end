@@ -4,9 +4,8 @@
       <el-aside width="150px">
         <el-menu :default-active=$route.path router="true">
           <div class="page-title">
-            <div class="logo">
-              <img class="icon" src="/favicon.png">
-              <span>浅时</span>
+            <div>
+              <Image url="/favicon.png" :w="40" :h="40"></Image>
             </div>
             <div>后台管理</div>
             <div @click="cmjs.jump.new('/')" class="open-main-web">打开主站</div>
@@ -54,7 +53,7 @@ function setItemIndex(idx: number, index: string) {
 
 <style lang="less" scoped>
 .container .page-title {
-  height: 83px;
+  height: 84px;
   border-bottom: 1px solid #dcdfe6;
   display: flex;
   align-items: center;
@@ -65,25 +64,12 @@ function setItemIndex(idx: number, index: string) {
   cursor: default;
 }
 
-.container .page-title .logo {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-  font-size: 30px;
-  margin-left: -21px;
-}
-
-.container .page-title .logo .icon {
-  width: 37.5px;
-  vertical-align: top;
-}
-
 .container .page-title .open-main-web {
   position: absolute;
   font-size: 12px;
   width: 15px;
   padding-left: 3px;
-  height: 83px;
+  height: 84px;
   align-self: flex-end;
   border-left: 1px solid #dcdfe6;
   background-color: #FAFAFA;

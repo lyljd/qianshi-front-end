@@ -5,15 +5,13 @@
         <el-input @keyup.enter.native="search" v-model="searchKey" show-word-limit :maxlength="50" :prefix-icon="Search"
           clearable placeholder="搜索视频" />
       </div>
+
       <el-tab-pane :label="`已通过 ${listNum.pubedNum}`" name="pubed">
-        <el-table @cell-click="pubedCellClick" :cell-style="pubedCellStyle" border :data="pubed.list">
+        <el-table @cell-click="pubedCellClick" :cell-style="pubedCellStyle" border :data="pubed.list" class="pubed">
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
-              <el-image class="cover" :src="pubed.list[scope.$index].coverUrl">
-                <template #error>
-                  <div class="default">封面加载失败</div>
-                </template>
-              </el-image>
+              <Image :url="pubed.list[scope.$index].coverUrl" :w="210" :h="118.13" round errorText="封面加载失败"
+                :errorTextFontSize="16"></Image>
             </template>
           </el-table-column>
 
@@ -38,10 +36,9 @@
         </div>
       </el-tab-pane>
 
-
       <el-tab-pane :label="`进行中 ${listNum.isPubingNum}`" name="isPubing">
         <el-table @cell-click="isPubingCellClick" :cell-class-name="isPubingCellClassName" :cell-style="isPubingCellStyle"
-          border :data="isPubing.list">
+          :data="isPubing.list" class="is-pubing">
           <el-table-column label="修改后信息" :width="100" type="expand">
             <template #default="props"> <!--数据默认懒加载-->
               <VideoDescriptions :data="(props.row.modifyInfo)" title=""></VideoDescriptions>
@@ -50,11 +47,8 @@
 
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
-              <el-image class="cover" :src="isPubing.list[scope.$index].coverUrl">
-                <template #error>
-                  <div class="default">封面加载失败</div>
-                </template>
-              </el-image>
+              <Image :url="isPubing.list[scope.$index].coverUrl" :w="210" :h="118.13" round errorText="封面加载失败"
+                :errorTextFontSize="16"></Image>
             </template>
           </el-table-column>
 
@@ -84,16 +78,13 @@
         </div>
       </el-tab-pane>
 
-
       <el-tab-pane :label="`未通过 ${listNum.notPubedNum}`" name="notPubed">
-        <el-table @cell-click="notPubedCellClick" :cell-style="notPubedCellStyle" border :data="notPubed.list">
+        <el-table @cell-click="notPubedCellClick" :cell-style="notPubedCellStyle" border :data="notPubed.list"
+          class="not-pubed">
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
-              <el-image class="cover" :src="notPubed.list[scope.$index].coverUrl">
-                <template #error>
-                  <div class="default">封面加载失败</div>
-                </template>
-              </el-image>
+              <Image :url="notPubed.list[scope.$index].coverUrl" :w="210" :h="118.13" round errorText="封面加载失败"
+                :errorTextFontSize="16"></Image>
             </template>
           </el-table-column>
 
@@ -141,76 +132,63 @@
 
   <el-dialog width="75%" v-model="editWindowVisible" :custom-class="'edit-dialog'" :before-close="beforeEditWindowClose"
     title="视频编辑" align-center>
-    <div class="setting">
-      <div>
-        <span class="notice"><span style="color: red;">*</span>视频：</span>
-        <el-button v-blur :disabled="videoUploadPercent !== 0" @click="store.openPVWindow(video.videoUrl)">预览</el-button>
-        <el-button v-blur :disabled="videoUploadPercent !== 0" @click="openVideoUpload">上传</el-button>
-      </div>
-      <el-upload :before-upload="beforeVideoUpload" :on-remove="onVideoUploadRemove" :on-change="onVideoUploadChange"
-        :on-progress="onVideoUploadProgress" :on-success="onVideoUploadSuccess" :on-error="onVideoUploadError"
-        ref="videoUpload" action="/api/resource/video" accept="video/*" v-show="false"></el-upload>
-      <el-progress v-show="videoUploadPercent !== 0" :percentage="videoUploadPercent" class="prg" :stroke-width="10" />
-      <div class="tip">
-        <span>上传的视频大小上限为1G</span>
-        <span>上传视频，即表示您已同意 <Agreement></Agreement> ，请勿上传色情，反动等违法视频。</span>
-      </div>
-
-      <div>
-        <span class="notice"><span style="color: red;">*</span>封面：</span>
-        <ImageUpload @recImgUrl="recImgUrl" @recImgUploadPercent="recImgUploadPercent" uploadUrl="/api/resource/cover"
-          :imgUrl="video.coverUrl">
-        </ImageUpload>
-      </div>
-
-      <div>
-        <span class="notice"><span style="color: red;">*</span>标题：</span>
-        <el-input ref="titleInput" v-model="video.title" maxlength="50" placeholder="请输入标题" show-word-limit />
-      </div>
-
-      <div>
-        <span class="notice"><span style="color: red;">*</span>分区：</span>
-        <el-select ref="regionSelect" v-model="video.region" placeholder="请选择分区">
-          <el-option label="番剧" value="anime" />
-          <el-option label="游戏" value="game" />
-          <el-option label="音乐" value="music" />
-          <el-option label="科技" value="tech" />
-          <el-option label="其它" value="other" />
-        </el-select>
-      </div>
-
-      <div>
-        <span class="notice">标签：</span>
-        <div class="tag-container">
-          <el-tag class="tag" v-for="tag in video.tags" closable @close="delTag(tag)">
-            {{ tag }}
-          </el-tag>
-          <input v-if="newTagInputVisible" class="new-tag-input" ref="newTagInput" v-model="newTagInputValue"
-            @keyup.enter="newTag" @blur="newTag">
-          <el-button v-blur class="new-tag-btn" v-else size="small" @click="showNewTagInput">
-            + New Tag
-          </el-button>
+    <div class="v-container">
+      <div class="upload-form">
+        <div class="row">
+          <span class="notice"><span class="require">*</span>视频：</span>
+          <VideoUpload style="width: 100%;" @setVideoUrl="(f: Function) => { setVideoUrl = f }"
+            :initVideoUrl="video.videoUrl" :uploadHandler="videoUploadHandler">
+          </VideoUpload>
         </div>
-      </div>
 
-      <div>
-        <span class="notice">简介：</span>
-        <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="填写更全面的相关信息，让更多的人能找到你的视频吧" type="textarea"
-          show-word-limit />
-      </div>
+        <div class="row">
+          <span class="notice"><span class="require">*</span>封面：</span>
+          <ImageUpload @setImgUrl="(f: Function) => { setCoverUrl = f }" :initImgUrl="video.coverUrl" :w="270" :h="151.88"
+            proportion="16:9" :uploadHandler="coverUploadHandler">
+          </ImageUpload>
+        </div>
 
-      <div>
-        <span class="notice">权益声明：</span>
-        <el-checkbox :disabled="editEmpowerDisabled" v-model="video.empower" label="未经作者授权，禁止转载" />
-      </div>
-      <div class="tip">
-        <span>勾选后该文案会显示在视频播放页中，此选项可以在再次编辑时取消。<span style="color: #FF6699;">一旦取消勾选操作，不可再次勾选。</span></span>
-      </div>
+        <div class="row">
+          <span class="notice"><span class="require">*</span>标题：</span>
+          <el-input ref="titleInputRef" v-model="video.title" maxlength="50" placeholder="请输入标题" show-word-limit />
+        </div>
 
-      <div style="justify-content: center;">
-        <el-button v-blur
-          :disabled="!hasEdit || videoUploadPercent !== 0 || coverUploadPercent !== 0 || video.title === ''"
-          @click="modifyVideo" type="primary" size="large">修改</el-button>
+        <div class="row">
+          <span class="notice"><span class="require">*</span>分区：</span>
+          <el-select ref="regionSelect" v-model="video.region" placeholder="请选择分区">
+            <el-option label="番剧" value="anime" />
+            <el-option label="游戏" value="game" />
+            <el-option label="音乐" value="music" />
+            <el-option label="科技" value="tech" />
+            <el-option label="其它" value="other" />
+          </el-select>
+        </div>
+
+        <div class="row">
+          <span class="notice">标签：</span>
+          <TagInput :tags="video.tags" :limit="10"></TagInput>
+        </div>
+
+        <div class="row">
+          <span class="notice">简介：</span>
+          <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="请输入简介" type="textarea" show-word-limit />
+        </div>
+
+        <div class="row">
+          <span class="notice">权益声明：</span>
+          <div>
+            <el-checkbox :disabled="editEmpowerDisabled" v-model="video.empower" label="未经作者授权，禁止转载" />
+            <div class="tip">
+              <span>勾选后该文案会显示在视频播放页中</span>
+              <span style="color: #FF6699;">若在修改时取消勾选该项，后续在编辑时将不能恢复勾选。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="justify-content: center;">
+          <el-button v-blur :disabled="!hasEdit || videoUploading || coverUploading" @click="submit" type="primary"
+            size="large">修改</el-button>
+        </div>
       </div>
     </div>
   </el-dialog>
@@ -223,11 +201,12 @@ import mockIsPubing from "@/mock/platform/article/video/is_pubing.json"
 import mockNotPubed from "@/mock/platform/article/video/not_pubed.json"
 import cmjs from '@/cmjs'
 import { Search } from '@element-plus/icons-vue'
-import { UploadInstance, ElMessageBox, ElSelect, ElInput } from 'element-plus'
+import { ElMessageBox, ElSelect, ElInput } from 'element-plus'
 import { useStore } from "@/store"
 import VideoDescriptions from "@/components/util/VideoDescriptions.vue"
 import ImageUpload from "@/components/common/ImageUpload.vue"
-import Agreement from '@/components/common/Agreement.vue'
+import VideoUpload from "@/components/common/VideoUpload.vue"
+import TagInput from '@/components/common/TagInput.vue'
 
 type Num = {
   pubedNum: number,
@@ -292,16 +271,17 @@ type Video = {
 const store = useStore()
 store.setPlatformItemIndex(2, location.pathname)
 
-const videoUpload = ref<UploadInstance>()
-const newTagInput = ref<HTMLInputElement>()
-const titleInput = ref<InstanceType<typeof ElInput>>()
+const titleInputRef = ref<InstanceType<typeof ElInput>>()
 
 let pubedCurPage = ref(1)
 let isPubingCurPage = ref(1)
 let notPubedCurPage = ref(1)
 
 let listNum: Num = reactive(getNum())
-let pubed: Pubed = reactive(getPubed())
+let pubed: Pubed = reactive({
+  total: 0,
+  list: []
+})
 let isPubing: IsPubing = reactive({
   total: 0,
   list: []
@@ -310,7 +290,7 @@ let notPubed: NotPubed = reactive({
   total: 0,
   list: []
 })
-let viewItem = ref("pubed")
+let viewItem = ref(handleUrlQueryTab())
 let searchKey = ref("")
 let appealIdx = ref(-1)
 
@@ -332,15 +312,14 @@ let videoCopy: Video = reactive({
   intro: "",
   empower: false
 })
-let preVideoId = ref(0)
-let preVideoUrl = ref("")
-let coverUploadPercent = ref(0)
-let videoUploadPercent = ref(0)
-let newTagInputValue = ref("")
-let newTagInputVisible = ref(false)
+
 let editWindowVisible = ref(false)
 let editEmpowerDisabled = ref(false)
 let hasEdit = ref(false)
+let coverUploading = ref(false)
+let videoUploading = ref(false)
+let setCoverUrl: Function
+let setVideoUrl: Function
 
 watch(video, (newV) => {
   if (newV.videoUrl !== videoCopy.videoUrl || newV.coverUrl !== videoCopy.coverUrl || newV.title !== videoCopy.title || newV.region !== videoCopy.region || JSON.stringify(newV.tags) !== JSON.stringify(videoCopy.tags) || newV.intro !== videoCopy.intro || newV.empower !== videoCopy.empower) {
@@ -369,6 +348,7 @@ function tabChange() {
       } else {
         pubedCurPage.value = 1
       }
+      cmjs.util.addUrlQuery('tab', 'pubed')
       break
     }
     case "isPubing": {
@@ -377,6 +357,7 @@ function tabChange() {
       } else {
         isPubingCurPage.value = 1
       }
+      cmjs.util.addUrlQuery('tab', 'isPubing')
       break
     }
     case "notPubed": {
@@ -385,6 +366,7 @@ function tabChange() {
       } else {
         notPubedCurPage.value = 1
       }
+      cmjs.util.addUrlQuery('tab', 'notPubed')
       break
     }
   }
@@ -466,7 +448,23 @@ function appeal() {
     return
   }
 
-  store.openFSWindow('申诉', '#', { id: notPubed.list[appealIdx.value].id }, '请输入申诉理由', '理由不能为空', "提交成功！管理员会尽快处理的，请留意系统消息", () => { notPubed.list[appealIdx.value].appealStatus = true })
+  store.openFSWindow({
+    title: "申诉",
+    placeholder: "请输入申诉理由",
+    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+      // TODO api
+      console.log({
+        "msg": msg,
+        "fileList": fileList,
+        "data": {
+          id: notPubed.list[appealIdx.value].id,
+        },
+      })
+      cmjs.prompt.success("提交成功！管理员会尽快处理的，请留意系统消息")
+      notPubed.list[appealIdx.value].appealStatus = true
+      closeWindow()
+    },
+  })
 }
 
 function getVideo(id: number): Video {
@@ -507,7 +505,6 @@ function setVideo(v: Video) {
   videoCopy.intro = v.intro
   videoCopy.empower = v.empower
 
-  preVideoUrl.value = video.videoUrl
   editEmpowerDisabled.value = !video.empower
 }
 
@@ -551,22 +548,66 @@ function beforeEditWindowClose(done: Function) {
   }
 }
 
-function modifyVideo() {
+function coverUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  coverUploading.value = true
+
+  // TODO api
+
+  const url = URL.createObjectURL(file)
+  setCoverUrl(url)
+  const timer = setInterval(() => {
+    const randPercent = Math.floor(Math.random() * 26) + 25 // [25,50]，整数
+    if (percent.value + randPercent < 100) {
+      percent.value += randPercent
+    } else {
+      percent.value = 100
+      clearInterval(timer)
+      coverUploading.value = false
+      video.coverUrl = url // fail时不能设置！！
+      succ()
+      // fail()
+    }
+  }, 1000)
+}
+
+function videoUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  videoUploading.value = true
+
+  // TODO api
+
+  const url = URL.createObjectURL(file)
+  setVideoUrl(url)
+  const timer = setInterval(() => {
+    const randPercent = Math.floor(Math.random() * 11) + 10 // [10,20]，整数
+    if (percent.value + randPercent < 100) {
+      percent.value += randPercent
+    } else {
+      percent.value = 100
+      clearInterval(timer)
+      videoUploading.value = false
+      video.videoUrl = url // fail时不能设置！！
+      succ()
+      // fail()
+    }
+  }, 1000)
+}
+
+function submit() {
   video.title = video.title.trim()
   video.intro = video.intro.trim()
 
   if (video.title.length === 0) {
     cmjs.prompt.error("请输入标题")
-    titleInput.value?.focus()
+    titleInputRef.value?.focus()
     return
   }
 
   // TODO api
   // TODO 若在pubed页则需删除该条数据并跳转到isPubing
+  console.log(video)
 
   editWindowVisible.value = false
   store.switchAsk = false
-
   cmjs.prompt.success("修改成功")
 }
 
@@ -609,78 +650,6 @@ function cancelModify(idx: number) {
       viewItem.value = "pubed"
       cmjs.prompt.success('取消修改成功')
     })
-}
-
-function recImgUploadPercent(imgUploadPercent: number) {
-  coverUploadPercent.value = imgUploadPercent
-}
-
-function recImgUrl(imgUrl: string) {
-  video.coverUrl = imgUrl
-}
-
-function openVideoUpload() {
-  videoUpload.value?.$el.querySelector('input').click()
-}
-
-function beforeVideoUpload(rawFile: any) {
-  if (rawFile.size / 1024 / 1024 / 1024 > 1) {
-    cmjs.prompt.error("上传的视频大小不能超过1G")
-    return false
-  }
-  return true
-}
-
-function onVideoUploadRemove() {
-  video.videoUrl = preVideoUrl.value
-}
-
-function onVideoUploadChange(file: any) {
-  if (file.uid !== preVideoId.value) {
-    preVideoId.value = file.uid
-    video.videoUrl = URL.createObjectURL(file.raw)
-  }
-}
-
-function onVideoUploadProgress(event: any) {
-  videoUploadPercent.value = Math.floor(event.percent)
-}
-
-function onVideoUploadSuccess() {
-  preVideoUrl.value = video.videoUrl
-  videoUploadPercent.value = 0
-  cmjs.prompt.success("视频上传成功")
-}
-
-function onVideoUploadError() {
-  video.videoUrl = preVideoUrl.value
-  videoUploadPercent.value = 0
-  cmjs.prompt.error("视频上传失败")
-}
-
-function delTag(tag: string) {
-  video.tags.splice(video.tags.indexOf(tag), 1)
-}
-
-function showNewTagInput() {
-  newTagInputVisible.value = true
-  nextTick(() => {
-    newTagInput.value!.focus()
-  })
-}
-
-function newTag() {
-  let val = newTagInputValue.value
-  if (val) {
-    if (video.tags.includes(val)) {
-      cmjs.prompt.error("该标签已存在")
-      newTagInput.value!.focus()
-      return
-    }
-    video.tags.push(val)
-  }
-  newTagInputVisible.value = false
-  newTagInputValue.value = ""
 }
 
 function tableTimeFormatter(_: any, __: any, time: number) {
@@ -738,112 +707,77 @@ function notPubedCellStyle(cell: any) {
   }
   return {}
 }
+
+function handleUrlQueryTab(): string {
+  const tab = cmjs.util.getUrlQuery('tab')
+  if (!tab) {
+    pubed = reactive(getPubed())
+    return "pubed"
+  }
+
+  switch (tab) {
+    case 'pubed': {
+      pubed = reactive(getPubed())
+      return "pubed"
+    }
+    case 'isPubing': {
+      isPubing = reactive(getIsPubing())
+      return "isPubing"
+    }
+    case 'notPubed': {
+      notPubed = reactive(getNotPubed())
+      return "notPubed"
+    }
+    default: {
+      cmjs.prompt.error('不存在的页面')
+      cmjs.util.addUrlQuery('tab', 'pubed')
+      pubed = reactive(getPubed())
+      return "pubed"
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
-.v-container .cover {
-  width: 210px;
-  height: 118.125px;
-  border-radius: 5px;
-}
+.v-container {
+  .appealBtnT {
+    cursor: not-allowed;
+    background-color: #c8c9cc;
+    border-color: #c8c9cc;
+  }
 
-.v-container .appealBtnT {
-  cursor: not-allowed;
-  background-color: #c8c9cc;
-  border-color: #c8c9cc;
-}
+  .page-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 
-.v-container .page-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-}
+  .upload-form {
+    .row:first-child {
+      margin-top: 0 !important;
+    }
 
-.setting {
-  margin-top: -30px;
-  margin-bottom: -10px;
-}
+    .row {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
 
-.setting>div:not(.tip) {
-  display: flex;
-  align-items: center;
-}
+      .notice {
+        font-size: 14px;
+        margin-right: 10px;
+        min-width: 75px;
+        text-align: right;
 
-.setting>div:not(:first-child, .tip) {
-  margin-top: 10px;
-}
-
-.tip {
-  margin-left: 85px;
-}
-
-.setting .notice {
-  font-size: 14px;
-  margin-right: 10px;
-  min-width: 75px;
-  text-align: right;
-}
-
-.setting .upload-cover-div {
-  width: 210px;
-  height: 116.125px;
-  /* 这里的高度必须比cover的高度少2px，因为上下的border还占了2px */
-  border-radius: 5px;
-  cursor: pointer;
-  border: 1px dashed #909399;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
-  font-size: 14px;
-}
-
-.setting .cover {
-  width: 210px;
-  height: 118.125px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.setting .tag-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.setting .tag,
-.setting .new-tag-btn {
-  min-width: 100px;
-  height: 30px;
-  font-size: 14px;
-  border-radius: 5px;
-}
-
-.setting .new-tag-input {
-  width: 78px;
-  height: 18px;
-  font-size: 14px;
-  border-radius: 5px;
-  outline: none;
-  border: 1px solid #409EFF;
-  padding: 5px 10px;
-}
-
-.setting .prg {
-  margin-top: 0 !important;
-  margin-left: 85px;
+        .require {
+          color: red;
+        }
+      }
+    }
+  }
 }
 </style>
 
 <style>
-.setting .prg .el-progress__text {
-  font-size: 14px !important;
-  display: flex;
-  justify-content: right;
-  margin-left: -10px;
-}
-
 .v-container .el-tabs__nav-wrap::after {
   display: none;
 }
@@ -868,10 +802,6 @@ function notPubedCellStyle(cell: any) {
   margin-bottom: 10px;
 }
 
-.v-container .el-image {
-  vertical-align: top;
-}
-
 .v-container .no-vid .el-table__expand-icon {
   pointer-events: none;
 }
@@ -882,13 +812,18 @@ function notPubedCellStyle(cell: any) {
 
 .edit-dialog {
   height: 75%;
-  max-height: 597px;
+  max-height: 745.66px;
+  /* dialog的header加上body的高度，假如屏幕很长再显示75%就会出现空白区域了 */
   overflow: auto;
-}
 
-.edit-dialog .el-dialog__header {
-  padding: 20px;
-  margin: 0;
+  .el-dialog__header {
+    padding: 20px !important;
+    padding-bottom: 0 !important;
+  }
+
+  .el-dialog__body {
+    padding: 20px !important;
+  }
 }
 
 #appeal-reason {
@@ -908,5 +843,36 @@ function notPubedCellStyle(cell: any) {
   color: red;
   font-size: 12px;
   display: none;
+}
+
+.el-tabs__header .is-top {
+  /* 同上，在预览时会出现在图片顶上 */
+  z-index: 0;
+}
+
+.el-table__inner-wrapper::before {
+  /* 同上，不知道哪跑出来的线 */
+  display: none;
+}
+
+.pubed,
+.not-pubed {
+  .el-table__empty-block {
+    border-bottom: 1px solid #ebeef5;
+  }
+}
+
+.is-pubing {
+  .el-table__empty-block {
+    width: 100% !important;
+  }
+
+  /* 本来在table上加个border就行的，但是那个border会在预览封面时出现 */
+  border: 1px solid #ebeef5;
+
+  th:not(:last-child),
+  td:not(:last-child) {
+    border-right: 1px solid #ebeef5 !important;
+  }
 }
 </style>

@@ -1,10 +1,10 @@
 <template>
   <div class="cw-container">
-    <el-dialog @close="clearInput" v-model="dialogVisible" title="人机验证" :width="360" :close-on-press-escape=false
+    <el-dialog @close="clearInput" v-model="dialogVisible" title="人机验证" :width="300" :close-on-press-escape=false
       :close-on-click-modal=false :align-center=true>
       <div style="display: flex;">
-        <el-input @keyup.enter.native="verify" maxlength="4" v-model="input" class="vi" />
-        <Image :url="captchaUrl" :w="100" :h="30" border :round="false"></Image>
+        <el-input @keyup.enter.native="verify" maxlength="4" v-model="input" class="vi" placeholder="请输入右侧图片中的数字" />
+        <Image :url="captchaUrl" :w="100" :h="30" border style="border-left: none;"></Image>
       </div>
       <template #footer>
         <el-button v-blur @click="verify" :disabled="input.length !== 4" type="primary">验证</el-button>

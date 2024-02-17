@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="left">
-      <div :title="video.title" class="title">{{ video.title }}</div>
+      <div class="title"><span :title="video.title">{{ video.title }}</span></div>
 
       <div class="interaction-bar">
         <span :title="video.likeNum.toString()" @click="likeVideo" :class="{ highLight: video.isLike && isLogin }"
@@ -79,9 +79,7 @@
 
     <div class="right">
       <div class="avatar-container">
-        <el-avatar @click="cmjs.jump.user(video.author.uid)" class="avatar" :src="video.author.avatarUrl" @error="true">
-          <img @click="cmjs.jump.user(video.author.uid)" src="/default-avatar.png" />
-        </el-avatar>
+        <Avatar :url="video.author.avatarUrl" size="medium" :home="{ uid: video.author.uid }"></Avatar>
 
         <div class="info">
           <div class="nickname-row">
@@ -90,7 +88,7 @@
             <span class="iconfont el-icon-sixin send-msg">发消息</span>
           </div>
 
-          <div :title="video.author.signature" class="signature">{{ video.author.signature || "-" }}</div>
+          <div class="signature"><span :title="video.author.signature">{{ video.author.signature || "-" }}</span></div>
 
           <el-button v-blur @click="focuAuthor" class="focus"
             :type="video.author.isFocu && isLogin ? 'info' : 'primary'">{{
@@ -182,13 +180,14 @@ import Advertisement from "@/components/common/Advertisement.vue"
 import CommentArea from "@/components/common/CommentArea.vue"
 import VideoTag from "@/components/common/VideoTag.vue"
 import Video from '@/components/common/Video.vue'
+import Avatar from '@/components/common/Avatar.vue'
 import cmjs from '@/cmjs'
 import Data from '@/mock/video.json'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
-import { onBeforeRouteUpdate, useRoute } from "vue-router"
+import { onBeforeRouteUpdate, onBeforeRouteLeave, useRoute } from "vue-router"
 import { useRouter } from "vue-router"
-import { ElMessageBox } from 'element-plus'
+import cache from '@/cmjs/impl/cache'
 
 type Video = {
   vid: number,
@@ -319,8 +318,8 @@ const route = useRoute()
 const router = useRouter()
 const store = useStore()
 let { isLogin } = storeToRefs(store)
-store.$subscribe((_, state) => {
-  if (state.isLogin) {
+watch(() => store.isLogin, (newVal: boolean) => {
+  if (newVal) {
     setVideo()
   }
 })
@@ -334,7 +333,7 @@ let dmCtlEle: HTMLDivElement
 
 let video = ref<Video>(undefined as unknown as Video)
 let init = ref(false) // 页面是否初始化完成；在onMounted执行完毕后则初始化完成
-let autoStreaming = ref(localStorage.getItem("autoStreaming") !== "false" ? true : false) // 自动连播
+let autoStreaming = ref(cache.getLS("autoStreaming") !== "false" ? true : false) // 自动连播
 let nextVid = ref(-1)
 setVideo()
 let isUp = ref(cmjs.biz.verifyLoginUid(video.value.author.uid))
@@ -380,6 +379,11 @@ onMounted(() => {
 
 onBeforeRouteUpdate((to, from, next) => {
   setVideo(parseInt(to.params.vid as string))
+  next()
+})
+
+onBeforeRouteLeave((to, from, next) => {
+  document.title = '浅时'
   next()
 })
 
@@ -508,7 +512,22 @@ function reportVideo() {
     return
   }
 
-  store.openFSWindow("视频举报", "#", { vid: video.value.vid }, "请输入举报理由", "理由不能为空", "举报成功")
+  store.openFSWindow({
+    title: "视频举报",
+    placeholder: "请输入举报理由",
+    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+      // TODO api
+      console.log({
+        "msg": msg,
+        "fileList": fileList,
+        "data": {
+          vid: video.value.vid,
+        },
+      })
+      cmjs.prompt.success("提交成功")
+      closeWindow()
+    },
+  })
 }
 
 function reportDanmu(did: number) {
@@ -519,41 +538,34 @@ function reportDanmu(did: number) {
     return
   }
 
-  store.openFSWindow('弹幕举报', "#", { did: did }, '请输入举报理由', '理由不能为空', '举报成功')
+  store.openFSWindow({
+    title: "弹幕举报",
+    placeholder: "请输入举报理由",
+    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+      // TODO api
+      console.log({
+        "msg": msg,
+        "fileList": fileList,
+        "data": {
+          did: did,
+        },
+      })
+      cmjs.prompt.success("提交成功")
+      closeWindow()
+    },
+  })
 }
 
 function deleteDanmu(d: Danmu) {
   dmCtl.value.show = false
 
-  ElMessageBox.confirm('你确认要删除该弹幕吗？', '确认提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    showClose: false,
-    type: 'warning',
-    autofocus: false,
-  })
-    .then(() => {
-      delDm(d)
-    })
+  delDm(d)
 }
 
 function recallDanmu(d: Danmu) {
   dmCtl.value.show = false
 
-  ElMessageBox.confirm('你确认要撤回该弹幕吗？', '确认提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    showClose: false,
-    type: 'warning',
-    autofocus: false,
-  })
-    .then(() => {
-      recDm(d)
-    })
+  recDm(d)
 }
 
 function focuAuthor() {
@@ -584,6 +596,7 @@ function calcNextVid() {
     if (video.value.collection) {
       const vds = video.value.collection.videos
       if (vds[vds.length - 1].vid === video.value.vid) {
+        nextVid.value = -1
         return
       }
       for (let i = 0; i < vds.length - 1; i++) {
@@ -721,10 +734,6 @@ function danmuItemHoverLeave() {
     .avatar-container {
       display: flex;
       align-items: center;
-
-      .avatar {
-        cursor: pointer;
-      }
 
       .info {
         margin-left: 10px;
@@ -937,13 +946,14 @@ function danmuItemHoverLeave() {
       align-items: center;
       justify-content: space-between;
       font-size: 14px;
+    }
 
-      .autoStreaming {
-        display: flex;
-        align-items: center;
-        color: #909399;
-        cursor: default;
-      }
+    .autoStreaming {
+      display: flex;
+      align-items: center;
+      color: #909399;
+      cursor: default;
+      gap: 1px;
     }
 
     .recommend {

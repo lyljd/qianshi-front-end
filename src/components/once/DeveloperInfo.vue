@@ -1,10 +1,10 @@
 <template>
   <div class="dev-info">
-    <div>
+    <div class="beian-row">
       <a class="link" href="https://beian.miit.gov.cn" target="_blank">渝ICP备2023011499号-1</a>
       ·
-      <span>
-        <img src="/gaba.png" style="width: 14px;">
+      <span class="gaba">
+        <Image url="/gaba.png" :w="14" :h="14"></Image>
         <a class="link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=50010602503726"
           target="_blank">渝公网安备50010602503726号</a>
       </span>
@@ -41,13 +41,25 @@ function getEstablishDuration(): string {
   display: flex;
   align-items: center;
   flex-direction: column;
-}
+  cursor: default;
 
-.link {
-  color: #409EFF;
-}
+  .beian-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-.link:hover {
-  color: #337ecc;
+  .link {
+    color: #409EFF;
+  }
+
+  .link:hover {
+    color: #337ecc;
+  }
+
+  .gaba {
+    display: inline-flex;
+    align-items: center;
+  }
 }
 </style>

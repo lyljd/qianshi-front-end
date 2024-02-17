@@ -1,22 +1,23 @@
 <template>
   <div style="display: flex; flex-direction: column;">
     <div class="v-container">
+
       <div class="screen">
-        <video @mouseenter="cancelHoverDanmu" id="video" class="video"></video>
+        <video @mouseenter="cancelHoverDanmu" id="video" class="video" @error="handleVideoError"></video>
 
         <div @mouseenter="cancelHoverDanmu" v-if="trackShow" class="track-container">
-          <div v-for="idx in trackNum" :style="{ height: `${trackHeight * proportion}px` }" class="track"><span
+          <div v-for="idx in trackNum" :style="{ height: `${trackHeight * thProportion}px` }" class="track"><span
               style="margin-left: 15px;">{{ idx }}</span></div>
         </div>
 
         <div v-for="d in runningDanmus" :key="d.id" class="danmu" :class="d.isUp ? ' danmu-modal' : ''"
           @animationend="doneDanmu(d)"
-          :style="{ animationPlayState: d.id === dmHover.dm.id || !playStatus ? 'paused' : '', color: d.color, top: `${d.track! * trackHeight * proportion + (trackHeight * proportion - 20 * dmSize * proportion / 100) / 2 - (d.isUp ? 5 : 0)}px`, zIndex: dmShow ? 'auto' : '-1', opacity: dmOpacity / 100, fontSize: `${20 * dmSize * proportion / 100}px`, lineHeight: `${20 * dmSize * proportion / 100}px`, animationDuration: `${10 - dmSpeed}s` }"
+          :style="{ animationPlayState: d.id === dmHover.dm.id || !playStatus ? 'paused' : '', color: d.color, top: `${d.track! * trackHeight * thProportion + (trackHeight * thProportion - 20 * dmSize * dsProportion / 100) / 2 - (d.isUp ? 5 : 0)}px`, zIndex: dmShow ? 'auto' : '-1', opacity: dmOpacity / 100, fontSize: `${20 * dmSize * dsProportion / 100}px`, lineHeight: `${20 * dmSize * dsProportion / 100}px`, animationDuration: `${10 - dmSpeed + (d.aniDiff as number)}s` }"
           @mouseenter="(event: MouseEvent) => { hoverDanmu(d, event) }" :id="`dm-${d.id}`">
           <span v-if="!d.isUp && d.isLike && isLogin" @click="d.isLike ? cancelLikeDanmu(d) : likeDanmu(d)"
-            :style="{ fontSize: `${20 * dmSize * proportion / 100}px` }" class="iconfont el-icon-good-fill icon"></span>
+            :style="{ fontSize: `${20 * dmSize * dsProportion / 100}px` }" class="iconfont el-icon-good-fill icon"></span>
           <div v-if="d.isUp"
-            :style="{ fontSize: `${12 * dmSize * proportion / 100}px`, lineHeight: `${12 * dmSize * proportion / 100}px`, padding: `${4 * dmSize * proportion / 100}px` }"
+            :style="{ fontSize: `${12 * dmSize * dsProportion / 100}px`, lineHeight: `${12 * dmSize * dsProportion / 100}px`, padding: `${4 * dmSize * dsProportion / 100}px` }"
             class="upzhu">UP主</div>
           <span :style="{ border: d.isNew && !d.isUp ? '1px solid' : '' }">{{ d.content }}</span>
         </div>
@@ -46,11 +47,207 @@
           enterActiveClass="animate__animated animate__fadeIn">
           <div v-show="tipShow" id="tip" class="tip">{{ tipContent }}</div>
         </transition>
+
+        <div id="ps" v-show="previewShow" :style="{ left: psLeft + 'px' }">
+          <video id="psv" @contextmenu="(event: any) => { event.preventDefault() }"></video>
+          <div class="ps-time">{{ psTime }}</div>
+        </div>
+
+        <transition :leaveActiveClass="!btProgerssShow ? 'animate__animated animate__fadeOut' : ''"
+          enterActiveClass="animate__animated animate__fadeIn">
+          <div class="ctl-bar-container" v-show="ctlBarShow">
+            <el-progress @click="handleProgressClick" @mousemove="handleProgressMove" @mouseleave="hidePreview"
+              class="progress" :percentage="videoTimePercentage" :show-text="false" />
+
+            <div id="ctl-bar" class="ctl-bar">
+              <div class="left-bar">
+                <span v-show="props.collection && activeItemPos > 0"
+                  @click="selectEpisode(props.collection![activeItemPos - 1].vid)"
+                  class="iconfont el-icon-shangyiji pre"></span>
+
+                <span v-show="!playStatus" @click="errorStatus ? undefined : videoEle.play()"
+                  class="iconfont el-icon-bofang play" :style="{ cursor: errorStatus ? 'not-allowed' : '' }"></span>
+
+                <span v-show="playStatus" @click="videoEle.pause()" class="iconfont el-icon-zanting pause"></span>
+
+                <span v-show="props.collection && activeItemPos < props.collection.length - 1"
+                  @click="selectEpisode(props.collection![activeItemPos + 1].vid)"
+                  class="iconfont el-icon-xiayiji next"></span>
+
+                <span style="cursor: default;">{{ videoCurrent }} / {{ videoDuration }}</span>
+              </div>
+
+              <div v-show="fullScreenStatus" class="flex-center" style="gap: 15px;">
+                <el-tooltip :append-to="vContainerEle" :content="dmShow ? '关闭弹幕(d)' : '开启弹幕(d)'" placement="top"
+                  effect="light" :enterable="false">
+                  <span @click="setDanmuShow" class="iconfont icon dm-ico"
+                    :class="`el-icon-dm-${dmShow ? 'open' : 'close'}`"></span>
+                </el-tooltip>
+
+                <el-popover :append-to="vContainerEle" placement="top" :show-arrow="false"
+                  popper-style="min-width:unset; width: auto;">
+                  <template #reference>
+                    <span class="iconfont el-icon-dm-set icon dm-ico"></span>
+                  </template>
+
+                  <div class="dmsz-container">
+                    <div class="option">
+                      <span>不透明度</span><el-slider v-model="dmOpacity" @change="cmjs.cache.setLS('dmOpacity', dmOpacity)"
+                        :show-tooltip="false" class="slider"></el-slider>{{ dmOpacity
+                        }}%
+                    </div>
+                    <div class="option">
+                      <span>显示区域</span><el-slider v-model="dmRegion" @change="cmjs.cache.setLS('dmRegion', dmRegion)"
+                        :min="25" :step="25" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmRegionMark()
+                        }}
+                    </div>
+                    <div class="option">
+                      <span>弹幕字号</span><el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)" :min="75"
+                        :max="150" :show-tooltip="false" class="slider"></el-slider>{{
+                          dmSize }}%
+                    </div>
+                    <div class="option">
+                      <span>弹幕放大率<el-tooltip :append-to="vContainerEle" content="弹幕在全屏时根据屏幕等比放大比例的占比" placement="top">
+                          <span class="iconfont el-icon-info"></span>
+                        </el-tooltip></span><el-slider v-model="dmEnlargeRate"
+                        @change="cmjs.cache.setLS('dmEnlargeRate', dmEnlargeRate)" :show-tooltip="false"
+                        class="slider"></el-slider>{{
+                          dmEnlargeRate }}%
+                    </div>
+                    <div class="option">
+                      <span>弹幕速度</span><el-slider v-model="dmSpeed" @change="cmjs.cache.setLS('dmSpeed', dmSpeed)"
+                        :min="3" :max="7" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark() }}
+                    </div>
+                  </div>
+                </el-popover>
+
+                <div style="display: flex;">
+                  <div class="danmu-input-container">
+                    <el-popover :append-to="vContainerEle" placement="top" :show-arrow="false"
+                      popper-style="min-width:unset; width: auto;">
+                      <template #reference>
+                        <span class="iconfont el-icon-font-set icon font-set-ico"></span>
+                      </template>
+
+                      <div class="ftsz-container">
+                        <div class="option">
+                          颜色：<ColorPicker v-model="ftColor" :append-to="vContainerEle"></ColorPicker>
+                        </div>
+                      </div>
+                    </el-popover>
+
+                    <el-input ref="dmInput2Ref" @keyup.enter.native="sendDanmu" class="danmu-input" v-model="dmInput"
+                      maxlength="50" placeholder="发个友善的弹幕见证当下" />
+                  </div>
+
+                  <el-button v-blur v-login @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
+                </div>
+              </div>
+
+              <div class="right-bar">
+                <el-popover :teleported="false" trigger="hover" placement="top"
+                  popper-style="min-width: unset; width: auto;" ref="videoQualityPop">
+                  <template #reference>
+                    <span class="quality">{{ videoQuality }}</span>
+                  </template>
+                  <el-radio-group @change="changeVideoQuality" v-model="videoQuality">
+                    <div class="row">
+                      <el-radio-button v-for="q in props.video" style="margin: 0;" :label="q.label" />
+                    </div>
+                  </el-radio-group>
+                </el-popover>
+
+                <el-popover ref="collectionPop" :teleported="false" trigger="hover" placement="top"
+                  popper-style="min-width: unset; width: auto; padding: 0;" @show="locateTo">
+                  <template #reference>
+                    <span v-if="props.collection" v-show="fullScreenStatus" class="collection">选集</span>
+                  </template>
+                  <div class="collection-container">
+                    <ul class="collection-item-container">
+                      <li v-for="c in props.collection" :class="{ activeItem: c.vid === props.vid }"
+                        @click="selectEpisode(c.vid)">{{ c.title }}</li>
+                    </ul>
+                  </div>
+                </el-popover>
+
+                <el-popover :teleported="false" :trigger="playSpeed === 3 ? 'never' : 'hover'" placement="top"
+                  popper-style="min-width:unset; width: auto;" ref="playSpeedPop">
+                  <template #reference>
+                    <span :style="{ cursor: playSpeed === 3 ? 'not-allowed' : 'pointer' }" class="speed">{{ playSpeed ===
+                      1
+                      ? '倍速' :
+                      `${playSpeed}x` }}</span>
+                  </template>
+                  <el-radio-group class="speed-radio-group" @change="setPlaySpeed" v-model="playSpeed"
+                    :disabled="errorStatus">
+                    <el-radio :label="2">2x</el-radio>
+                    <el-radio :label="1.5">1.5x</el-radio>
+                    <el-radio :label="1.25">1.25x</el-radio>
+                    <el-radio :label="1">1x</el-radio>
+                    <el-radio :label="0.75">0.75x</el-radio>
+                    <el-radio :label="0.5">0.5x</el-radio>
+                  </el-radio-group>
+                </el-popover>
+
+                <el-popover :teleported="false" trigger="hover" placement="top"
+                  popper-style="min-width:unset; width: 245px;">
+                  <template #reference>
+                    <span v-show="!mutedStatus" @click="setMutedStatus" class="iconfont el-icon-yinliang icon"></span>
+                  </template>
+                  <div class="row" style="gap: 10px;">
+                    <span style="margin: 0;">{{ volume }}</span>
+                    <div><el-slider @input="changeVolume" style="width: 185px; margin: 0;" v-model="volume"
+                        :show-tooltip="false" /></div>
+                  </div>
+                </el-popover>
+
+                <el-tooltip content="关闭静音(m)" placement="top" effect="light" :enterable="false">
+                  <span v-show="mutedStatus" @click="setMutedStatus" class="iconfont el-icon-jingyin icon"></span>
+                </el-tooltip>
+
+                <el-popover :teleported="false" trigger="hover" placement="top"
+                  popper-style="min-width:unset; width: 160px;">
+                  <template #reference>
+                    <span class="iconfont el-icon-shezhi icon"></span>
+                  </template>
+                  <div @click="setAutoplay" class="row">静音自动开播<el-switch style="margin-left: 5px;" v-model="autoplay" />
+                  </div>
+                  <div @click="setBtProgressShow" class="row">底部进度条<el-switch style="margin-left: 5px;"
+                      v-model="btProgerssShow" />
+                  </div>
+                </el-popover>
+
+                <el-tooltip :content="!pipStatus ? '开启画中画' : '退出画中画'" placement="top" effect="light" :enterable="false"
+                  :append-to="vContainerEle">
+                  <span @click="!pipStatus ? pip() : cancelPip()" class="iconfont el-icon-huazhonghua icon"
+                    :style="{ cursor: errorStatus ? 'not-allowed' : '' }"></span>
+                </el-tooltip>
+
+                <el-tooltip content="进入全屏(f)" placement="top-end" effect="light" :enterable="false">
+                  <span @click="fullScreen" v-show="!fullScreenStatus" class="iconfont el-icon-quanping icon"
+                    :style="{ cursor: errorStatus ? 'not-allowed' : '' }"></span>
+                </el-tooltip>
+
+                <el-tooltip content="退出全屏(f)" placement="top-end" effect="light" :enterable="false"
+                  :append-to="vContainerEle">
+                  <span @click="cancelFullScreen" v-show="fullScreenStatus"
+                    class="iconfont el-icon-quxiaoquanping icon"></span>
+                </el-tooltip>
+              </div>
+            </div>
+          </div>
+        </transition>
+
+        <transition enterActiveClass="animate__animated animate__fadeIn">
+          <el-progress class="bt-progress" v-show="!ctlBarShow && btProgerssShow" :percentage="videoTimePercentage"
+            :show-text="false" :stroke-width="fullScreenStatus ? 1 : 3"
+            :style="{ marginTop: fullScreenStatus ? -1 : -3 + 'px' }" />
+        </transition>
       </div>
 
       <div class="context-menu">
         <ul>
-          <li>弹幕视频播放器 v100923</li>
+          <li>弹幕视频播放器 v021724</li>
           <li @click="copyVideoUrl">复制视频地址（精准空降）</li>
           <li @click="shortcutKeyDescriptionWindowVisible = true">快捷键说明</li>
           <li @click="cmjs.jump.developer()">关于作者</li>
@@ -64,172 +261,6 @@
           <el-table-column prop="desc" label="说明" :align="'center'" />
         </el-table>
       </el-dialog>
-
-      <transition leaveActiveClass="animate__animated animate__fadeOut"
-        enterActiveClass="animate__animated animate__fadeIn">
-        <div class="ctl-bar-container" v-show="ctlBarShow">
-          <el-progress @click="handleProgressClick" @mousemove="handleProgressMove" @mouseleave="hideTip" class="progress"
-            :percentage="videoTimePercentage" :show-text="false" />
-
-          <div id="ctl-bar" class="ctl-bar">
-            <div class="left-bar">
-              <span v-show="props.collection && activeItemPos > 0"
-                @click="selectEpisode(props.collection![activeItemPos - 1].vid)"
-                class="iconfont el-icon-shangyiji pre"></span>
-
-              <span v-show="!playStatus" @click="videoEle.play()" class="iconfont el-icon-bofang play"></span>
-
-              <span v-show="playStatus" @click="videoEle.pause()" class="iconfont el-icon-zanting pause"></span>
-
-              <span v-show="props.collection && activeItemPos < props.collection.length - 1"
-                @click="selectEpisode(props.collection![activeItemPos + 1].vid)"
-                class="iconfont el-icon-xiayiji next"></span>
-
-              <span style="cursor: default;">{{ videoCurrent }} / {{ videoDuration }}</span>
-            </div>
-
-            <div v-show="fullScreenStatus" class="flex-center" style="gap: 15px;">
-              <el-tooltip :append-to="vContainerEle" :content="dmShow ? '关闭弹幕(d)' : '开启弹幕(d)'" placement="top"
-                effect="light" :enterable="false">
-                <span @click="setDanmuShow" class="iconfont icon dm-ico"
-                  :class="`el-icon-dm-${dmShow ? 'open' : 'close'}`"></span>
-              </el-tooltip>
-
-              <el-popover :append-to="vContainerEle" placement="top" :show-arrow="false"
-                popper-style="min-width:unset; width: auto;">
-                <template #reference>
-                  <span class="iconfont el-icon-dm-set icon dm-ico"></span>
-                </template>
-
-                <div class="dmsz-container">
-                  <div class="option">
-                    不透明度：<el-slider v-model="dmOpacity" @change="cmjs.cache.setLS('dmOpacity', dmOpacity)"
-                      :show-tooltip="false" class="slider"></el-slider>{{ dmOpacity
-                      }}%
-                  </div>
-                  <div class="option">
-                    显示区域：<el-slider v-model="dmRegion" @change="cmjs.cache.setLS('dmRegion', dmRegion)" :min="25"
-                      :step="25" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmRegionMark() }}
-                  </div>
-                  <div class="option">
-                    弹幕字号：<el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)" :min="75" :max="150"
-                      :show-tooltip="false" class="slider"></el-slider>{{
-                        dmSize }}%
-                  </div>
-                  <div class="option">
-                    弹幕速度：<el-slider v-model="dmSpeed" @change="cmjs.cache.setLS('dmSpeed', dmSpeed)" :min="3" :max="7"
-                      show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark() }}
-                  </div>
-                </div>
-              </el-popover>
-
-              <div style="display: flex;">
-                <div class="danmu-input-container">
-                  <el-popover :append-to="vContainerEle" placement="top" :show-arrow="false"
-                    popper-style="min-width:unset; width: auto;">
-                    <template #reference>
-                      <span class="iconfont el-icon-font-set icon font-set-ico"></span>
-                    </template>
-
-                    <div class="ftsz-container">
-                      <div class="option">
-                        颜色：<ColorPicker v-model="ftColor" :append-to="vContainerEle"></ColorPicker>
-                      </div>
-                    </div>
-                  </el-popover>
-
-                  <el-input @keyup.enter.native="sendDanmu" class="danmu-input" v-model="dmInput" maxlength="50"
-                    placeholder="发个友善的弹幕见证当下" />
-                </div>
-
-                <el-button v-blur v-login @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
-              </div>
-            </div>
-
-            <div class="right-bar">
-              <el-popover :teleported="false" trigger="hover" placement="top"
-                popper-style="min-width: unset; width: auto;" ref="videoQualityPop">
-                <template #reference>
-                  <span class="quality">{{ videoQuality }}</span>
-                </template>
-                <el-radio-group @change="changeVideoQuality" v-model="videoQuality">
-                  <div class="row">
-                    <el-radio-button v-for="q in props.video" style="margin: 0;" :label="q.label" />
-                  </div>
-                </el-radio-group>
-              </el-popover>
-
-              <el-popover ref="collectionPop" :teleported="false" trigger="hover" placement="top"
-                popper-style="min-width: unset; width: auto; padding: 0;" @show="locateTo">
-                <template #reference>
-                  <span v-if="props.collection" v-show="fullScreenStatus" class="collection">选集</span>
-                </template>
-                <div class="collection-container">
-                  <ul class="collection-item-container">
-                    <li v-for="c in props.collection" :class="{ activeItem: c.vid === props.vid }"
-                      @click="selectEpisode(c.vid)">{{ c.title }}</li>
-                  </ul>
-                </div>
-              </el-popover>
-
-              <el-popover :teleported="false" :trigger="playSpeed === 3 ? 'never' : 'hover'" placement="top"
-                popper-style="min-width:unset; width: auto;" ref="playSpeedPop">
-                <template #reference>
-                  <span :style="{ cursor: playSpeed === 3 ? 'not-allowed' : 'pointer' }" class="speed">{{ playSpeed === 1
-                    ? '倍速' :
-                    `${playSpeed}x` }}</span>
-                </template>
-                <el-radio-group class="speed-radio-group" @change="setPlaySpeed" v-model="playSpeed">
-                  <el-radio :label="2">2x</el-radio>
-                  <el-radio :label="1.5">1.5x</el-radio>
-                  <el-radio :label="1.25">1.25x</el-radio>
-                  <el-radio :label="1">1x</el-radio>
-                  <el-radio :label="0.75">0.75x</el-radio>
-                  <el-radio :label="0.5">0.5x</el-radio>
-                </el-radio-group>
-              </el-popover>
-
-              <el-popover :teleported="false" :width="250" trigger="hover" placement="top">
-                <template #reference>
-                  <span v-show="!mutedStatus" @click="setMutedStatus" class="iconfont el-icon-yinliang icon"></span>
-                </template>
-                <div class="row" style="gap: 10px;">
-                  <span style="margin: 0;">{{ volume }}</span>
-                  <div><el-slider @input="changeVolume" style="width: 185px; margin: 0;" v-model="volume"
-                      :show-tooltip="false" /></div>
-                </div>
-              </el-popover>
-
-              <el-tooltip content="关闭静音(m)" placement="top" effect="light" :enterable="false">
-                <span v-show="mutedStatus" @click="setMutedStatus" class="iconfont el-icon-jingyin icon"></span>
-              </el-tooltip>
-
-              <el-popover :teleported="false" :width="175" trigger="hover" placement="top">
-                <template #reference>
-                  <span class="iconfont el-icon-shezhi icon"></span>
-                </template>
-                <div @click="setAutoplay" class="row">静音自动开播<el-switch style="margin-left: 5px;" v-model="autoplay" />
-                </div>
-              </el-popover>
-
-              <el-tooltip :content="!pipStatus ? '开启画中画' : '退出画中画'" placement="top" effect="light" :enterable="false"
-                :append-to="vContainerEle">
-                <span @click="pip" class="iconfont el-icon-huazhonghua icon"></span>
-              </el-tooltip>
-
-              <el-tooltip content="进入全屏(f)" placement="top-end" effect="light" :enterable="false">
-                <span @click="fullScreen" v-show="!fullScreenStatus" class="iconfont el-icon-quanping icon"></span>
-              </el-tooltip>
-
-              <el-tooltip content="退出全屏(f)" placement="top-end" effect="light" :enterable="false"
-                :append-to="vContainerEle">
-                <span @click="cancelFullScreen" v-show="fullScreenStatus"
-                  class="iconfont el-icon-quxiaoquanping icon"></span>
-              </el-tooltip>
-            </div>
-          </div>
-        </div>
-      </transition>
     </div>
 
     <div class="danmu-bar">
@@ -247,22 +278,30 @@
 
         <div class="dmsz-container">
           <div class="option">
-            不透明度：<el-slider v-model="dmOpacity" @change="cmjs.cache.setLS('dmOpacity', dmOpacity)" :show-tooltip="false"
-              class="slider"></el-slider>{{ dmOpacity
+            <span>不透明度</span><el-slider v-model="dmOpacity" @change="cmjs.cache.setLS('dmOpacity', dmOpacity)"
+              :show-tooltip="false" class="slider"></el-slider>{{ dmOpacity
               }}%
           </div>
           <div class="option">
-            显示区域：<el-slider v-model="dmRegion" @change="cmjs.cache.setLS('dmRegion', dmRegion)" :min="25" :step="25"
-              show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmRegionMark() }}
+            <span>显示区域</span><el-slider v-model="dmRegion" @change="cmjs.cache.setLS('dmRegion', dmRegion)" :min="25"
+              :step="25" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmRegionMark() }}
           </div>
           <div class="option">
-            弹幕字号：<el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)" :min="75" :max="150"
+            <span>弹幕字号</span><el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)" :min="75" :max="150"
               :show-tooltip="false" class="slider"></el-slider>{{
                 dmSize }}%
           </div>
           <div class="option">
-            弹幕速度：<el-slider v-model="dmSpeed" @change="cmjs.cache.setLS('dmSpeed', dmSpeed)" :min="3" :max="7" show-stops
-              :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark() }}
+            <span>弹幕放大率<el-tooltip content="弹幕在全屏时根据屏幕等比放大比例的占比" placement="top">
+                <span class="iconfont el-icon-info"></span>
+              </el-tooltip></span><el-slider v-model="dmEnlargeRate"
+              @change="cmjs.cache.setLS('dmEnlargeRate', dmEnlargeRate)" :show-tooltip="false"
+              class="slider"></el-slider>{{
+                dmEnlargeRate }}%
+          </div>
+          <div class="option">
+            <span>弹幕速度</span><el-slider v-model="dmSpeed" @change="cmjs.cache.setLS('dmSpeed', dmSpeed)" :min="3" :max="7"
+              show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark() }}
           </div>
         </div>
       </el-popover>
@@ -283,11 +322,12 @@
           </div>
         </el-popover>
 
-        <el-input @keyup.enter.native="sendDanmu" class="danmu-input" v-model="dmInput" maxlength="50"
+        <el-input ref="dmInputRef" @keyup.enter.native="sendDanmu" class="danmu-input" v-model="dmInput" maxlength="50"
           placeholder="发个友善的弹幕见证当下" />
       </div>
 
-      <el-button v-blur v-login @click="sendDanmu" class="danmu-send-btn" type="primary">发送</el-button>
+      <el-button v-blur v-login @click="sendDanmu" class="danmu-send-btn" type="primary"
+        :disabled="errorStatus">发送</el-button>
     </div>
   </div>
 </template>
@@ -298,6 +338,7 @@ import cmjs from '@/cmjs'
 import { useStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { useRouter } from "vue-router"
+import { InputInstance, ElMessageBox } from 'element-plus'
 
 type VideoQuality = {
   label: string,
@@ -323,6 +364,7 @@ type Danmu = {
   isUp: boolean, // up主评论 特殊显示（若弹幕有up主评论特殊显示，则其他特殊显示均不会再显示）
   isNew?: boolean, // 新发弹幕 特殊显示
   track?: number, // 弹幕属于哪条轨道
+  aniDiff?: number, // 弹幕的动画时间随机差值（用于解决弹幕重复问题）
 }
 
 type DanmuHover = {
@@ -348,6 +390,7 @@ const props = defineProps<{
 
 const vidRef = toRef(props, 'vid')
 watch(vidRef, () => {
+  playSpeed.value = 1
   calcVideoUrlAndQuality()
   runningDanmus.value.forEach(d => {
     d.running = false
@@ -411,6 +454,8 @@ let trackReduce = ref(0) // 用作在控制栏显示时减少轨道随机上限�
 const collectionPop = ref()
 const videoQualityPop = ref()
 const playSpeedPop = ref()
+const dmInputRef = ref<InputInstance>()
+const dmInput2Ref = ref<InputInstance>()
 
 let vContainerEle: HTMLDivElement
 let screenEle: HTMLDivElement
@@ -421,6 +466,8 @@ let contextMenuEle: HTMLDivElement
 let danmuSendBtns: NodeListOf<HTMLButtonElement>
 let collectionItemContainerEle: HTMLUListElement
 let collectionActiveItemEle: HTMLLIElement
+let psEle: HTMLDivElement // preview screen
+let psvEle: HTMLVideoElement // preview screen video
 
 // hmb：hover-menu::before(菜单上下方的小三角)；css绑定变量
 let hmbTop = ref("")
@@ -441,8 +488,9 @@ let dmHover = reactive<DanmuHover>({
 const danmuMap: Map<number, Danmu[]> = new Map() // 将props.danmus按d.time分类存储，优化性能
 let runningDanmus = ref<Danmu[]>([])
 let playStatus = ref(false)
+let contextStatus = ref(false) // 菜单是否显示
+let errorStatus = ref(false) // 视频是否加载失败
 let shortcutKeyDescriptionWindowVisible = ref(false)
-let ctlBarShow = ref(true)
 let videoTimePercentage = ref(0)
 let videoCurrent = ref("00:00")
 let videoDurationNumber = ref(0) // 该视频有多少秒
@@ -454,14 +502,21 @@ let volume = ref(cmjs.cache.getLS("volume") === null ? 50 : parseInt(cmjs.cache.
 let autoplay = ref(cmjs.cache.getLS("autoplay") === "true" ? true : false)
 let pipStatus = ref(false)
 let fullScreenStatus = ref(false)
-let showCtlBarTimer: number
-let showCtlBarTimerRunning = ref(false)
-let ctlBarEnterStatus = ref(false)
 let tipContent = ref("")
 let tipShow = ref(false)
+let psTime = ref("")
+let previewShow = ref(false)
+let psLeft = ref(0)
 let tipShowTimer: number
-let vContainerEleOriginHeight = ref(0)
-let proportion = ref(1) // 全屏后弹幕会等比放大于全屏放大的比例；所有使用到dmSize和trackHeight的地方都需要乘上该比例系数
+let ctlBarShow = ref(true)
+let ctlBarShowTimer: number
+let btProgerssShow = ref(cmjs.cache.getLS("btProgress") !== "false" ? true : false)
+let vContainerOriginWidth = ref(0)
+let vContainerWidth = ref(0)
+let vContainerOriginHeight = ref(0)
+let proportion = ref(1) // 全屏放大的基准比例（在进入全屏后会动态计算）
+let thProportion = ref(1) // 全屏后“轨道高度”会等比放大于全屏放大的比例；所有使用到trackHeight的地方都需要乘上该比例系数
+let dsProportion = ref(1) // 全屏后“弹幕字号”会等比放大于全屏放大的比例；所有使用到dmSize的地方都需要乘上该比例系数
 let videoClickTimer: number | null
 let activeItemPos = ref(-1)
 let isRightArrowKeyPressed = ref(false) // 右方向键是否按下；为了实现长按时3倍速播放
@@ -473,21 +528,31 @@ let dmShow = ref(cmjs.cache.getLS("dmShow") !== "false" ? true : false)
 let dmOpacity = ref(cmjs.cache.getLS("dmOpacity") ? Number(cmjs.cache.getLS("dmOpacity")) : 100)
 let dmRegion = ref(cmjs.cache.getLS("dmRegion") ? Number(cmjs.cache.getLS("dmRegion")) : 100)
 let dmSize = ref(cmjs.cache.getLS("dmSize") ? Number(cmjs.cache.getLS("dmSize")) : 100)
+let dmEnlargeRate = ref(cmjs.cache.getLS("dmEnlargeRate") ? Number(cmjs.cache.getLS("dmEnlargeRate")) : 50)
+watch(dmEnlargeRate, (newVal: number) => {
+  dsProportion.value = (proportion.value - 1) * newVal / 100 + 1
+})
 let dmSpeed = ref(cmjs.cache.getLS("dmSpeed") ? Number(cmjs.cache.getLS("dmSpeed")) : 5)
 let ftColor = ref(!trackShow ? '#FFFFFF' : '#000000')
 let dmInput = ref("")
 
 onMounted(() => {
   vContainerEle = document.querySelector(".v-container") as HTMLDivElement
-  vContainerEleOriginHeight.value = vContainerEle.clientHeight
+  vContainerOriginWidth.value = vContainerEle.clientWidth
+  vContainerWidth.value = vContainerOriginWidth.value
+  vContainerOriginHeight.value = vContainerEle.clientHeight
   screenEle = document.querySelector(".screen") as HTMLDivElement
   videoEle = document.getElementById("video") as HTMLVideoElement
-  videoEle.style.maxWidth = `${screen.width}px`
   ctlBarContainerEle = document.querySelector(".ctl-bar-container") as HTMLDivElement
   hoverMenuEle = document.querySelector(".hover-menu") as HTMLDivElement
   contextMenuEle = document.querySelector('.context-menu') as HTMLDivElement
   danmuSendBtns = document.querySelectorAll(".danmu-send-btn") as NodeListOf<HTMLButtonElement>
   collectionItemContainerEle = document.querySelector(".v-container .collection-item-container") as HTMLUListElement
+  psEle = document.getElementById('ps') as HTMLDivElement
+  psvEle = document.getElementById('psv') as HTMLVideoElement
+
+  psEle.style.width = vContainerOriginWidth.value / 4 + 'px'
+  psEle.style.height = vContainerOriginHeight.value / 4 + 'px'
 
   trackHeight.value = vContainerEle.clientHeight / trackNum
   trackReduce.value = calcTrackReduce()
@@ -496,18 +561,16 @@ onMounted(() => {
   videoEle.volume = volume.value / 100
 
   videoEle.addEventListener('contextmenu', function (event: any) {
-    event.preventDefault();
-
-    contextMenuEle.style.display = 'block';
-    contextMenuEle.style.left = event.pageX + 'px';
-    contextMenuEle.style.top = event.pageY + 'px';
+    event.preventDefault()
+    showContext(event.pageX, event.pageY)
   })
 
   window.addEventListener('click', function () {
-    contextMenuEle.style.display = 'none'
+    hideContext()
   })
 
   videoEle.addEventListener('loadedmetadata', function () {
+    errorStatus.value = false
     videoDurationNumber.value = Math.floor(videoEle.duration)
     videoDuration.value = cmjs.fmt.videoDuration(videoDurationNumber.value)
     vContainerEle.style.pointerEvents = "auto"
@@ -529,7 +592,7 @@ onMounted(() => {
     videoCurrent.value = cmjs.fmt.videoDuration(Math.floor(videoEle.currentTime))
 
     const ct = Math.floor(videoEle.currentTime)
-    if (danmuMap.has(ct)) {
+    if (danmuMap.has(ct) && !errorStatus.value) {
       danmuMap.get(ct)!.forEach(d => {
         if (!d.running) {
           runDanmu(d)
@@ -544,14 +607,12 @@ onMounted(() => {
 
   videoEle.addEventListener('play', function () {
     playStatus.value = true
-    ctlBarShow.value = false
-    videoEle.style.cursor = "none"
+    showCtlBar()
   })
 
   videoEle.addEventListener('pause', function () {
+    showCtlBar(-1)
     playStatus.value = false
-    ctlBarShow.value = true
-    videoEle.style.cursor = "default"
   })
 
   videoEle.addEventListener('ended', function () {
@@ -560,21 +621,16 @@ onMounted(() => {
     }
   })
 
-  videoEle.addEventListener('mousemove', showCtlBar)
+  videoEle.addEventListener('mousemove', function () {
+    showCtlBar()
+  })
 
   ctlBarContainerEle.addEventListener('mouseenter', function () {
-    ctlBarEnterStatus.value = true
+    showCtlBar(-1)
   })
 
   ctlBarContainerEle.addEventListener('mouseleave', function () {
-    ctlBarEnterStatus.value = false
-
-    if (!showCtlBarTimerRunning.value) {
-      if (playStatus.value) {
-        ctlBarShow.value = false;
-        videoEle.style.cursor = "none"
-      }
-    }
+    showCtlBar()
   })
 
   document.addEventListener('keydown', function (event) {
@@ -587,8 +643,10 @@ onMounted(() => {
       case "ArrowLeft": {
         event.preventDefault()
         showTip("快退5秒")
+        if (!btProgerssShow.value) {
+          showCtlBar()
+        }
         videoEle.currentTime -= 5
-        showCtlBar()
         break
       }
       case "ArrowRight": {
@@ -601,12 +659,15 @@ onMounted(() => {
             prePlaySpeed.value = playSpeed.value
             playSpeed.value = 3
             videoEle.playbackRate = 3
-          }, 1000);
+          }, 500);
         }
         break
       }
       case "ArrowUp": {
         event.preventDefault()
+        if (mutedStatus.value) {
+          setMutedStatus()
+        }
         if (volume.value > 90) {
           volume.value = 100
         } else {
@@ -618,6 +679,9 @@ onMounted(() => {
       }
       case "ArrowDown": {
         event.preventDefault()
+        if (mutedStatus.value) {
+          setMutedStatus()
+        }
         if (volume.value < 10) {
           volume.value = 0
         } else {
@@ -668,8 +732,10 @@ onMounted(() => {
         if (playSpeed.value !== 3) {
           clearTimeout(rightArrowKeyPressedTimer)
           showTip("快进5秒")
+          if (!btProgerssShow.value) {
+            showCtlBar()
+          }
           videoEle.currentTime += 5
-          showCtlBar()
         } else {
           hideTip()
           playSpeed.value = prePlaySpeed.value
@@ -681,12 +747,21 @@ onMounted(() => {
   })
 
   videoEle.addEventListener('click', function () {
+    if (errorStatus.value) {
+      return
+    }
+
     if (!videoClickTimer) {
       videoClickTimer = setTimeout(() => {
         clearTimeout(videoClickTimer as number)
         videoClickTimer = null
-        playStatus.value ? videoEle.pause() : videoEle.play(); playStatus.value = !playStatus.value
-      }, 200) // 解决双击全屏时视频会暂停一下的问题
+
+        if (contextStatus.value) {
+          hideContext()
+          return
+        }
+        playStatus.value ? videoEle.pause() : videoEle.play()
+      }, 200) // 解决双击全屏时视频播放状态会短暂改变的问题
     } else {
       clearTimeout(videoClickTimer)
       videoClickTimer = null
@@ -766,15 +841,32 @@ function deleteFromDanmuMap(d: Danmu) {
 }
 
 function randTrack(): number {
-  return Math.floor(Math.random() * (trackNum - (ctlBarShow.value ? trackReduce.value : 0)) * dmRegion.value / 100)
+  return Math.floor(Math.random() * (trackNum - trackReduce.value) * dmRegion.value / 100)
+}
+
+// randDiff 生成(-1,1)范围内的小数，用于暂时缓解弹幕重复问题（给弹幕的动画时间和出现时间加上diff）
+function randDiff(): number {
+  let rdn = Math.random()
+  // [0,1)
+
+  while (rdn === 0) {
+    rdn = Math.random()
+  }
+  // (0,1)
+
+  rdn = rdn * 2 - 1
+  // (-1,1)
+
+  return rdn
 }
 
 function calcTrackReduce(): number {
-  return 1 + Math.floor(ctlBarContainerEle.clientHeight / (trackHeight.value * proportion.value))
+  return 1 + Math.floor(ctlBarContainerEle.clientHeight / (trackHeight.value * thProportion.value))
 }
 
 function runDanmu(d: Danmu) {
   d.track = randTrack()
+  d.aniDiff = randDiff()
   d.running = true
   runningDanmus.value.push(d)
 }
@@ -852,6 +944,10 @@ function setDanmuShow() {
 }
 
 function sendDanmu() {
+  if (errorStatus.value) {
+    return
+  }
+
   if (!isLogin.value) {
     if (fullScreenStatus.value) {
       cancelFullScreen()
@@ -878,6 +974,8 @@ function sendDanmu() {
   const d: Danmu = { id: Date.now(), content: dmInput.value, time: Math.round(videoEle.currentTime), date: Date.now(), color: ftColor.value, likeNum: 0, isLike: false, isMe: true, isUp: props.isUp, isNew: true, }
   props.danmus.push(d)
   addToDanmuMap(d)
+  dmInputRef.value?.blur()
+  dmInput2Ref.value?.blur()
   dmInput.value = ""
 }
 
@@ -916,30 +1014,76 @@ function cancelLikeDanmu(d: Danmu) {
 }
 
 function reportDanmu(did: number) {
+  const fs = fullScreenStatus
+  if (fullScreenStatus.value) {
+    cancelFullScreen()
+  }
+
   if (!isLogin.value) {
-    if (fullScreenStatus.value) {
-      cancelFullScreen()
-    }
     store.openLoginWindow()
     return
   }
 
   const ps = playStatus.value
   videoEle.pause()
-  store.openFSWindow('弹幕举报', "#", { did: did }, '请输入举报理由', '理由不能为空', '举报成功', () => { }, () => { ps ? videoEle.play() : undefined })
+
+  store.openFSWindow({
+    title: "弹幕举报",
+    placeholder: "请输入举报理由",
+    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+      // TODO api
+      console.log({
+        "msg": msg,
+        "fileList": fileList,
+        "data": {
+          did: did,
+        },
+      })
+      cmjs.prompt.success("提交成功", vContainerEle)
+      closeWindow()
+    },
+    cancelHandler: () => {
+      ps ? videoEle.play() : undefined
+      fs ? fullScreen() : undefined
+    },
+  })
 }
 
 function recallDanmu(d: Danmu) {
-  destroyDanmu(d)
-  cancelHoverDanmu()
-  cmjs.prompt.success("撤回成功", vContainerEle)
+  ElMessageBox.confirm('你确认要撤回该弹幕吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+    appendTo: vContainerEle,
+  })
+    .then(() => {
+      destroyDanmu(d)
+      cancelHoverDanmu()
+      cmjs.prompt.success("撤回成功", vContainerEle)
+    })
 }
 stf('recall-danmu', recallDanmu)
 
 function deleteDanmu(d: Danmu) {
-  destroyDanmu(d)
-  cancelHoverDanmu()
-  cmjs.prompt.success("删除成功", vContainerEle)
+  ElMessageBox.confirm('你确认要删除该弹幕吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+    appendTo: vContainerEle,
+  })
+    .then(() => {
+      destroyDanmu(d)
+      cancelHoverDanmu()
+      cmjs.prompt.success("删除成功", vContainerEle)
+    })
 }
 stf('delete-danmu', deleteDanmu)
 
@@ -952,21 +1096,32 @@ function copyVideoUrl() {
 }
 
 function handleProgressClick(event: any) {
+  if (errorStatus.value) {
+    return
+  }
+
   const progressBar = event.target
   const progressBarRect = progressBar.getBoundingClientRect()
   const clickX = event.clientX - progressBarRect.left
   const clickedPercentage = (clickX / vContainerEle.clientWidth) * 100
-  videoEle.currentTime = clickedPercentage * (videoEle.duration / 100)
+  const curSecond = Math.floor(clickedPercentage * (videoEle.duration / 100))
+  videoEle.currentTime = curSecond
   videoTimePercentage.value = clickedPercentage
+  hidePreview()
 }
 
 function handleProgressMove(event: any) {
+  if (errorStatus.value) {
+    return
+  }
+
   const progressBar = event.target
   const progressBarRect = progressBar.getBoundingClientRect()
   const moveX = event.clientX - progressBarRect.left
+  psLeft.value = Math.min(Math.max(moveX - vContainerOriginWidth.value / 4 / 2, 0), vContainerWidth.value - vContainerOriginWidth.value / 4)
   const movedPercentage = (moveX / vContainerEle.clientWidth) * 100
   const curSecond = Math.floor(movedPercentage * (videoEle.duration / 100))
-  showTip(cmjs.fmt.videoDuration(curSecond), -1)
+  showPreview(curSecond)
 }
 
 function changeVideoQuality(value: string) {
@@ -977,6 +1132,7 @@ function changeVideoQuality(value: string) {
   for (let i = 0; i < props.video.length; i++) {
     if (props.video[i].label === value) {
       videoEle.src = props.video[i].url
+      psvEle.src = props.video[i].url
       break
     }
   }
@@ -1019,34 +1175,22 @@ function setAutoplay() {
   cmjs.cache.setLS("autoplay", autoplay.value)
 }
 
+function setBtProgressShow() {
+  cmjs.cache.setLS("btProgress", btProgerssShow.value)
+}
+
 function pip() {
-  if (!pipStatus.value) {
-    videoEle.requestPictureInPicture()
-  } else {
-    document.exitPictureInPicture()
+  if (errorStatus.value) {
+    return
   }
+  videoEle.requestPictureInPicture()
 }
 
-function showCtlBar() {
-  if (playStatus.value) {
-    clearTimeout(showCtlBarTimer)
-
-    ctlBarShow.value = true
-
-    videoEle.style.cursor = "default"
-
-    showCtlBarTimerRunning.value = true
-    showCtlBarTimer = setTimeout(() => {
-      if (playStatus.value && !ctlBarEnterStatus.value) {
-        ctlBarShow.value = false;
-        videoEle.style.cursor = "none"
-      }
-      showCtlBarTimerRunning.value = false
-    }, 1000)
-  }
+function cancelPip() {
+  document.exitPictureInPicture()
 }
 
-// showTip duration表示显示几秒，省略时默认显示1秒，-1代表显示无限时间(要取消显示的话需调用hideTip)
+// showTip duration表示显示几秒，-1代表一直显示；省略时默认显示1秒
 function showTip(content: string, duration?: number) {
   clearTimeout(tipShowTimer)
   tipContent.value = content
@@ -1054,17 +1198,44 @@ function showTip(content: string, duration?: number) {
 
   if (duration !== -1) {
     tipShowTimer = setTimeout(() => {
-      tipShow.value = false
+      hideTip()
     }, duration ? duration * 1000 : 1000)
   }
 }
 
-// hideTip 只在showTip时选择了显示无限时间时才需调用
 function hideTip() {
+  clearTimeout(tipShowTimer)
   tipShow.value = false
 }
 
+// showCtlBar duration表示显示几秒，-1代表一直显示；省略时默认显示1秒
+function showCtlBar(duration?: number) {
+  if (!playStatus.value) {
+    return
+  }
+
+  clearTimeout(ctlBarShowTimer)
+  ctlBarShow.value = true
+  videoEle.style.cursor = "default"
+
+  if (duration !== -1) {
+    ctlBarShowTimer = setTimeout(() => {
+      hideCtlBar()
+    }, duration ? duration * 1000 : 1000)
+  }
+}
+
+function hideCtlBar() {
+  clearTimeout(ctlBarShowTimer)
+  videoEle.style.cursor = "none"
+  ctlBarShow.value = false
+}
+
 function fullScreen() {
+  if (errorStatus.value) {
+    return
+  }
+
   if (pipStatus.value) {
     document.exitPictureInPicture()
   }
@@ -1085,12 +1256,19 @@ function handleFullscreenChange() {
   let doc: any = document
   if (doc.fullscreenElement || doc.webkitFullscreenElement) {
     fullScreenStatus.value = true
-    proportion.value = screen.height / vContainerEleOriginHeight.value
+    vContainerWidth.value = screen.width
+    proportion.value = screen.height / vContainerOriginHeight.value
+    thProportion.value = proportion.value
+    dsProportion.value = (proportion.value - 1) * dmEnlargeRate.value / 100 + 1
   } else {
     fullScreenStatus.value = false
+    vContainerWidth.value = vContainerOriginWidth.value
     proportion.value = 1
+    thProportion.value = 1
+    dsProportion.value = 1
   }
   trackReduce.value = calcTrackReduce()
+  showCtlBar()
 }
 
 function calcActiveItemPos() {
@@ -1110,6 +1288,7 @@ function calcVideoUrlAndQuality() {
   const vq = cmjs.cache.getLS('videoQuality')
   if (!vq) {
     videoEle.src = props.video[0].url
+    psvEle.src = props.video[0].url
     videoQuality.value = props.video[0].label
     return
   }
@@ -1117,13 +1296,60 @@ function calcVideoUrlAndQuality() {
   for (let i = 0; i < props.video.length; i++) {
     if (props.video[i].label === vq) {
       videoEle.src = props.video[i].url
+      psvEle.src = props.video[i].url
       videoQuality.value = vq
       return
     }
   }
 
   videoEle.src = props.video[0].url
+  psvEle.src = props.video[0].url
   videoQuality.value = props.video[0].label
+}
+
+function handleVideoError() {
+  errorStatus.value = true
+  if (fullScreenStatus.value) {
+    cancelFullScreen()
+  }
+  if (pipStatus.value) {
+    cancelPip()
+  }
+  cmjs.prompt.error("视频加载失败")
+}
+
+function showContext(left: number, top: number) {
+  contextMenuEle.style.display = 'block'
+  contextMenuEle.style.left = left + 'px'
+  contextMenuEle.style.top = top + 'px'
+  contextStatus.value = true
+}
+
+function hideContext() {
+  /* 判断条件加上videoClickTimer主要是想实现在菜单显示时点击视频元素只关闭菜单，而不改变其播放状态；
+  此处为分析：若在菜单显示时点击了视频元素，此时不应该触发video的click事件，而dbClick事件应该被正常触发，
+  但触发dbClick必定会触发两次click，若直接在菜单显示时禁掉了video的click，那么在dbClick时，
+  只有video的第一次click被禁止掉了，因为虽然在触发video的第一次click时被禁止了，但在同时，
+  监听在window上的click会被触发（会关闭菜单），那么第二次click因为菜单已被关闭，所以会正常触发，
+  那么播放状态就会被改变；若在click事件内直接判断contextStatus，因为在解决dbClick会短暂改变播放状态时，
+  设置了200的延迟，那么此处就需要设置短暂大于200的延迟，才会被内部判断到，但这可能会有一些未知的影响，
+  所以干脆此处就不触发了，那么在内部就能判断到了，但是需要在video的click内部来手动调用该事件。
+  */
+  if (contextStatus.value && !videoClickTimer) {
+    contextMenuEle.style.display = 'none'
+    contextStatus.value = false
+  }
+}
+
+// showPreview 显示视频第x秒的预览画面
+function showPreview(second: number) {
+  psvEle.currentTime = second
+  psTime.value = cmjs.fmt.videoDuration(psvEle.currentTime)
+  previewShow.value = true
+}
+
+function hidePreview() {
+  previewShow.value = false
 }
 </script>
 
@@ -1135,12 +1361,11 @@ function calcVideoUrlAndQuality() {
   .screen {
     width: 100%;
     height: 100%;
-
     position: relative;
     overflow: hidden;
 
     .video {
-      widows: 100%;
+      width: 100%;
       height: 100%;
       background-color: black;
     }
@@ -1255,6 +1480,158 @@ function calcVideoUrlAndQuality() {
       border-radius: 5px;
       font-size: 14px;
     }
+
+    #ps {
+      position: absolute;
+      bottom: 65.5px;
+
+      #psv {
+        width: 100%;
+        height: 100%;
+      }
+
+      .ps-time {
+        position: absolute;
+        bottom: 0.5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        padding: 2px;
+        border-radius: 1px;
+        background-color: rgba(0, 0, 0, 0.66);
+        color: white;
+      }
+    }
+
+    .ctl-bar-container {
+      .progress {
+        cursor: pointer;
+        margin-top: -56px;
+
+        :deep(.el-progress-bar__outer),
+        :deep(.el-progress-bar__inner) {
+          border-radius: unset;
+        }
+      }
+
+      .ctl-bar {
+        width: calc(100% - 30px);
+        height: 50px;
+        color: white;
+        background: rgba(0, 0, 0, 0.25);
+        padding-left: 15px;
+        padding-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+
+        .left-bar,
+        .right-bar {
+          display: flex;
+          align-items: center;
+
+          .row {
+            display: flex;
+            justify-content: right;
+            align-items: center;
+            margin: 0;
+          }
+
+          .collection-container {
+            ul {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+              max-height: 340px; // 10项
+              overflow: auto;
+
+              li {
+                padding: 0px 10px; // 左右间距10px
+                line-height: 34px; // font-size默认10px；上下间距10px
+                cursor: pointer;
+                max-width: 150px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+
+              li:hover {
+                color: #409EFF;
+              }
+
+              .activeItem {
+                background-color: #F0F2F5;
+                color: #409EFF;
+                pointer-events: none;
+              }
+            }
+
+            ul::-webkit-scrollbar {
+              width: 5px;
+            }
+
+            ul::-webkit-scrollbar-thumb {
+              background-color: #666;
+            }
+
+            ul::-webkit-scrollbar-track {
+              background-color: #ccc;
+            }
+          }
+
+          .speed-radio-group {
+            flex-wrap: unset;
+            flex-direction: column;
+            align-items: unset;
+            padding: 0;
+            gap: 10px;
+
+            &>* {
+              margin-right: 0;
+              height: unset;
+            }
+          }
+        }
+
+        .left-bar>* {
+          margin-right: 15px;
+        }
+
+        .right-bar>* {
+          margin-left: 15px;
+        }
+
+        .icon {
+          font-size: 20px;
+        }
+
+        .play,
+        .pause {
+          font-size: 20px;
+        }
+
+        .play:hover,
+        .pre:hover,
+        .next:hover,
+        .pause:hover,
+        .quality:hover,
+        .collection:hover,
+        .speed:hover {
+          color: #409EFF;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .bt-progress {
+      pointer-events: none;
+
+      :deep(.el-progress-bar__outer),
+      :deep(.el-progress-bar__inner) {
+        border-radius: unset;
+      }
+    }
   }
 
   .context-menu {
@@ -1286,128 +1663,6 @@ function calcVideoUrlAndQuality() {
 
       li:hover {
         background: rgba(0, 0, 0, 0.25);
-      }
-    }
-  }
-
-  .ctl-bar-container {
-    .progress {
-      cursor: pointer;
-      margin-top: -56px;
-
-      :deep(.el-progress-bar__outer),
-      :deep(.el-progress-bar__inner) {
-        border-radius: unset;
-      }
-    }
-
-    .ctl-bar {
-      width: calc(100% - 32px);
-      height: 50px;
-      margin-left: 1px;
-      color: white;
-      background: rgba(0, 0, 0, 0.25);
-      padding-left: 15px;
-      padding-right: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-
-      .left-bar,
-      .right-bar {
-        display: flex;
-        align-items: center;
-
-        .row {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin: 0;
-        }
-
-        .collection-container {
-          ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            max-height: 340px; // 10项
-            overflow: auto;
-
-            li {
-              padding: 0px 10px; // 左右间距10px
-              line-height: 34px; // font-size默认10px；上下间距10px
-              cursor: pointer;
-              max-width: 150px;
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-            }
-
-            li:hover {
-              color: #409EFF;
-            }
-
-            .activeItem {
-              background-color: #F0F2F5;
-              color: #409EFF;
-              pointer-events: none;
-            }
-          }
-
-          ul::-webkit-scrollbar {
-            width: 5px;
-          }
-
-          ul::-webkit-scrollbar-thumb {
-            background-color: #666;
-          }
-
-          ul::-webkit-scrollbar-track {
-            background-color: #ccc;
-          }
-        }
-
-        .speed-radio-group {
-          flex-wrap: unset;
-          flex-direction: column;
-          align-items: unset;
-          padding: 0;
-          gap: 10px;
-
-          &>* {
-            margin-right: 0;
-            height: unset;
-          }
-        }
-      }
-
-      .left-bar>* {
-        margin-right: 15px;
-      }
-
-      .right-bar>* {
-        margin-left: 15px;
-      }
-
-      .icon {
-        font-size: 20px;
-      }
-
-      .play,
-      .pause {
-        font-size: 20px;
-      }
-
-      .play:hover,
-      .pre:hover,
-      .next:hover,
-      .pause:hover,
-      .quality:hover,
-      .collection:hover,
-      .speed:hover {
-        color: #409EFF;
-        cursor: pointer;
       }
     }
   }
@@ -1473,6 +1728,11 @@ function calcVideoUrlAndQuality() {
   .option {
     display: flex;
     align-items: center;
+    cursor: default;
+
+    span {
+      width: 90px;
+    }
 
     .slider {
       width: 100px;

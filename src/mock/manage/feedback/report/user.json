@@ -1,0 +1,35 @@
+{
+  "total": 2,
+  "records": [
+    {
+      "id": 1,
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "reportTime": 1689576232517,
+      "reportInfo": {
+        "content": "随便试下用户举报",
+        "imgs": []
+      },
+      "userInfo": {
+        "uid": 2,
+        "nickname": "惜缘灬冷颜"
+      }
+    },
+    {
+      "id": 2,
+      "uid": 1,
+      "nickname": "Bonnenult",
+      "reportTime": 1689589232517,
+      "reportInfo": {
+        "content": "看他不爽😕",
+        "imgs": [
+          "/resource/壁纸/锁屏1.jpg"
+        ]
+      },
+      "userInfo": {
+        "uid": 3,
+        "nickname": "浅时"
+      }
+    }
+  ]
+}

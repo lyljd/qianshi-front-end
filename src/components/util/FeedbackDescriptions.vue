@@ -7,7 +7,7 @@
 
       <el-descriptions-item v-if="data.imgs.length > 0" label="附件">
         <div ref="imgRow" class="img-row">
-          <Image v-for="url in data.imgs" :url="url" :customClass="'fd-image'" preview contain border></Image>
+          <Image v-for="url in data.imgs" class="fd-image" :url="url" preview contain border round></Image>
         </div>
       </el-descriptions-item>
     </el-descriptions>

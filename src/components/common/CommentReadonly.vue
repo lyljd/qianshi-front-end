@@ -1,19 +1,15 @@
 <template>
   <div :id="`comment-${data.cid}`" class="comment-container">
-    <Image :customClick="() => { cmjs.jump.user(data.uid) }" :url="data.avatarUrl" :w="40" :h="40" customClass="avatar"
-      avatar>
-    </Image>
+    <Avatar :url="data.avatarUrl" size="medium" :home="{ uid: data.uid }"></Avatar>
     <div class="right">
       <div class="main">
         <div class="user-info">
           <span :class="{ nicknameVip: data.isVip }" @click="cmjs.jump.user(data.uid)" class="nickname">{{ data.nickname
           }}</span>
 
-          <svg class="icon-symbol level" aria-hidden="true">
-            <use :xlink:href="`#el-icon-level_${cmjs.biz.expToLevel(data.exp)}`"></use>
-          </svg>
+          <LevelIco :level="cmjs.biz.expToLevel(data.exp)" style="margin-left: 6px;"></LevelIco>
 
-          <svg v-if="data.isUp" style="font-size: 25px;" class="icon-symbol" aria-hidden="true">
+          <svg v-if="data.isUp" style="font-size: 27.5px;" class="icon-symbol" aria-hidden="true">
             <use xlink:href="#el-icon-UPzhu-copy"></use>
           </svg>
         </div>
@@ -48,6 +44,8 @@
 </template>
 
 <script setup lang="ts">
+import Avatar from '@/components/common/Avatar.vue'
+import LevelIco from '@/components/common/LevelIco.vue'
 import cmjs from '@/cmjs'
 
 type Comment = {
@@ -103,6 +101,7 @@ export default {
 
   .right {
     width: 100%;
+    margin-left: 7.5px;
 
     .main {
       display: flex;
@@ -124,11 +123,6 @@ export default {
 
         .nicknameVip {
           color: #FF6699;
-        }
-
-        .level {
-          font-size: 25px;
-          margin-left: 7.5px;
         }
       }
 
@@ -204,11 +198,5 @@ export default {
       }
     }
   }
-}
-</style>
-
-<style>
-.container .avatar {
-  margin-right: 7.5px;
 }
 </style>

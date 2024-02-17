@@ -93,8 +93,8 @@ type Video = {
 
 const route = useRoute()
 const store = useStore()
-store.$subscribe((_, state) => {
-  if (state.isLogin) {
+watch(() => store.isLogin, (newVal: boolean) => {
+  if (newVal) {
     isMe.value = cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
@@ -412,6 +412,7 @@ function removeItem(idx: number) {
 .right-head .info .num {
   font-size: 14px;
   color: #909399;
+  cursor: default;
 }
 
 .right-head .ctl {

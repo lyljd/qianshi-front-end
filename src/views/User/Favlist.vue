@@ -41,8 +41,8 @@
               </div>
             </div>
 
-            <el-pagination class="page" v-model:current-page="curPage" background layout="prev, pager, next" :page-size="12"
-              :total="data!.favlists[activeId].total" hide-on-single-page />
+            <el-pagination class="page" v-model:current-page="curPage" background layout="prev, pager, next"
+              :page-size="12" :total="data!.favlists[activeId].total" hide-on-single-page />
           </div>
         </div>
 
@@ -98,8 +98,8 @@ type Video = {
 
 const route = useRoute()
 const store = useStore()
-store.$subscribe((_, state) => {
-  if (state.isLogin) {
+watch(() => store.isLogin, (newVal: boolean) => {
+  if (newVal) {
     isMe.value = cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
@@ -391,6 +391,7 @@ function openChange(newVal: boolean) {
 .right-head .info .num {
   font-size: 14px;
   color: #909399;
+  cursor: default;
 }
 
 .right-head .ctl {

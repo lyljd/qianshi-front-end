@@ -23,9 +23,7 @@
       <el-table-column :width="120" label="等级(经验)" align="center">
         <template #default="scope">
           <div class="flex-center">
-            <svg class="icon-symbol level" aria-hidden="true">
-              <use :xlink:href="'#el-icon-level_' + cmjs.biz.expToLevel(scope.row.exp)"></use>
-            </svg>
+            <LevelIco :level="cmjs.biz.expToLevel(scope.row.exp)"></LevelIco>
             <span class="exp">({{ scope.row.exp }})</span>
           </div>
         </template>
@@ -83,6 +81,7 @@
 </template>
 
 <script setup lang="ts">
+import LevelIco from '@/components/common/LevelIco.vue'
 import ManageTopMenuBar from "@/components/util/ManageTopMenuBar.vue"
 import Data from "@/mock/manage/user.json"
 import cmjs from '@/cmjs'
@@ -123,6 +122,14 @@ let openUISSWindow: Function // UserInfoSysSetWindow
 
 watch(curPage, newVal => {
   result.value = getData()
+})
+
+onMounted(() => {
+  let key = cmjs.util.getUrlQuery('key')
+  if (key) {
+    searchKey.value = key
+    search()
+  }
 })
 
 function getOpenDPWindow(f: Function) {
@@ -237,10 +244,6 @@ function setvipExpireDate(idx: number) {
   color: #409EFF;
   text-decoration: underline;
   cursor: pointer;
-}
-
-.mu-container .level {
-  font-size: 25px;
 }
 
 .mu-container .exp {

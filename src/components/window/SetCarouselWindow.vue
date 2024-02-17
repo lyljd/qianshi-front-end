@@ -8,9 +8,10 @@
           <div class="card-header">
             <span class="header">{{ `轮播图${viewItem} (${viewItem}/${data.length})` }}</span>
             <div>
-              <el-button v-blur @click="moveUp" :disabled="viewItem === 1" size="small">上移</el-button>
-              <el-button v-blur @click="moveDown" :disabled="viewItem === data.length" size="small">下移</el-button>
-              <el-button v-blur @click="delItem" type="danger" size="small">删除</el-button>
+              <el-button v-blur @click="moveUp" :disabled="viewItem === 1 || uploading" size="small">上移</el-button>
+              <el-button v-blur @click="moveDown" :disabled="viewItem === data.length || uploading"
+                size="small">下移</el-button>
+              <el-button v-blur @click="delItem" :disabled="uploading" type="danger" size="small">删除</el-button>
             </div>
           </div>
         </template>
@@ -31,8 +32,8 @@
               <span style="color: red; margin-left: -3px;">*</span>图片
             </div>
 
-            <ImageUpload @recSetImgUrlFc="recSetImgUrlFc" @recImgUrl="recImgUrl" uploadUrl="/api/resource/carousel"
-              :imgUrl="data[viewItem - 1].imgUrl" proportion="4:3" :width="200" :height="150"></ImageUpload>
+            <ImageUpload @setImgUrl="(f: Function) => { setImgUrl = f }" :initImgUrl="data[viewItem - 1].imgUrl"
+              :upload-handler="imageUploadHandler" proportion="4:3" :w="200" :h="150"></ImageUpload>
           </div>
         </div>
       </el-card>
@@ -48,12 +49,13 @@
 
     <template #footer>
       <div style="float: left;">
-        <el-button v-blur @click="newItem" type="success">新增一项</el-button>
-        <el-button v-blur @click="pre" :disabled="viewItem === 1" v-show="data.length > 0">上一项</el-button>
-        <el-button v-blur @click="next" :disabled="viewItem === data.length" v-show="data.length > 0">下一项</el-button>
+        <el-button v-blur @click="newItem" :disabled="uploading" type="success">新增一项</el-button>
+        <el-button v-blur @click="pre" :disabled="viewItem === 1 || uploading" v-show="data.length > 0">上一项</el-button>
+        <el-button v-blur @click="next" :disabled="viewItem === data.length || uploading"
+          v-show="data.length > 0">下一项</el-button>
       </div>
-      <el-button v-blur @click="closeMainWindow">取消</el-button>
-      <el-button v-blur @click="save" type="primary">保存</el-button>
+      <el-button v-blur @click="closeMainWindow" :disabled="uploading">取消</el-button>
+      <el-button v-blur @click="save" :disabled="uploading" type="primary">保存</el-button>
     </template>
   </el-dialog>
 </template>
@@ -87,6 +89,7 @@ let data: carousel[] = reactive([])
 let dataCopy: carousel[] = reactive([])
 let viewItem = ref(1)
 let setImgUrl: Function
+let uploading = ref(false)
 
 watch(viewItem, newVal => {
   if (newVal === 0) {
@@ -99,14 +102,6 @@ function setData() {
   //TODO api
   data = reactive([...Data])
   dataCopy = reactive([...Data])
-}
-
-function recImgUrl(imgUrl: string) {
-  data[viewItem.value - 1].imgUrl = imgUrl
-}
-
-function recSetImgUrlFc(f: Function) {
-  setImgUrl = f
 }
 
 function openMainWindow() {
@@ -200,6 +195,28 @@ function moveUp() {
 function moveDown() {
   [data[viewItem.value - 1], data[viewItem.value]] = [data[viewItem.value], data[viewItem.value - 1]]
   viewItem.value++
+}
+
+function imageUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  uploading.value = true
+
+  // TODO api
+
+  const url = URL.createObjectURL(file)
+  setImgUrl(url)
+  const timer = setInterval(() => {
+    const randPercent = Math.floor(Math.random() * 26) + 25 // [25,50]，整数
+    if (percent.value + randPercent < 100) {
+      percent.value += randPercent
+    } else {
+      percent.value = 100
+      clearInterval(timer)
+      uploading.value = false
+      data[viewItem.value - 1].imgUrl = url // fail时不能设置！！
+      succ()
+      // fail()
+    }
+  }, 1000)
 }
 </script>
 

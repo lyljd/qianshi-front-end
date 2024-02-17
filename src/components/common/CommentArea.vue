@@ -162,8 +162,9 @@ function send() {
   })
 
   // TODO api
+  const cid = Date.now()
   const c: Comment = {
-    "cid": Date.now(),
+    "cid": cid,
     "avatarUrl": "/resource/avatar.jpeg",
     "uid": 1,
     "nickname": "Bonnenult",
@@ -179,7 +180,7 @@ function send() {
     "isLike": false,
     "isDislike": false,
     "isChild": false,
-    "parentCid": props.total
+    "parentCid": cid
   }
   props.data.unshift(c)
   props.incrTotal(1)
@@ -333,6 +334,7 @@ function viewMore(c: Comment, page: number) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: default;
 
     .comment-span {
       font-size: 18px;

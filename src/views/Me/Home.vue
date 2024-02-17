@@ -1,9 +1,7 @@
 <template>
   <div class="avatar-container">
     <div class="left">
-      <el-avatar size="large" class="avatar" :src="cmjs.cache.getCookie('avatar')" @error="true">
-        <img src="/default-avatar.png" />
-      </el-avatar>
+      <Avatar :url="cmjs.cache.getCookie('avatar')" size="large"></Avatar>
     </div>
     <div class="right">
       <div class="nickname">{{ meHome.nickname }}</div>
@@ -45,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import Avatar from '@/components/common/Avatar.vue'
 import mockMeHome from "@/mock/me/home.json"
 import { useStore } from "@/store"
 import cmjs from '@/cmjs'
@@ -69,7 +68,7 @@ function getMeHome() {
 <style lang="less" scoped>
 .avatar-container {
   display: flex;
-  height: 56px;
+  align-items: center;
 }
 
 .avatar-container .right {

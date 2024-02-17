@@ -3,9 +3,7 @@
     <el-card>
       <div class="avatar-container">
         <div class="left">
-          <el-avatar size="large" class="avatar" :src="cmjs.cache.getCookie('avatar')" @error="true">
-            <img src="/default-avatar.png" />
-          </el-avatar>
+          <Avatar :url="cmjs.cache.getCookie('avatar')" size="large"></Avatar>
         </div>
         <div class="right">
           <div class="nickname">{{ getCurTimePeriod() }}好，<span class="normallight">{{
@@ -124,6 +122,7 @@
 import { useStore } from "@/store"
 import { useRouter } from "vue-router"
 import cmjs from '@/cmjs'
+import Avatar from '@/components/common/Avatar.vue'
 import SetCarouselWindow from "@/components/window/SetCarouselWindow.vue"
 import SetAdvertisementWindow from "@/components/window/SetAdvertisementWindow.vue"
 import IPBanlWindow from "@/components/window/IPBanWindow.vue"
@@ -277,10 +276,6 @@ function processFeedback() {
 .avatar-container {
   display: flex;
   cursor: default;
-}
-
-.avatar-container .left .avatar {
-  vertical-align: top;
 }
 
 .avatar-container .right {

@@ -27,11 +27,7 @@ export default {
 
   // maxAge单位：秒
   setCookie(name: string, value: string, maxAge: number) {
-    let domain = "qianshi.fun"
-    if (window.location.hostname === "localhost") {
-      domain = "localhost"
-    }
-    document.cookie = `${name}=${value}; max-age=${maxAge}; domain=${domain}; path=/`
+    document.cookie = `${name}=${value}; max-age=${maxAge}; path=/`
   },
 
   // 未找到名为name的cookie时将返回“”
@@ -66,6 +62,6 @@ export default {
   },
 
   delCookie(name: string) {
-    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC`
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
   }
 }

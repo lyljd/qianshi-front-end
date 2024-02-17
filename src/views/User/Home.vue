@@ -51,7 +51,12 @@
         <el-empty v-else description="暂无认证" :image-size="75" />
       </el-card>
 
-      <el-card v-if="userHome.notice != '' || isMe" header="公告">
+      <el-card v-if="userHome.notice != '' || isMe">
+        <template #header>
+          <div class="header">
+            <span>公告</span>
+          </div>
+        </template>
         <div>
           <textarea :class="isMe ? 'space-notice-me' : 'space-notice'" v-model="spaceNotice"
             :readonly="isMe ? false : true" ref="noticeTextarea" @blur="saveSpaceNotice"
@@ -123,8 +128,8 @@ type Video = {
 }
 
 const store = useStore()
-store.$subscribe((_, state) => {
-  if (state.isLogin) {
+watch(() => store.isLogin, (newVal: boolean) => {
+  if (newVal) {
     isMe.value = cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string))
   } else {
     isMe.value = false
@@ -298,6 +303,7 @@ function saveSpaceNotice() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: default;
 
   .title {
     display: flex;
@@ -334,6 +340,7 @@ function saveSpaceNotice() {
 
 .home-container .right .info-row .item .span {
   color: #909399;
+  cursor: default;
 }
 
 .home-container .right .info-row .item .value {
