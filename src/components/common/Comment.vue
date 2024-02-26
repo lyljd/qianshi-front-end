@@ -7,7 +7,7 @@
           <span :class="{ nicknameVip: data.isVip }" @click="cmjs.jump.user(data.uid)" class="nickname">{{ data.nickname
           }}</span>
 
-          <LevelIco :level="cmjs.biz.expToLevel(data.exp)" style="margin-left: 6px;"></LevelIco>
+          <LevelIco :level="data.level" style="margin-left: 6px;"></LevelIco>
 
           <svg v-if="data.isUp" style="font-size: 27.5px;" class="icon-symbol" aria-hidden="true">
             <use xlink:href="#el-icon-UPzhu-copy"></use>
@@ -66,7 +66,7 @@
 
       <div v-for="c in data.reply?.data">
         <ChildComment :data="c" :openCommentSendArea="openCommentSendArea" :deleteComment="deleteChildComment"
-          :authorUid="authorUid"></ChildComment>
+          :authorUid="authorUid" :incr-total="incrTotal"></ChildComment>
       </div>
     </div>
   </div>
@@ -84,7 +84,7 @@ type Comment = {
   avatarUrl: string
   uid: number
   nickname: string
-  exp: number
+  level: number
   isVip: boolean
   isUp: boolean
   isTop: boolean
@@ -112,6 +112,7 @@ let props = defineProps<{
   openCommentSendArea: Function
   deleteComment: Function
   authorUid: number
+  incrTotal: (incr: number) => void
 }>()
 
 const store = useStore()
@@ -142,7 +143,8 @@ function deleteChildComment(cid: number) {
     if (props.data.reply!.data[i].cid === cid) {
       props.data.reply!.data.splice(i, 1)
       props.data.reply!.total--
-      // TODO api：若还有评论，则向后端再请求一条评论补充进来
+      props.incrTotal(-1)
+      // TODO api：若还有评论，后端则会返回下一条评论，应补充进去
       return
     }
   }

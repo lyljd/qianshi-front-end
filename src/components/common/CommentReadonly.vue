@@ -7,7 +7,7 @@
           <span :class="{ nicknameVip: data.isVip }" @click="cmjs.jump.user(data.uid)" class="nickname">{{ data.nickname
           }}</span>
 
-          <LevelIco :level="cmjs.biz.expToLevel(data.exp)" style="margin-left: 6px;"></LevelIco>
+          <LevelIco :level="data.level" style="margin-left: 6px;"></LevelIco>
 
           <svg v-if="data.isUp" style="font-size: 27.5px;" class="icon-symbol" aria-hidden="true">
             <use xlink:href="#el-icon-UPzhu-copy"></use>
@@ -53,7 +53,7 @@ type Comment = {
   avatarUrl: string
   uid: number
   nickname: string
-  exp: number
+  level: number
   isVip: boolean
   isUp: boolean
   isTop: boolean

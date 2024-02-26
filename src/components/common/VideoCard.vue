@@ -11,16 +11,34 @@
       </div>
     </el-tooltip>
 
-    <Image v-show="!playStatus" :url="data.coverUrl" :w="cs.w" :h="cs.ch" :errorText="!data.expire ? '封面加载失败' : '视频已失效'"
-      :errorTextFontSize="cs.bfs" class="cover" @click="!data.expire ? cmjs.jump.video(data.vid) : undefined"
-      @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
-      :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
-    </Image>
+    <div style="position: relative;">
+      <Image v-show="!playStatus" :url="data.coverUrl" :w="cs.w" :h="cs.ch" :errorText="!data.expire ? '封面加载失败' : '视频已失效'"
+        :errorTextFontSize="cs.bfs" class="cover" @click="!data.expire ? cmjs.jump.video(data.vid) : undefined"
+        @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
+        :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
+      </Image>
+
+      <div v-if="!data.expire" v-show="!playStatus && !hoverInfoStatus" class="inner-info"
+        :style="{ width: `${cs.w}px`, height: `${cs.ufs+10}px`, lineHeight: `${cs.ufs+10}px`, fontSize: `${cs.ufs}px`, justifyContent: innerInfoShow ? 'space-between' : 'right' }">
+        <span v-if="innerInfoShow" style="margin-left: 5px;">
+          <span>
+            <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
+              cmjs.fmt.numWE(data.playNum) }}
+          </span>
+          <span style="margin-left: 5px;">
+            <span class="iconfont el-icon-danmushu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
+              cmjs.fmt.numWE(data.danmuNum) }}
+          </span>
+        </span>
+        <span v-show="!hoverInfoStatus" style="margin-right: 5px;">{{ cmjs.fmt.videoDuration(data.duration) }}</span>
+      </div>
+    </div>
 
     <video v-if="hoverStyleSwitch === 'preview'" v-show="playStatus" @mouseenter="videoMouseEnter"
       @mouseleave="videoMouseLeave" @click="cmjs.jump.video(data.vid)"
       @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle" :src="data.videoUrl" muted
       disablePictureInPicture class="video" :style="{ width: `${cs.w}px`, height: `${cs.ch}px` }"></video>
+
     <div v-if="hoverStyleSwitch === 'info'" v-show="hoverInfoStatus" @mouseleave="hoverInfoMouseLeave"
       @click="cmjs.jump.video(data.vid)" class="hover-style-info-container"
       :style="{ width: `${cs.w}px`, height: `${cs.ch}px`, fontSize: `${cs.bfs}px` }">
@@ -30,21 +48,6 @@
         <div class="hover-style-info-up">UP主：{{ data.nickname }}</div>
         <div>投稿：{{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}</div>
       </div>
-    </div>
-
-    <div v-if="!data.expire" v-show="!playStatus && !hoverInfoStatus" class="inner-info"
-      :style="{ width: `${cs.w}px`, height: `${cs.ufs}px`, lineHeight: `${cs.ufs}px`, fontSize: `${cs.ufs}px`, justifyContent: innerInfoShow ? 'space-between' : 'right' }">
-      <span v-if="innerInfoShow" style="margin-left: 5px;">
-        <span>
-          <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
-            cmjs.fmt.numWE(data.playNum) }}
-        </span>
-        <span style="margin-left: 5px;">
-          <span class="iconfont el-icon-danmushu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
-            cmjs.fmt.numWE(data.danmuNum) }}
-        </span>
-      </span>
-      <span v-show="!hoverInfoStatus" style="margin-right: 5px;">{{ cmjs.fmt.videoDuration(data.duration) }}</span>
     </div>
 
     <div class="info" :style="{ height: `${cs.h - cs.ch}px` }">
@@ -321,12 +324,14 @@ function watchLaterFc(vid: number) {
 }
 
 .video-card .inner-info {
-  margin-top: -19px;
-  /* -19 = -14 + -5 */
   color: white;
   position: absolute;
   display: flex;
   pointer-events: none;
+  bottom: 0;
+  background-image: linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.8) 100%);
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .video-card .info .title-row {

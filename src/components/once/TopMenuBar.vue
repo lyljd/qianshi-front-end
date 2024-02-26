@@ -1,5 +1,5 @@
 <template>
-  <TopMenuImg id="top-menu-img"></TopMenuImg>
+  <TopMenuImg id="top-menu-img" v-if="tpp === ''"></TopMenuImg>
 
   <el-menu id="menu" class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
     <div class="logo">
@@ -61,7 +61,7 @@
           </div>
           <div class="tags">
             <VipIco v-if="ahi.isVip" style="margin-right: 5px;"></VipIco>
-            <LevelIco :level="cmjs.biz.expToLevel(ahi.exp)"></LevelIco>
+            <LevelIco :level="ahi.level"></LevelIco>
           </div>
           <div class="coin-row">
             <span @click="cmjs.jump.new('/me/coin')">硬币:<span class="coin">{{ ahi.coin }}</span></span>
@@ -159,7 +159,7 @@ type AvatarHoverInfo = {
   nickname: string,
   isVip: boolean,
   power: number,
-  exp: number,
+  level: number,
   coin: number,
   focuNum: number,
   fanNum: number,
@@ -185,7 +185,7 @@ let ahi = ref<AvatarHoverInfo>({
   "nickname": "",
   "isVip": false,
   "power": 0,
-  "exp": 0,
+  "level": 1,
   "coin": 0,
   "focuNum": 0,
   "fanNum": 0,
@@ -193,26 +193,37 @@ let ahi = ref<AvatarHoverInfo>({
   "signinStatus": true,
 })
 let avatar = ref(cmjs.cache.getCookie('avatar'))
+let tpp = ref("不能为空") // topPath
 
 watch(() => route.path, (newPath) => {
   if (newPath === "/") {
-    topMenuImg.style.display = "block"
+    if (tpp.value === '') {
+      topMenuImg = document.getElementById("top-menu-img") as HTMLElement
+      topMenuImg.style.display = "block"
+    }
     menu.style.backgroundColor = "transparent"
     menu.style.border = "none"
     searchInput.style.background = "rgba(255, 255, 255, 0.75)"
   } else {
-    topMenuImg.style.display = "none"
+    if (tpp.value === '') {
+      topMenuImg = document.getElementById("top-menu-img") as HTMLElement
+      topMenuImg.style.display = "none"
+    }
     menu.style.backgroundColor = "white"
     menu.style.borderBottom = "1px solid #dedfe0"
     searchInput.style.background = "#f4f4f5"
   }
 })
 
+watch(() => store.topPath, (newPath) => {
+  tpp.value = store.topPath
+})
+
+setTimeout(() => {
+  tpp.value = store.topPath
+}, 0)
+
 onMounted(() => {
-  topMenuImg = document.getElementById("top-menu-img") as HTMLElement
-  if (location.pathname === "/") {
-    topMenuImg.style.display = "block"
-  }
   menu = document.getElementById("menu") as HTMLElement
   searchInput = document.querySelector(".el-input__wrapper") as HTMLElement
   window.addEventListener('scroll', scrollListenerHandler)
@@ -264,7 +275,7 @@ function onAvatarPopShow() {
       nickname: "Bonnenult",
       isVip: true,
       power: 6,
-      exp: 23456,
+      level: 6,
       coin: 233,
       focuNum: 6,
       fanNum: 114514,
@@ -280,6 +291,7 @@ function signin() {
     return
   }
   // TODO api
+  // 后端会返回一个签到后的level，需赋值到原level中；如果新的level变大了，则提示用户已升级
   ahi.value.signinStatus = true
   ahi.value.coin += 5
   cmjs.prompt.success("签到成功")
@@ -295,6 +307,10 @@ function recSetAvatar(f: Function) {
 </script>
 
 <style scoped>
+#top-menu-img {
+  display: block;
+}
+
 .menu {
   width: 100%;
   min-width: 1280px;

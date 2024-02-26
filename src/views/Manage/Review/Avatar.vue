@@ -1,14 +1,16 @@
 <template>
-  <el-table :data="form" empty-text="暂无待处理的个人认证" class="table" stripe border>
+  <el-table :data="data.records" empty-text="暂无待处理的头像" class="table" stripe border>
     <el-table-column label="用户" align="center">
       <template #default="scope">
         <span @click="cmjs.jump.user(scope.row.uid)" class="user">{{ scope.row.nickname }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column prop="oldTitle" label="原个人认证" align="center" />
-
-    <el-table-column prop="newTitle" label="新个人认证" align="center" />
+    <el-table-column label="新头像" align="center">
+      <template #default="scope">
+        <Avatar :url="scope.row.newAvatar" size="large"></Avatar>
+      </template>
+    </el-table-column>
 
     <el-table-column :formatter="tableTimeFormatter" prop="applyTime" label="申请时间" align="center" />
 
@@ -19,30 +21,46 @@
       </template>
     </el-table-column>
   </el-table>
+
+  <el-pagination :total="data.total" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
+    hide-on-single-page background layout="prev, pager, next" />
 </template>
 
 <script setup lang="ts">
-import Form from "@/mock/manage/review/title.json"
+import Data from "@/mock/manage/review/avatar.json"
 import cmjs from '@/cmjs'
 import { ElMessageBox } from 'element-plus'
 import { useStore } from "@/store"
+import Avatar from '@/components/common/Avatar.vue'
 
 type Record = {
   id: number,
   uid: number,
   nickname: string,
-  oldTitle: string,
-  newTitle: string,
+  newAvatar: string,
   applyTime: number,
+}
+
+type Data = {
+  total: number,
+  records: Record[]
 }
 
 const store = useStore()
 store.setManegeItemIndex(1, location.pathname)
 
-let form: Record[] = reactive(getForm())
+let curPage = ref(1)
+let data = ref<Data>(getData())
 
-function getForm(): Record[] {
-  return Form
+watch(curPage, newVal => {
+  data.value = getData()
+})
+
+function getData(): Data {
+  // TODO api
+  console.log("获取第" + curPage.value + "页的数据")
+
+  return Data
 }
 
 function tableTimeFormatter(_: any, __: any, time: number) {
@@ -51,14 +69,15 @@ function tableTimeFormatter(_: any, __: any, time: number) {
 
 function pass(formIdx: number) {
   //TODO api
-  console.log(form[formIdx].id)
+  console.log(data.value.records[formIdx].id)
 
-  form.splice(formIdx, 1)
+  data.value.records.splice(formIdx, 1)
+  data.value.total--
   cmjs.prompt.success("已通过")
 }
 
 function deny(formIdx: number) {
-  ElMessageBox.prompt('请输入驳回理由（可为空）', '个人认证审批', {
+  ElMessageBox.prompt('请输入驳回理由（可为空）', '头像审批', {
     confirmButtonText: '提交',
     cancelButtonText: '取消',
     closeOnClickModal: false,
@@ -67,10 +86,11 @@ function deny(formIdx: number) {
   })
     .then(({ value }) => {
       //TODO api
-      console.log(form[formIdx].id)
+      console.log(data.value.records[formIdx].id)
       console.log("理由：" + value)
 
-      form.splice(formIdx, 1)
+      data.value.records.splice(formIdx, 1)
+      data.value.total--
       cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
@@ -78,9 +98,14 @@ function deny(formIdx: number) {
 </script>
 
 <style lang="less" scoped>
-.table .user {
-  cursor: pointer;
-  text-decoration: underline;
-  color: #409EFF;
+.table {
+
+  margin-bottom: 20px;
+
+  .user {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #409EFF;
+  }
 }
 </style>

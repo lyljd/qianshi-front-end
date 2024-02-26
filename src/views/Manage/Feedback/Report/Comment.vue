@@ -8,8 +8,7 @@
           <span>举报时间：{{ cmjs.fmt.tsStandard(r.reportTime) }}</span>
           <div>
             <el-button v-blur @click="del(idx)" type="success">删除评论</el-button>
-            <el-button v-blur @click="deny(idx)" type="warning">驳回</el-button>
-            <el-button v-blur @click="ignore(idx)" type="danger">忽略</el-button>
+            <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
           </div>
         </div>
       </template>
@@ -92,6 +91,7 @@ function del(formIdx: number) {
       console.log(data.value.records[formIdx].id)
 
       data.value.records.splice(formIdx, 1)
+      data.value.total--
       cmjs.prompt.success('已删除')
     })
 }
@@ -110,17 +110,10 @@ function deny(formIdx: number) {
       console.log("理由：" + value)
 
       data.value.records.splice(formIdx, 1)
+      data.value.total--
       cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
-}
-
-function ignore(formIdx: number) {
-  //TODO api
-  console.log(data.value.records[formIdx].id)
-
-  data.value.records.splice(formIdx, 1)
-  cmjs.prompt.success("已忽略")
 }
 </script>
 

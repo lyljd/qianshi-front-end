@@ -3,7 +3,7 @@
     <div class="head">
       <Image :url="user.topImg" :w="1140" :h="180" errorText="头图加载失败" :errorTextFontSize="20"></Image>
 
-      <div v-if="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
+      <div v-show="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
       <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false"
         size="auto">
@@ -21,7 +21,7 @@
       </el-drawer>
 
       <div class="info">
-        <Avatar :url="user.avatarUrl" size="large" :upload="{ handler: avatarUploadHandler }"></Avatar>
+        <Avatar :url="user.avatarUrl" size="large" :upload="isMe ? { handler: avatarUploadHandler } : undefined"></Avatar>
 
         <div class="right">
           <div class="head-row">
@@ -30,7 +30,7 @@
             <span v-if="user.gender === '男'" style="color: #a0cfff;" class="iconfont el-icon-male"></span>
             <span v-else style="color: #ff6699;" class="iconfont el-icon-female"></span>
 
-            <LevelIco :level="cmjs.biz.expToLevel(user.exp)"></LevelIco>
+            <LevelIco :level="user.level"></LevelIco>
 
             <VipIco v-if="user.isVip" style="margin-left: 5px;"></VipIco>
 
@@ -38,15 +38,23 @@
               <span class="iconfont el-icon-ip"></span>
               {{ user.ipLocation }}
             </span>
+
+            <el-tooltip v-if="user.isReview" content="在此期间你可以重新上传头像" placement="top">
+              <span class="iconfont el-icon-info tool-tip">头像审核中</span>
+            </el-tooltip>
+
+            <el-tooltip v-if="user.isBan" content="" placement="top">
+              <span class="iconfont el-icon-info tool-tip">账号封禁中</span>
+            </el-tooltip>
           </div>
 
           <input ref="signatureInput" @blur="saveSignature" :readonly="isMe ? false : true"
             :class="{ 'signature-row-me': isMe, 'signature-row': !isMe }" :placeholder="isMe ? '编辑个性签名' : ''"
-            v-model="signature" />
+            v-model="signature" @keyup.enter.native="signatureInput?.blur()" />
         </div>
       </div>
 
-      <div v-if="!isMe" class="oper">
+      <div v-show="!isMe" class="oper">
         <el-button v-blur @click="focu" :class="!user.isFocu ? 'not-focu' : ''">{{ !user.isFocu ? "关注" : "已关注"
         }}</el-button>
 
@@ -143,9 +151,11 @@ type User = {
   signature: string
   avatarUrl: string
   gender: string
-  exp: number
+  level: number
   isVip: boolean
   ipLocation: string
+  isReview?: boolean
+  isBan?: boolean
   topImg: string
   isFocu: boolean
   isBlock: boolean
@@ -211,6 +221,8 @@ function avatarUploadHandler(file: File, succ: Function, fail: Function) {
   console.log(file)
   setTimeout(() => {
     succ()
+    user.value.isReview = true
+    cmjs.prompt.info("待审核通过后你的头像将被更新")
     // fail()
   }, 2000)
 }
@@ -229,7 +241,7 @@ function saveSignature() {
 }
 
 function replaceTopImg() {
-  replaceTopImgDrawerShow.value = true;
+  replaceTopImgDrawerShow.value = true
   oldTopImg.value = user.value.topImg
 }
 
@@ -241,6 +253,7 @@ function cancelTopImg() {
 function saveTopImg() {
   //TODO api
   replaceTopImgDrawerShow.value = false
+  cmjs.prompt.success("更换成功")
 }
 
 function focu() {
@@ -248,7 +261,7 @@ function focu() {
     store.openLoginWindow()
     return
   }
-  if (isMe) {
+  if (isMe.value) {
     cmjs.prompt.info("不能关注自己")
     return
   }
@@ -422,6 +435,12 @@ function toSearch() {
             font-size: 12px;
             display: flex;
             align-items: center;
+            cursor: default;
+          }
+
+          .tool-tip {
+            color: #dedfe0;
+            font-size: 14px;
             cursor: default;
           }
         }

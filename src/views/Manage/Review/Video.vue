@@ -85,6 +85,7 @@ function pass(formIdx: number) {
   console.log(data.value.records[formIdx].id)
 
   data.value.records.splice(formIdx, 1)
+  data.value.total--
   cmjs.prompt.success("已通过")
 }
 
@@ -102,6 +103,7 @@ function deny(formIdx: number) {
       console.log("理由：" + value)
 
       data.value.records.splice(formIdx, 1)
+      data.value.total--
       cmjs.prompt.success("已驳回")
     })
     .catch(() => { })

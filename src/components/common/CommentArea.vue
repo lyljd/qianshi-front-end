@@ -64,7 +64,7 @@ type Comment = {
   avatarUrl: string
   uid: number
   nickname: string
-  exp: number
+  level: number
   isVip: boolean
   isUp: boolean
   isTop: boolean
@@ -96,7 +96,7 @@ let props = defineProps<{
   data: Comment[]
   vid: number
   authorUid: number
-  incrTotal: (incr: 1 | -1) => void
+  incrTotal: (incr: number) => void
 }>()
 
 let curPage = ref(1)
@@ -168,7 +168,7 @@ function send() {
     "avatarUrl": "/resource/avatar.jpeg",
     "uid": 1,
     "nickname": "Bonnenult",
-    "exp": 23456,
+    "level": 6,
     "isVip": true,
     "isUp": true,
     "isTop": false,
@@ -213,8 +213,8 @@ function deleteComment(cid: number) {
   // TODO api
   for (let i = 0; i < props.data.length; i++) {
     if (props.data[i].cid === cid) {
+      props.incrTotal(props.data[i].reply ? -(props.data[i].reply!.total + 1) : -1)
       props.data.splice(i, 1)
-      props.incrTotal(-1)
       // TODO api：若还有评论，则向后端再请求一条评论补充进来
       return
     }
@@ -248,7 +248,7 @@ function childSend() {
     "avatarUrl": "/resource/avatar.jpeg",
     "uid": 1,
     "nickname": "Bonnenult",
-    "exp": 23456,
+    "level": 6,
     "isVip": true,
     "isTop": false,
     "isUp": true,
@@ -279,6 +279,7 @@ function childSend() {
       }
       c.reply.total++
       c.reply.data.push(newComment)
+      props.incrTotal(1)
       break
     }
   }
@@ -307,7 +308,7 @@ function viewMore(c: Comment, page: number) {
     "uid": 2,
     "avatarUrl": "/resource/avatar2.jpeg",
     "nickname": "惜缘灬冷颜",
-    "exp": 2345,
+    "level": 3,
     "isVip": false,
     "isUp": false,
     "isTop": false,

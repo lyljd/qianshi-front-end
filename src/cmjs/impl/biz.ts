@@ -46,7 +46,7 @@ export default {
   },
 
   // levelReqExp 用户等级升至对应等级所需经验
-  levelReqExp(level: 1 | 2 | 3 | 4 | 5 | 6): number {
+  levelReqExp(level: number): number {
     switch (level) {
       case 1: return 0
       case 2: return 350
@@ -54,6 +54,7 @@ export default {
       case 4: return 4500
       case 5: return 9000
       case 6: return 18000
+      default: return 0
     }
   },
 

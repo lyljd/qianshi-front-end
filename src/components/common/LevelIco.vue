@@ -8,7 +8,7 @@
 import cmjs from '@/cmjs'
 
 const data = defineProps<{
-  level: 1 | 2 | 3 | 4 | 5 | 6
+  level: number
 }>()
 </script>
 

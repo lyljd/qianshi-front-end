@@ -3,6 +3,8 @@
     <el-table-column fixed prop="level" label="权限等级" :width="90" align="center" :resizable="false" />
     <el-table-column prop="reviewVR" label="审批视频/专栏" :width="120" :formatter="tfFormatter" align="center"
       :resizable="false" />
+    <el-table-column prop="reviewAvatar" label="审批头像" :width="90" :formatter="tfFormatter" align="center"
+      :resizable="false" />
     <el-table-column prop="appeal" label="处理申诉" :width="90" :formatter="tfFormatter" align="center" :resizable="false" />
     <el-table-column prop="reviewTitle" label="审批个人认证" :width="110" :formatter="tfFormatter" align="center"
       :resizable="false" />
@@ -32,6 +34,7 @@ store.setManegeItemIndex(4, location.pathname)
 type power = {
   level: number,
   reviewVR: boolean,
+  reviewAvatar: boolean,
   appeal: boolean,
   reviewTitle: boolean,
   msg: boolean,
@@ -47,12 +50,12 @@ type power = {
 }
 
 const data: power[] = [
-  { level: 1, reviewVR: true, appeal: true, reviewTitle: false, msg: false, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, ipBan: false, log: false, statistic: false },
-  { level: 2, reviewVR: true, appeal: true, reviewTitle: true, msg: true, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, ipBan: false, log: false, statistic: false },
-  { level: 3, reviewVR: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, ipBan: false, log: false, statistic: false },
-  { level: 4, reviewVR: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, ipBan: true, log: false, statistic: false },
-  { level: 5, reviewVR: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, ipBan: true, log: true, statistic: true },
-  { level: 6, reviewVR: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, ipBan: true, log: true, statistic: true },
+  { level: 1, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: false, msg: false, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, ipBan: false, log: false, statistic: false },
+  { level: 2, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, ipBan: false, log: false, statistic: false },
+  { level: 3, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, ipBan: false, log: false, statistic: false },
+  { level: 4, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, ipBan: true, log: false, statistic: false },
+  { level: 5, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, ipBan: true, log: true, statistic: true },
+  { level: 6, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, ipBan: true, log: true, statistic: true },
 ]
 
 function tfFormatter(_: any, __: any, v: boolean): string {

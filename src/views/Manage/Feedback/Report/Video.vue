@@ -7,10 +7,9 @@
           }}</span></span>
           <span>举报时间：{{ cmjs.fmt.tsStandard(r.reportTime) }}</span>
           <div>
-            <el-button v-blur @click="process(idx)" type="success">隐藏并调整视频至未通过</el-button>
-            <el-button v-blur @click="del(idx)" type="success">删除视频</el-button>
-            <el-button v-blur @click="deny(idx)" type="warning">驳回</el-button>
-            <el-button v-blur @click="ignore(idx)" type="danger">忽略</el-button>
+            <el-button v-blur @click="process(idx)" type="success">调整视频至未通过</el-button>
+            <el-button v-blur @click="del(idx)" type="warning">删除视频</el-button>
+            <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
           </div>
         </div>
       </template>
@@ -83,11 +82,23 @@ function getData(): Data {
 }
 
 function process(formIdx: number) {
-  //TODO api
-  console.log(data.value.records[formIdx].id)
+  ElMessageBox.confirm('你确认要调整该视频至未通过吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+  })
+    .then(() => {
+      //TODO api
+      console.log(data.value.records[formIdx].id)
 
-  data.value.records.splice(formIdx, 1)
-  cmjs.prompt.success("已处理")
+      data.value.records.splice(formIdx, 1)
+      data.value.total--
+      cmjs.prompt.success("已处理")
+    })
 }
 
 function del(formIdx: number) {
@@ -105,6 +116,7 @@ function del(formIdx: number) {
       console.log(data.value.records[formIdx].id)
 
       data.value.records.splice(formIdx, 1)
+      data.value.total--
       cmjs.prompt.success('已删除')
     })
 }
@@ -123,17 +135,10 @@ function deny(formIdx: number) {
       console.log("理由：" + value)
 
       data.value.records.splice(formIdx, 1)
+      data.value.total--
       cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
-}
-
-function ignore(formIdx: number) {
-  //TODO api
-  console.log(data.value.records[formIdx].id)
-
-  data.value.records.splice(formIdx, 1)
-  cmjs.prompt.success("已忽略")
 }
 </script>
 

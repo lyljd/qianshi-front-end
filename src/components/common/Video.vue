@@ -10,33 +10,34 @@
               style="margin-left: 15px;">{{ idx }}</span></div>
         </div>
 
-        <div v-for="d in runningDanmus" :key="d.id" class="danmu" :class="d.isUp ? ' danmu-modal' : ''"
-          @animationend="doneDanmu(d)"
+        <div v-for="d in runningDanmus" :key="d.id" class="danmu"
+          :class="{ danmuModalUp: d.isUp, danmuBorderNew: d.isNew && !d.isUp }" @animationend="doneDanmu(d)"
           :style="{ animationPlayState: d.id === dmHover.dm.id || !playStatus ? 'paused' : '', color: d.color, top: `${d.track! * trackHeight * thProportion + (trackHeight * thProportion - 20 * dmSize * dsProportion / 100) / 2 - (d.isUp ? 5 : 0)}px`, zIndex: dmShow ? 'auto' : '-1', opacity: dmOpacity / 100, fontSize: `${20 * dmSize * dsProportion / 100}px`, lineHeight: `${20 * dmSize * dsProportion / 100}px`, animationDuration: `${10 - dmSpeed + (d.aniDiff as number)}s` }"
           @mouseenter="(event: MouseEvent) => { hoverDanmu(d, event) }" :id="`dm-${d.id}`">
-          <span v-if="!d.isUp && d.isLike && isLogin" @click="d.isLike ? cancelLikeDanmu(d) : likeDanmu(d)"
+          <span v-show="!d.isUp && d.isLike && isLogin" @click="d.isLike ? cancelLikeDanmu(d) : likeDanmu(d)"
             :style="{ fontSize: `${20 * dmSize * dsProportion / 100}px` }" class="iconfont el-icon-good-fill icon"></span>
           <div v-if="d.isUp"
             :style="{ fontSize: `${12 * dmSize * dsProportion / 100}px`, lineHeight: `${12 * dmSize * dsProportion / 100}px`, padding: `${4 * dmSize * dsProportion / 100}px` }"
             class="upzhu">UP主</div>
-          <span :style="{ border: d.isNew && !d.isUp ? '1px solid' : '' }">{{ d.content }}</span>
+          <span>{{ d.content }}</span>
         </div>
 
         <transition enterActiveClass="animate__zoomIn" leaveActiveClass="animate__zoomOut">
           <div v-show="dmHover.status" :style="{ left: `${dmHover.x}px`, top: `${dmHover.y}px` }"
             class="hover-menu animate__animated animate__faster">
-            <span v-if="!dmHover.dm.isLike || !isLogin" @click="likeDanmu(dmHover.dm)"
+            <span v-show="!dmHover.dm.isLike || !isLogin" @click="likeDanmu(dmHover.dm)"
               class="iconfont el-icon-good icon dh-ico"></span>
-            <span v-else @click="cancelLikeDanmu(dmHover.dm)" class="iconfont el-icon-good-fill icon dh-ico"></span>
+            <span v-show="dmHover.dm.isLike && isLogin" @click="cancelLikeDanmu(dmHover.dm)"
+              class="iconfont el-icon-good-fill icon dh-ico"></span>
 
             <span class="dm-like-num">{{ cmjs.fmt.numWE(dmHover.dm.likeNum) }}</span>
             <span @click="copyDanmuContent(dmHover.dm)" class="iconfont el-icon-copy icon dh-ico"></span>
 
-            <span v-if="!dmHover.dm.isMe" @click="reportDanmu(dmHover.dm.id)"
+            <span v-show="!isLogin || !dmHover.dm.isMe" @click="reportDanmu(dmHover.dm.id)"
               class="iconfont el-icon-report icon dh-ico"></span>
-            <span v-if="dmHover.dm.isMe" @click="recallDanmu(dmHover.dm)"
+            <span v-show="dmHover.dm.isMe && isLogin" @click="recallDanmu(dmHover.dm)"
               class="iconfont el-icon-recall icon dh-ico"></span>
-            <span v-if="props.isUp && !dmHover.dm.isMe" @click="deleteDanmu(dmHover.dm)"
+            <span v-show="props.isUp && !dmHover.dm.isMe && isLogin" @click="deleteDanmu(dmHover.dm)"
               class="iconfont el-icon-ashbin icon dh-ico"></span>
 
             <div class="hmbr" :style="`${hmbIsTop ? 'top' : 'bottom'}: -7.5px`">&nbsp</div>
@@ -1407,10 +1408,15 @@ function hidePreview() {
       }
     }
 
-    .danmu-modal {
+    .danmuModalUp {
       background-color: rgba(0, 0, 0, 0.5);
       border-radius: 15px;
       padding: 5px;
+    }
+
+    .danmuBorderNew {
+      border: 1px solid;
+      padding: 3px;
     }
 
     @keyframes running {

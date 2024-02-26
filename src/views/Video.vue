@@ -73,7 +73,7 @@
       </el-card>
 
       <CommentArea :total="video.comments.total" :data="video.comments.data" :vid="video.vid"
-        :authorUid="video.author.uid" :incrTotal="(incr: 1 | -1) => { video.comments.total += incr }"></CommentArea>
+        :authorUid="video.author.uid" :incrTotal="(incr: number) => { video.comments.total += incr }"></CommentArea>
     </div>
 
 
@@ -109,7 +109,7 @@
       </div>
 
       <div id="dm-ctl" v-show="dmCtl.show" @mouseenter="dmCtlHoverStatus = true" @mouseleave="dmCtlHoverStatus = false">
-        <el-button v-blur @click="reportDanmu(dmCtl.d.id)" v-show="!dmCtl.d.isMe" type="warning"
+        <el-button v-blur @click="reportDanmu(dmCtl.d.id)" v-show="!isLogin || !dmCtl.d.isMe" type="warning"
           size="small">举报</el-button>
         <el-button v-blur @click="deleteDanmu(dmCtl.d)" v-show="dmCtl.delete && isLogin" type="danger"
           size="small">删除</el-button>
@@ -226,7 +226,7 @@ type Comment = {
   avatarUrl: string
   uid: number
   nickname: string
-  exp: number
+  level: number
   isVip: boolean
   isUp: boolean
   isTop: boolean
@@ -321,6 +321,9 @@ let { isLogin } = storeToRefs(store)
 watch(() => store.isLogin, (newVal: boolean) => {
   if (newVal) {
     setVideo()
+    isUp.value = cmjs.biz.verifyLoginUid(video.value.author.uid)
+  } else {
+    isUp.value = false
   }
 })
 

@@ -68,6 +68,7 @@ function reply(formIdx: number) {
     to: [{ uid: data.value.records[formIdx].uid, nickname: data.value.records[formIdx].nickname }],
     afterSuccDo: () => {
       data.value.records.splice(formIdx, 1)
+      data.value.total--
     },
   })
 }
@@ -77,6 +78,7 @@ function ignore(formIdx: number) {
   console.log(data.value.records[formIdx].id)
 
   data.value.records.splice(formIdx, 1)
+  data.value.total--
   cmjs.prompt.success("已忽略")
 }
 </script>

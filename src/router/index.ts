@@ -117,6 +117,7 @@ const routes: Array<RouteRecordRaw> = [
         children: [
           { path: "/manage/review/video", component: () => import("@/views/Manage/Review/Video.vue"), meta: { power: 1 } },
           { path: "/manage/review/read", component: () => import("@/views/Manage/Review/Read.vue"), meta: { power: 1 } },
+          { path: "/manage/review/avatar", component: () => import("@/views/Manage/Review/Avatar.vue"), meta: { power: 1 } },
           { path: "/manage/review/title", component: () => import("@/views/Manage/Review/Title.vue"), meta: { power: 2 } },
         ]
       },

@@ -31,7 +31,7 @@
     </div>
 
     <div class="right">
-      <el-card v-if="userHome.title != '' || isMe">
+      <el-card v-if="userHome.title !== '' || isMe">
         <template #header>
           <div class="header">
             <span>个人认证</span>
@@ -51,7 +51,7 @@
         <el-empty v-else description="暂无认证" :image-size="75" />
       </el-card>
 
-      <el-card v-if="userHome.notice != '' || isMe">
+      <el-card v-if="userHome.notice !== '' || isMe">
         <template #header>
           <div class="header">
             <span>公告</span>

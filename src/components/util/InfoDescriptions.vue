@@ -53,7 +53,7 @@ type Comment = {
   avatarUrl: string
   uid: number
   nickname: string
-  exp: number
+  level: number
   isVip: boolean
   isUp: boolean
   isTop: boolean

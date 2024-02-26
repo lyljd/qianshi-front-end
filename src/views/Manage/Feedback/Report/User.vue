@@ -7,9 +7,9 @@
           }}</span></span>
           <span>举报时间：{{ cmjs.fmt.tsStandard(r.reportTime) }}</span>
           <div>
-            <el-button v-blur @click="deal(idx)" type="success">前往处理</el-button>
-            <el-button v-blur @click="deny(idx)" type="warning">驳回</el-button>
-            <el-button v-blur @click="ignore(idx)" type="danger">忽略</el-button>
+            <el-button v-blur @click="deal(idx)" type="primary">前往处理</el-button>
+            <el-button v-blur @click="processed(idx)" type="success">已处理</el-button>
+            <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
           </div>
         </div>
       </template>
@@ -82,8 +82,28 @@ function deal(formIdx: number) {
   cmjs.jump.new(`/manage/user?key=${data.value.records[formIdx].userInfo.nickname}`)
 }
 
+function processed(formIdx: number) {
+  ElMessageBox.prompt('请描述处理方式（可为空）', '用户举报', {
+    confirmButtonText: '提交',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+  })
+    .then(({ value }) => {
+      //TODO api
+      console.log(data.value.records[formIdx].id)
+      console.log("处理方式：" + value)
+
+      data.value.records.splice(formIdx, 1)
+      data.value.total--
+      cmjs.prompt.success("已处理")
+    })
+    .catch(() => { })
+}
+
 function deny(formIdx: number) {
-  ElMessageBox.prompt('请输入驳回理由（可为空）', '弹幕举报', {
+  ElMessageBox.prompt('请输入驳回理由（可为空）', '用户举报', {
     confirmButtonText: '提交',
     cancelButtonText: '取消',
     closeOnClickModal: false,
@@ -96,17 +116,10 @@ function deny(formIdx: number) {
       console.log("理由：" + value)
 
       data.value.records.splice(formIdx, 1)
+      data.value.total--
       cmjs.prompt.success("已驳回")
     })
     .catch(() => { })
-}
-
-function ignore(formIdx: number) {
-  //TODO api
-  console.log(data.value.records[formIdx].id)
-
-  data.value.records.splice(formIdx, 1)
-  cmjs.prompt.success("已忽略")
 }
 </script>
 

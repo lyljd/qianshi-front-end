@@ -40,10 +40,10 @@ const store = useStore()
 watch(() => store.isLogin, (newVal: boolean) => {
   if (newVal) {
     isMe.value = cmjs.biz.verifyLoginUid(parseInt(route.params.uid as string))
+    userSetting = reactive(getUserSetting())
   } else {
     isMe.value = false
   }
-  userSetting = reactive(getUserSetting())
 })
 
 let userSetting: UserSetting = reactive(getUserSetting())

@@ -6,7 +6,7 @@
     <div class="right">
       <div class="nickname">{{ meHome.nickname }}</div>
       <div class="level-bar">
-        <span class="level">LV{{ level }}</span>
+        <span class="level">LV{{ meHome.level }}</span>
         <el-progress :percentage="meHome.exp / reqExp * 100" stroke-width="20" color="#ff905a" :show-text="false" />
         <div class="exp">{{ meHome.exp }} /<span style="color: #909399;">&nbsp;{{ reqExp }}</span></div>
       </div>
@@ -51,14 +51,14 @@ import cmjs from '@/cmjs'
 type MeHome = {
   nickname: string
   exp: number
+  level: number
 }
 
 const store = useStore()
 store.setMeCurTitle("首页")
 
 let meHome: MeHome = reactive(getMeHome())
-const level = cmjs.biz.expToLevel(meHome.exp)
-const reqExp = cmjs.biz.levelReqExp(level)
+const reqExp = cmjs.biz.levelReqExp(meHome.level)
 
 function getMeHome() {
   return mockMeHome //TODO api
