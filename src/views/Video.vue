@@ -72,8 +72,9 @@
         <VideoTag :tags="video.tags" style="margin-top: 20px;"></VideoTag>
       </el-card>
 
-      <CommentArea :total="video.comments.total" :data="video.comments.data" :vid="video.vid"
-        :authorUid="video.author.uid" :incrTotal="(incr: number) => { video.comments.total += incr }"></CommentArea>
+      <CommentArea :total="video.comments.total" :totalTop="video.comments.totalTop" :data="video.comments.data"
+        :vid="video.vid" :authorUid="video.author.uid" :incrTotal="(incr: number) => { video.comments.total += incr }"
+        :incrTotalTop="(incr: number) => { video.comments.totalTop += incr }"></CommentArea>
     </div>
 
 
@@ -207,6 +208,7 @@ type Video = {
   tags: string[]
   comments: {
     total: number
+    totalTop: number
     data: Comment[]
   }
   author: AuthorInfo

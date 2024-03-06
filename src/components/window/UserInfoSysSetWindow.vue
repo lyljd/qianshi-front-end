@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" title="调整信息" custom-class="uissw" :close-on-click-modal="false"
+  <el-dialog v-model="dialogVisible" title="调整信息" class="uissw" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">
@@ -63,7 +63,7 @@ import cmjs from '@/cmjs'
 import Data from "@/mock/manage/userInfo.json"
 import { useStore } from "@/store"
 import { ElMessageBox } from "element-plus"
-import zhCn from 'element-plus/lib/locale/lang/zh-cn'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
 type User = {
   coverUrl: string,

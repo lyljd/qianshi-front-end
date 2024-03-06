@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="mainWindowVisible" title="设置广告" width="75%" custom-class="saw" :close-on-click-modal="false"
+  <el-dialog v-model="mainWindowVisible" title="设置广告" width="75%" class="saw" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">

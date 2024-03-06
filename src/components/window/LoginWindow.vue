@@ -11,7 +11,7 @@
             <div class="row">
               <span class="tag">邮箱</span>
               <el-input style="width: calc(100% - 57px - 135px);" v-model="email" placeholder="请输入邮箱" />
-              <el-button v-blur :disabled="!checkEmailValid()" @click="openCaptchaWindow" id="get-captcha-btn"
+              <el-button v-blur :disabled="!getCaptchaBtnCheck()" @click="openCaptchaWindow" id="get-captcha-btn"
                 class="get-captcha-btn">获取验证码</el-button>
             </div>
             <div class="row">
@@ -22,6 +22,7 @@
         </el-tab-pane>
 
         <el-tab-pane name="password">
+
           <template #label>
             <span :style="{ cursor: option === 'password' ? 'not-allowed' : 'pointer' }">密码登录</span>
           </template>
@@ -38,8 +39,11 @@
           </div>
         </el-tab-pane>
       </el-tabs>
+
       <template #footer>
-        <el-button v-blur @click="login" :disabled="!loginBtnCheck()" class="btn" type="primary">{{ btnText }}</el-button>
+        <el-button v-blur @click="login" :disabled="!loginBtnCheck()" class="btn" id="login-btn" type="primary">{{
+      btnText
+          }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -50,12 +54,24 @@ import cmjs from '@/cmjs'
 import { useStore } from "@/store"
 import { useRouter } from "vue-router"
 import { ElNotification } from 'element-plus'
+import * as VCodeAPI from '@/api/vcode'
+import * as UserAPI from '@/api/user'
 
 type LoginInfo = {
   nickname: string,
   avatarUrl: string,
   token: string,
   refreshToken: string,
+  newMessageNum: number,
+  newDynamicNum: number,
+}
+
+type disabledEleResp = {
+  disabled: () => void,
+  cancelDisabled: () => void,
+  isCounting: () => boolean,
+  countDown: (second: number, endStatus?: Function, endDo?: Function) => void,
+  endCountDown: (disabled: boolean) => void,
 }
 
 defineExpose({
@@ -65,18 +81,17 @@ defineExpose({
 const store = useStore()
 const router = useRouter()
 
-// TODO 接入后端接口后清除预填充数据
+let getCaptchaBtn: HTMLButtonElement
+let gcbDis: disabledEleResp
+let loginBtn: HTMLButtonElement
+let lbDis: disabledEleResp
+
 let dialogVisible = ref(false)
-// let option = ref("vcode")
-let option = ref("password")
+let option = ref("vcode")
 let btnText = ref("登录/注册")
-// let email = ref("")
-let email = ref("test@qianshi.fun")
+let email = ref("")
 let vcode = ref("")
-// let password = ref("")
-let password = ref("123456")
-let hasVerify = ref(false)
-let resetGetCaptchaBtn: Function
+let password = ref("")
 
 function show(tip?: string) {
   dialogVisible.value = true
@@ -88,6 +103,11 @@ function show(tip?: string) {
   if (tip.length > 0) {
     cmjs.prompt.info(tip)
   }
+}
+
+function beforeClose() {
+  vcode.value = ""
+  password.value = ""
 }
 
 function tabChange(newTabName: string) {
@@ -104,19 +124,44 @@ function tabChange(newTabName: string) {
 }
 
 function openCaptchaWindow() {
-  const btn = document.getElementById("get-captcha-btn") as HTMLButtonElement
-  store.openCaptchaWindow(() => {
-    // TODO api：发送验证码（若发送失败时则检查响应值是否有ttl(表示欲发送邮箱目前还处于cd中，还有ttl秒才能发送)，若有则直接让按钮进入cd ttl秒）
-    resetGetCaptchaBtn = cmjs.util.btnCD(btn, 180, () => { hasVerify.value = false })
-    hasVerify.value = true
-    cmjs.prompt.success("验证码已发送")
-  })
-}
+  if (!checkEmailValid()) {
+    return
+  }
 
-function beforeClose() {
-  // TODO 接入后端接口后解除下方两行代码的注释
-  // vcode.value = ""
-  // password.value = ""
+  if (!getCaptchaBtn) {
+    getCaptchaBtn = document.getElementById("get-captcha-btn") as HTMLButtonElement
+    gcbDis = cmjs.util.disabledButton(getCaptchaBtn)
+  }
+
+  gcbDis.countDown(5, checkEmailValid)
+
+  store.openCaptchaWindow((captchaId: string) => {
+    gcbDis.endCountDown(false)
+    gcbDis.disabled()
+    cmjs.prompt.info("发送验证码中，请稍等")
+
+    VCodeAPI.login(email.value, captchaId)
+      .then((res) => {
+        gcbDis.cancelDisabled()
+        if (res.code !== 0) {
+          cmjs.prompt.error("验证码发送失败")
+          return
+        }
+
+        if (res.data.ttl > 0) {
+          gcbDis.countDown(res.data.ttl, checkEmailValid)
+          cmjs.prompt.info("你有未使用的验证码，请检查邮箱")
+          return
+        }
+
+        gcbDis.countDown(180, checkEmailValid)
+        cmjs.prompt.success("验证码已发送")
+      })
+      .catch(() => {
+        gcbDis.cancelDisabled()
+        cmjs.prompt.error("发送验证码失败")
+      })
+  })
 }
 
 function checkEmailValid(): boolean {
@@ -125,7 +170,7 @@ function checkEmailValid(): boolean {
 }
 
 function checkVcodeValid(): boolean {
-  const vcodeRegex = /^[0-9]{6}$/
+  const vcodeRegex = /^[0-9A-Za-z]{6}$/
   return vcodeRegex.test(vcode.value)
 }
 
@@ -133,33 +178,85 @@ function checkPasswordValid(): boolean {
   return password.value.length >= 6 && password.value.length <= 20
 }
 
+function getCaptchaBtnCheck(): boolean {
+  if (gcbDis && gcbDis.isCounting()) {
+    return false
+  }
+
+  return checkEmailValid()
+}
+
 function loginBtnCheck(): boolean {
+  if (lbDis && lbDis.isCounting()) {
+    return false
+  }
+
   switch (option.value) {
     case "vcode": {
-      if (hasVerify.value && checkVcodeValid()) {
-        return true
-      }
-      break
+      return checkEmailValid() && checkVcodeValid()
     }
     case "password": {
-      if (checkEmailValid() && checkPasswordValid()) {
-        return true
-      }
-      break
+      return checkEmailValid() && checkPasswordValid()
     }
   }
+
   return false
 }
 
-function mockLogin(): LoginInfo {
-  // TODO api
-  let li: LoginInfo = {
-    "nickname": "Bonnenult",
-    "avatarUrl": "/resource/avatar.jpeg",
-    "token": "1",
-    "refreshToken": "1",
+function login() {
+  if (!loginBtnCheck()) {
+    return
   }
-  return li
+
+  if (!loginBtn) {
+    loginBtn = document.getElementById("login-btn") as HTMLButtonElement
+    lbDis = cmjs.util.disabledButton(loginBtn)
+  }
+
+  lbDis.disabled()
+
+  switch (option.value) {
+    case "vcode": {
+      UserAPI.emailLogin(email.value, vcode.value)
+        .then((res) => {
+          lbDis.cancelDisabled()
+          lbDis.countDown(3, loginBtnCheck)
+
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
+
+          loginSuccDo(res.data)
+        })
+        .catch((err) => {
+          lbDis.cancelDisabled()
+          lbDis.countDown(3, loginBtnCheck)
+          cmjs.prompt.error(err)
+        })
+      break
+    }
+    case "password": {
+      UserAPI.passLogin(email.value, password.value)
+        .then((res) => {
+          lbDis.cancelDisabled()
+          lbDis.countDown(3, loginBtnCheck)
+
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
+
+          loginSuccDo(res.data)
+        })
+        .catch((err) => {
+          lbDis.cancelDisabled()
+          lbDis.countDown(3, loginBtnCheck)
+          cmjs.prompt.error(err)
+        })
+      break
+    }
+  }
 }
 
 function saveLoginInfo(li: LoginInfo) {
@@ -170,32 +267,26 @@ function saveLoginInfo(li: LoginInfo) {
   cmjs.cache.setLS("refreshToken", li.refreshToken)
 }
 
-function login() {
-  if (!loginBtnCheck()) {
-    return
-  }
-
-  let li = mockLogin()
+function loginSuccDo(li: LoginInfo) {
   saveLoginInfo(li)
 
   dialogVisible.value = false
-  if (resetGetCaptchaBtn) {
-    resetGetCaptchaBtn()
-  }
+  lbDis.endCountDown(false)
   store.isLogin = true
+  store.setNewMessageNum(li.newMessageNum)
+  store.setNewDynamicNum(li.newDynamicNum)
+  setTimeout(() => {
+    store.setTopMenuBarAvatar(li.avatarUrl)
+  }, 0)
 
   let index = location.href.lastIndexOf("from=")
   if (index !== -1) {
     router.replace(location.href.slice(index + 5))
   }
 
-  showLoginSuccess(li.nickname)
-}
-
-function showLoginSuccess(nickname: string) {
   ElNotification.success({
     title: "登录成功",
-    message: `欢迎你，${nickname}`,
+    message: `欢迎你，${li.nickname}`,
     showClose: false,
     offset: 57,
     duration: 2000,
@@ -217,7 +308,7 @@ function showLoginSuccess(nickname: string) {
 }
 
 .lw-container .input-box .row .tag {
-  width: 42px;
+  width: 43px;
   color: black;
   margin-right: 15px;
   text-align: right;

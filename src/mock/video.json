@@ -26,6 +26,7 @@
     ],
     "comments": {
       "total": 5,
+      "totalTop": 2,
       "data": [
         {
           "cid": 1,
@@ -269,29 +270,26 @@
     ],
     "comments": {
       "total": 1,
+      "totalTop": 1,
       "data": [
         {
           "cid": 1,
           "avatarUrl": "/resource/avatar.jpeg",
           "uid": 1,
           "nickname": "Bonnenult",
-          "level": 6,
+          "level": 3,
           "isVip": true,
           "isUp": true,
           "isTop": false,
           "isUpLike": false,
           "content": "第一",
-          "date": 1698079812300,
+          "date": 1698076860000,
           "ipLocation": "重庆",
           "likeNum": 0,
           "isLike": false,
           "isDislike": false,
           "isChild": false,
-          "parentCid": 5,
-          "reply": {
-            "total": 0,
-            "data": []
-          }
+          "parentCid": 1
         }
       ]
     },
@@ -459,6 +457,7 @@
     ],
     "comments": {
       "total": 0,
+      "totalTop": 0,
       "data": []
     },
     "author": {
@@ -591,6 +590,7 @@
     ],
     "comments": {
       "total": 0,
+      "totalTop": 0,
       "data": []
     },
     "author": {
@@ -723,6 +723,7 @@
     ],
     "comments": {
       "total": 0,
+      "totalTop": 0,
       "data": []
     },
     "author": {
@@ -855,6 +856,7 @@
     ],
     "comments": {
       "total": 0,
+      "totalTop": 0,
       "data": []
     },
     "author": {
@@ -987,6 +989,7 @@
     ],
     "comments": {
       "total": 0,
+      "totalTop": 0,
       "data": []
     },
     "author": {
@@ -1119,6 +1122,7 @@
     ],
     "comments": {
       "total": 0,
+      "totalTop": 0,
       "data": []
     },
     "author": {
@@ -1251,6 +1255,7 @@
     ],
     "comments": {
       "total": 0,
+      "totalTop": 0,
       "data": []
     },
     "author": {

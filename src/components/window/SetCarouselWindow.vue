@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="mainWindowVisible" title="设置轮播图" :width="data.length > 0 ? '80%' : '40%'" custom-class="scw"
+  <el-dialog v-model="mainWindowVisible" title="设置轮播图" :width="data.length > 0 ? '80%' : '40%'" class="scw"
     :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">

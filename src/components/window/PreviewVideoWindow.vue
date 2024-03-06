@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="previewVideoWindowVisible" :custom-class="'preview-video'" :before-close="beforePVWindowClose"
+  <el-dialog v-model="previewVideoWindowVisible" class="preview-video" :before-close="beforePVWindowClose"
     destroy-on-close align-center>
     <video volume="0.5" controls :src="previewVideoUrl"></video>
   </el-dialog>

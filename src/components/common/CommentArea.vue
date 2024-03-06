@@ -45,7 +45,7 @@
           <hr class="divide" v-if="idx !== props.data.length - 1">
         </div>
 
-        <el-pagination class="video-page" :total="props.total" v-model:current-page="curPage" :default-page-size="10"
+        <el-pagination class="video-page" :total="props.totalTop" v-model:current-page="curPage" :default-page-size="10"
           background hide-on-single-page layout="prev, pager, next" />
       </div>
     </div>
@@ -93,10 +93,12 @@ let { isLogin } = storeToRefs(store)
 
 let props = defineProps<{
   total: number
+  totalTop: number // 分页得按照顶级评论数来
   data: Comment[]
   vid: number
   authorUid: number
   incrTotal: (incr: number) => void
+  incrTotalTop: (incr: number) => void
 }>()
 
 let curPage = ref(1)
@@ -158,7 +160,7 @@ function send() {
   }
 
   sendBtns.forEach((ele) => {
-    cmjs.util.btnCD(ele, 10)
+    cmjs.util.btnCD(ele, 5)
   })
 
   // TODO api
@@ -184,12 +186,13 @@ function send() {
   }
   props.data.unshift(c)
   props.incrTotal(1)
+  props.incrTotalTop(1)
 
   // 由于刚才新插入了一个元素，所以会导致该页最后一条评论的发布按钮未被禁止
   setTimeout(() => {
     sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
     let lastSendBtn = sendBtns[sendBtns.length - 1]
-    cmjs.util.btnCD(lastSendBtn, 10)
+    cmjs.util.btnCD(lastSendBtn, 5)
   }, 0);
 
   VSAInput.value = ""
@@ -239,7 +242,7 @@ function childSend() {
   }
 
   sendBtns.forEach((ele) => {
-    cmjs.util.btnCD(ele, 10)
+    cmjs.util.btnCD(ele, 5)
   })
 
   //TODO api

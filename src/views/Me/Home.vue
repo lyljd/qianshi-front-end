@@ -44,9 +44,9 @@
 
 <script setup lang="ts">
 import Avatar from '@/components/common/Avatar.vue'
-import mockMeHome from "@/mock/me/home.json"
 import { useStore } from "@/store"
 import cmjs from '@/cmjs'
+import * as API from '@/api/user'
 
 type MeHome = {
   nickname: string
@@ -57,11 +57,24 @@ type MeHome = {
 const store = useStore()
 store.setMeCurTitle("首页")
 
-let meHome: MeHome = reactive(getMeHome())
-const reqExp = cmjs.biz.levelReqExp(meHome.level)
+let meHome = ref<MeHome>({ nickname: "", exp: 0, level: 1 })
+let reqExp = ref(0)
+getMeHome()
 
 function getMeHome() {
-  return mockMeHome //TODO api
+  API.meExp()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error("获取首页失败")
+        return
+      }
+
+      meHome.value = res.data
+      reqExp.value = cmjs.biz.levelReqExp(meHome.value.level)
+    })
+    .catch(() => {
+      cmjs.prompt.error("获取首页失败")
+    })
 }
 </script>
 

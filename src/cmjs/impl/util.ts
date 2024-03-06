@@ -2,6 +2,14 @@ import prompt from "./prompt"
 import cache from "./cache"
 import { ElMessageBox } from 'element-plus'
 
+type disabledEleResp = {
+  disabled: () => void,
+  cancelDisabled: () => void,
+  isCounting: () => boolean,
+  countDown: (second: number, endStatus?: Function, endDo?: Function) => void,
+  endCountDown: (disabled: boolean) => void,
+}
+
 export default {
   browserAlert() {
     if (cache.checkCookieExist('browserAlert')) {
@@ -67,63 +75,168 @@ export default {
     return parseFloat(numS).toFixed(digits)
   },
 
-  // btnCD 让按钮进入指定秒的冷却状态（不能点击，并且会显示剩余的冷却时间）
-  // 返回一个重置函数（恢复按钮到禁止前）；调用重置函数时会触发whenOverDo）
-  // 如果按钮的click事件会被其他元素所触发，则需在click事件的函数内部最开始位置判断按钮是否处于禁止状态
-  btnCD(btn: HTMLButtonElement, cdTime: number, whenOverDo?: Function): Function {
+  // btnCD 让一个按钮禁止second秒（到时间后会取消禁止，所以如果按钮的禁止状态不固定请使用disabledButton）
+  btnCD(btn: HTMLButtonElement, second: number) {
+    if (second <= 0) {
+      return
+    }
+
     const text = btn.innerText
 
     btn.disabled = true
     btn.classList.add('is-disabled')
-    btn.innerText = text + "(" + cdTime + ")"
+    btn.innerText = text + "(" + second + ")"
 
-    const reset = () => {
-      clearInterval(dec);
-      btn.innerText = text
-      btn.classList.remove('is-disabled')
-      if (whenOverDo) {
-        whenOverDo()
+    const timerId = setInterval(() => {
+      second--
+      btn.innerText = text + "(" + second + ")"
+
+      if (second === 0) {
+        clearInterval(timerId)
+        btn.innerText = text
+        btn.classList.remove('is-disabled')
+        btn.disabled = false
       }
+    }, 1000)
+  },
+
+  // disabled: 让元素处于禁止状态
+  // cancelDisabled: 取消元素的禁止状态
+  // countDown: 让元素处于禁止状态，接着开启一个倒计时，在倒计时结束时调用endStatus，然后根据返回值决定取消是否元素的禁止状态（默认为true），最后再调用endDo
+  // endCountDown: 立即结束倒计时（根据disabled的值决定元素的禁止状态；优先级大于endDisabled）
+  // isCounting: 是否处于倒计时中
+  disabledButton(btn: HTMLButtonElement): disabledEleResp {
+    const disabled = () => {
+      btn.disabled = true
+      btn.classList.add('is-disabled')
+    }
+
+    const cancelDisabled = () => {
+      btn.classList.remove('is-disabled')
       btn.disabled = false
     }
 
-    const dec = setInterval(() => {
-      cdTime--
-      btn.innerText = text + "(" + cdTime + ")"
-      if (cdTime === 0) {
-        reset()
-      }
-    }, 1000)
+    let countDownDo: Function
+    let counting = ref(false)
 
-    return reset
-  },
-
-  // spanCD 让标签进入指定秒的冷却状态（不能点击，并且会显示剩余的冷却时间）
-  // 返回一个重置函数（恢复标签到禁止前）；调用重置函数时会触发whenOverDo）
-  spanCD(span: HTMLSpanElement, cdTime: number, whenOverDo?: Function): Function {
-    const text = span.innerText
-
-    span.style.pointerEvents = "none"
-    span.innerText = text + "(" + cdTime + ")"
-
-    const reset = () => {
-      clearInterval(dec);
-      span.innerText = text
-      span.style.pointerEvents = "unset"
-      if (whenOverDo) {
-        whenOverDo()
-      }
+    const isCounting = (): boolean => {
+      return counting.value
     }
 
-    const dec = setInterval(() => {
-      cdTime--
-      span.innerText = text + "(" + cdTime + ")"
-      if (cdTime === 0) {
-        reset()
+    const countDown = (second: number, endStatus?: Function, endDo?: Function) => {
+      if (isCounting() || second <= 0) {
+        return
       }
-    }, 1000)
 
-    return reset
+      disabled()
+
+      const text = btn.innerText
+      btn.innerText = text + "(" + second + ")"
+
+      let timerId: number
+      countDownDo = function (status: boolean) {
+        clearInterval(timerId)
+        btn.innerText = text
+
+        if (status) {
+          cancelDisabled()
+        }
+
+        if (endDo) {
+          endDo()
+        }
+      }
+
+      counting.value = true
+      timerId = setInterval(() => {
+        second--
+        btn.innerText = text + "(" + second + ")"
+
+        if (second === 0) {
+          counting.value = false
+          countDownDo(!endStatus || endStatus())
+        }
+      }, 1000)
+    }
+
+    const endCountDown = (disabled: boolean) => {
+      if (!isCounting()) {
+        return
+      }
+
+      counting.value = false
+      countDownDo(!disabled)
+    }
+
+    return {
+      disabled, cancelDisabled, isCounting, countDown, endCountDown
+    }
+  },
+
+  disabledSpan(span: HTMLSpanElement): disabledEleResp {
+    const disabled = () => {
+      span.style.pointerEvents = "none"
+    }
+
+    const cancelDisabled = () => {
+      span.style.pointerEvents = "auto"
+    }
+
+    let countDownDo: Function
+    let counting = ref(false)
+
+    const isCounting = (): boolean => {
+      return counting.value
+    }
+
+    const countDown = (second: number, endStatus?: Function, endDo?: Function) => {
+      if (isCounting() || second <= 0) {
+        return
+      }
+
+      disabled()
+
+      const text = span.innerText
+      span.innerText = text + "(" + second + ")"
+
+      let timerId: number
+      countDownDo = function (status: boolean) {
+        clearInterval(timerId)
+        span.innerText = text
+
+        if (status) {
+          cancelDisabled()
+        }
+
+        if (endDo) {
+          endDo()
+        }
+      }
+
+      counting.value = true
+      timerId = setInterval(() => {
+        second--
+        span.innerText = text + "(" + second + ")"
+
+        if (second === 0) {
+          counting.value = false
+          countDownDo(!endStatus || endStatus())
+        }
+      }, 1000)
+    }
+
+    const endCountDown = (disabled: boolean) => {
+      if (!isCounting()) {
+        return
+      }
+
+      counting.value = false
+      countDownDo(!disabled)
+    }
+
+    return {
+      disabled, cancelDisabled, isCounting, countDown, endCountDown
+    }
   },
 
   copyToClip(content: string, appendToEle?: HTMLElement) {
@@ -159,10 +272,22 @@ export default {
     history.replaceState({}, '', `${window.location.href.split('?')[0]}?${name}=${value}`)
   },
 
-  // encryptionEmailText 加密邮箱文本（@前字符串下称为前缀，若前缀<=3位则前缀将被替换为"***"，若>3位则取前3位(不足3则有多少取多少)并拼接"***"）
-  encryptionEmailText(email: string): string {
-    const pos = email.indexOf("@")
-    const prefix = email.substring(0, pos)
-    return `${prefix.length > 3 ? prefix.substring(0, 3) : ""}***${email.substring(pos)}`
+  // encEmail 加密邮箱（只针对@前加密；<=3时填充3个*；4、5时保留前后1位，中间填充等量*；，>=6时保留前后2位，中间填充2个*）
+  encEmail(email: string): string {
+    const idx = email.indexOf("@")
+    if (idx === -1) {
+      return ""
+    }
+
+    const prefix = email.substring(0, idx)
+    const suffix = email.substring(idx)
+    const l = prefix.length
+    if (l <= 3) {
+      return "***" + suffix
+    } else if (l <= 5) {
+      return prefix[0] + (l === 4 ? '**' : '***') + prefix[l - 1] + suffix
+    } else {
+      return prefix.substring(0, 2) + "**" + prefix.substring(l - 2) + suffix
+    }
   }
 }

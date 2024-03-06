@@ -22,7 +22,18 @@ export default {
 
   // getUid 读取token中payload部分的uid
   getUid(): number {
-    return parseInt((cache.getLS('token') as string))
+    const token = cache.getLS('token')
+    if (!token) {
+      return 0
+    }
+
+    const payload = atob(token.split('.')[0])
+    const uid = JSON.parse(payload).uid
+    if (!uid) {
+      return 0
+    }
+
+    return uid
   },
 
   // expToLevel (用户)经验转换至等级
@@ -80,4 +91,11 @@ export default {
     prompt.error("操作失败")
     return -1
   },
+
+  // clearLoginInfo 清除登录信息
+  clearLoginInfo() {
+    cache.delCookie("avatar")
+    cache.delLS("token")
+    cache.delLS("refreshToken")
+  }
 }

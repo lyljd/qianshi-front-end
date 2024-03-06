@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="mainWindowVisible" :title="title" custom-class="main" :close-on-click-modal="false"
+  <el-dialog v-model="mainWindowVisible" :title="title" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center>
     <el-input v-model="msg" ref="inputEle" :placeholder="placeholder" resize="none" rows="5" :maxlength="msgMaxlength"
       show-word-limit type="textarea" />
@@ -19,7 +19,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="previewWindowVisible" custom-class="preview" align-center>
+  <el-dialog v-model="previewWindowVisible" align-center class="preview">
     <Image :url="previewImgUrl"></Image>
   </el-dialog>
 </template>
@@ -122,17 +122,6 @@ function onExceed() {
 <style lang="less" scoped></style>
 
 <style>
-.main .el-dialog__header,
-.main .el-dialog__footer {
-  padding: 20px;
-  margin: 0;
-}
-
-.main .el-dialog__body {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
 .upload {
   margin-top: 20px;
 }
@@ -149,11 +138,13 @@ function onExceed() {
   height: calc((50vw - 40px) / 5 - 4px) !important;
 }
 
-.preview .el-dialog__header {
-  display: none;
-}
+.preview {
+  .el-dialog__header, .el-dialog__footer {
+    padding: 0;
+  }
 
-.preview .el-dialog__body {
-  padding: 0;
+  .el-dialog__body {
+    padding: 0;
+  }
 }
 </style>

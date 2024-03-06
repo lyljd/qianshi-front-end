@@ -22,7 +22,9 @@
     <div class="flex-grow" />
 
     <div class="search-bar">
-      <el-input @keyup.enter.native="toSearch" id="search" v-model="searchKey" class="search" placeholder="搜索" clearable>
+      <el-input @keyup.enter.native="toSearch" id="search" v-model="searchKey" class="search" placeholder="搜索"
+        clearable>
+
         <template #prefix><el-icon @click="toSearch" style="cursor: pointer;">
             <search />
           </el-icon></template>
@@ -32,6 +34,7 @@
     <div class="flex-grow" />
 
     <el-popover ref="loginPop" :width="400">
+
       <template #reference>
         <div @click="openLoginWindow('')" v-if="!isLogin" class="login-btn">登录</div>
       </template>
@@ -49,9 +52,10 @@
 
     <div v-if="isLogin" class="after-login-menu">
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
+
         <template #reference>
-          <Avatar @setUrl="(f: Function) => { recSetAvatar(f) }" :url="avatar" size="medium" :home="{ uid: ahi.id }"
-            style="margin-right: 10px;"></Avatar>
+          <Avatar @setUrl="(f: Function) => { recSetAvatar(f) }" :url="avatar" size="medium" :home="{ uid: ahi.id }">
+          </Avatar>
         </template>
         <el-button v-blur @click="signin" :type="!ahi.signinStatus ? 'success' : 'info'"
           :style="{ cursor: !ahi.signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
@@ -68,7 +72,7 @@
           </div>
           <div class="num-container">
             <div class="num">
-              <div class="number" @click="cmjs.jump.follow(ahi.id)">{{ cmjs.fmt.numWE(ahi.focuNum) }}</div>
+              <div class="number" @click="cmjs.jump.follow(ahi.id)">{{ cmjs.fmt.numWE(ahi.followNum) }}</div>
               <div class="text">关注</div>
             </div>
             <div class="num">
@@ -92,11 +96,12 @@
       </div>
 
       <el-popover :show-arrow=false>
+
         <template #reference>
-          <div class="ico-btn">
-            <el-button v-blur circle><el-icon class="ico">
-                <Message />
-              </el-icon></el-button>
+          <div class="ico-btn" style="margin-top: 1px;">
+            <el-button v-blur circle><el-badge :value="newMessageNum" :max="99" :show-zero="false"><el-icon class="ico">
+                  <Message />
+                </el-icon></el-badge></el-button>
             <div class="notice">消息</div>
           </div>
         </template>
@@ -109,8 +114,9 @@
         </ul>
       </el-popover>
 
-      <div @click="cmjs.jump.new('/dynamic')" class="ico-btn">
-        <el-button v-blur class="iconfont el-icon-fengche ico" circle></el-button>
+      <div @click="cmjs.jump.new('/dynamic')" class="ico-btn" style="margin-top: 1px;">
+        <el-button v-blur circle><el-badge :value="newDynamicNum" :max="99" :show-zero="false"><el-icon
+              class="iconfont el-icon-fengche ico"></el-icon></el-badge></el-button>
         <div class="notice">动态</div>
       </div>
 
@@ -161,7 +167,7 @@ type AvatarHoverInfo = {
   power: number,
   level: number,
   coin: number,
-  focuNum: number,
+  followNum: number,
   fanNum: number,
   dynamicNum: number,
   signinStatus: boolean,
@@ -187,13 +193,15 @@ let ahi = ref<AvatarHoverInfo>({
   "power": 0,
   "level": 1,
   "coin": 0,
-  "focuNum": 0,
+  "followNum": 0,
   "fanNum": 0,
   "dynamicNum": 0,
   "signinStatus": true,
 })
 let avatar = ref(cmjs.cache.getCookie('avatar'))
 let tpp = ref("不能为空") // topPath
+let newMessageNum = ref(0)
+let newDynamicNum = ref(0)
 
 watch(() => route.path, (newPath) => {
   if (newPath === "/") {
@@ -252,15 +260,9 @@ function openLoginWindow(tip?: string) {
   loginWindow.value?.show(tip)
 }
 
-function clearLoginInfo() {
-  cmjs.cache.delCookie("avatar")
-  cmjs.cache.delLS("token")
-  cmjs.cache.delLS("refreshToken")
-}
-
 function logout() {
   avatarPop.value.hide()
-  clearLoginInfo()
+  cmjs.biz.clearLoginInfo()
   store.isLogin = false
   if (route.meta.needLogin) {
     cmjs.jump.error(401)
@@ -277,7 +279,7 @@ function onAvatarPopShow() {
       power: 6,
       level: 6,
       coin: 233,
-      focuNum: 6,
+      followNum: 6,
       fanNum: 114514,
       dynamicNum: 0,
       signinStatus: false,
@@ -303,6 +305,16 @@ function toSearch() {
 
 function recSetAvatar(f: Function) {
   store.setTopMenuBarAvatar = f as () => void
+}
+
+store.setNewMessageNum = setNewMessageNum
+function setNewMessageNum(num: number) {
+  newMessageNum.value = num
+}
+
+store.setNewDynamicNum = setNewDynamicNum
+function setNewDynamicNum(num: number) {
+  newDynamicNum.value = num
 }
 </script>
 
@@ -417,6 +429,7 @@ function recSetAvatar(f: Function) {
 .after-login-menu {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .signin {
@@ -540,7 +553,6 @@ function recSetAvatar(f: Function) {
 .upload-btn {
   font-size: 17.5px;
   border-radius: 7.5px;
-  margin-left: 10px;
 }
 
 .upload-btn .notice {

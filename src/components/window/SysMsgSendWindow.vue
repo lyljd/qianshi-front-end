@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="mainWindowVisible" title="发送系统消息" custom-class="smsw" :close-on-click-modal="false"
+  <el-dialog v-model="mainWindowVisible" title="发送系统消息" class="smsw" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center>
     <el-input v-model="title" ref="inputTitleEle" placeholder="消息标题" maxlength="50" show-word-limit />
 

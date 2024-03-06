@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 import { useStore } from "@/store"
 import { ElMessageBox } from 'element-plus'
 import cmjs from "@/cmjs"
+import * as API from '@/api/user'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -206,17 +207,25 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-function getAvatar(): string {
-  // TODO api
-  return "/resource/avatar.jpeg"
+async function getPower() {
+  const store = useStore()
+  await API.mePower()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error("获取我的权限失败")
+        store.power = 0
+        return
+      }
+
+      store.power = res.data.power
+    })
+    .catch(() => {
+      cmjs.prompt.error("获取我的权限失败")
+      store.power = 0
+    })
 }
 
-function getPower(): number {
-  // TODO api
-  return 6
-}
-
-function beforeEach(to: any, from: any, next: Function) {
+async function beforeEach(to: any, from: any, next: Function) {
   const store = useStore()
   store.topPath = to.path.split('/')[1]
 
@@ -226,13 +235,27 @@ function beforeEach(to: any, from: any, next: Function) {
   }
 
   if (store.isLogin && !cmjs.cache.checkCookieExist('avatar')) {
-    const avatar = getAvatar()
-    cmjs.cache.setCookie("avatar", avatar, 3600)
-    store.setTopMenuBarAvatar(avatar)
+    API.meAvatar() // 异步不阻塞
+      .then((res) => {
+        if (res.code !== 0) {
+          cmjs.prompt.error("获取我的头像失败")
+          cmjs.cache.setCookie("avatar", "", 300)
+          store.setTopMenuBarAvatar("")
+          return
+        }
+
+        cmjs.cache.setCookie("avatar", res.data.avatarUrl, 300)
+        store.setTopMenuBarAvatar(res.data.avatarUrl)
+      })
+      .catch(() => {
+        cmjs.prompt.error("获取我的头像失败")
+        cmjs.cache.setCookie("avatar", "", 300)
+        store.setTopMenuBarAvatar("")
+      })
   }
 
   if (store.topPath === 'manage' && store.isLogin && store.power === -1) {
-    store.power = getPower()
+    await getPower() // 同步阻塞
   }
 
   if (to.meta.power && store.power < to.meta.power) {

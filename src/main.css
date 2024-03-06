@@ -14,7 +14,8 @@ html {
 }
 
 img,
-video {
+video,
+.el-image {
   vertical-align: top;
 }
 
@@ -54,4 +55,26 @@ a {
 
 .tip>* {
   margin-top: 3px;
+}
+
+/* 以下均为修复 element-plus 由2.3.5 升至 2.6.0 导致部分窗口显示与以前不同的问题*/
+.el-dialog {
+  padding: 0;
+
+  .el-dialog__header,
+  .el-dialog__footer {
+    padding: 20px;
+  }
+
+  .el-dialog__body {
+    padding: 0 20px;
+  }
+}
+
+.el-message-box__message {
+  width: calc(100% - 2px);
+}
+
+.el-menu--horizontal {
+  height: unset;
 }

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="mainWindowVisible" title="IP封禁" custom-class="ipb" :close-on-click-modal="false"
+  <el-dialog v-model="mainWindowVisible" title="IP封禁" class="ipb" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">

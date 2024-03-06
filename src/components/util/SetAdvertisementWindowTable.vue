@@ -22,7 +22,7 @@
     </el-table-column>
   </el-table>
 
-  <el-dialog v-model="previewWindowVisible" :custom-class="'preview'" :show-close="false" destroy-on-close align-center>
+  <el-dialog v-model="previewWindowVisible" class="preview" :show-close="false" destroy-on-close align-center>
     <div :style="{ width: `${pageSize.width}px`, height: `${pageSize.height}px` }">
       <Adv :data="data[previewDataIdx]"></Adv>
     </div>

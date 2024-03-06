@@ -130,7 +130,7 @@
     </el-tabs>
   </div>
 
-  <el-dialog width="75%" v-model="editWindowVisible" :custom-class="'edit-dialog'" :before-close="beforeEditWindowClose"
+  <el-dialog width="75%" v-model="editWindowVisible" class="edit-dialog" :before-close="beforeEditWindowClose"
     title="视频编辑" align-center>
     <div class="v-container">
       <div class="upload-form">

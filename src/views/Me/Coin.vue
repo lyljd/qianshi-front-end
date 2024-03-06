@@ -29,14 +29,28 @@
 
 <script setup lang="ts">
 import { useStore } from "@/store"
+import cmjs from '@/cmjs'
+import * as API from '@/api/user'
 
 const store = useStore()
 store.setMeCurTitle("我的硬币")
 
-let coinNum = ref(getCoinNum())
+let coinNum = ref(0)
+getMeCoin()
 
-function getCoinNum() {
-  return 233 //TODO api
+function getMeCoin() {
+  API.meCoin()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error("获取我的硬币失败")
+        return
+      }
+
+      coinNum.value = res.data.coin
+    })
+    .catch(() => {
+      cmjs.prompt.error("获取我的硬币失败")
+    })
 }
 </script>
 

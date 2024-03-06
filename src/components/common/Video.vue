@@ -968,7 +968,7 @@ function sendDanmu() {
   }
 
   danmuSendBtns.forEach((ele) => {
-    cmjs.util.btnCD(ele, 3)
+    cmjs.util.btnCD(ele, 5)
   })
   // 因为timeupdate事件每秒触发4次，所以在每半秒后发的弹幕需要在下一秒才显示（不这样的话，恰巧在第4次的时候发出去的弹幕将不会显示出来）
   // TODO api：请求发送弹幕api，获取响应值中的id、date，然后赋给弹幕对象

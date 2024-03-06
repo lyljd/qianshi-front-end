@@ -1,5 +1,5 @@
 <template>
-  <div class="pf-tip">每日凌晨4点更新数据</div>
+  <div class="pf-tip">每日凌晨3～5点每半个小时更新一次数据（昨日凌晨3点到今日凌晨3点）</div>
   <el-tabs class="pf-container">
     <el-tab-pane label="视频数据">
       <el-row>

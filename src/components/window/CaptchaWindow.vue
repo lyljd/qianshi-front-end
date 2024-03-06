@@ -1,13 +1,14 @@
 <template>
   <div class="cw-container">
-    <el-dialog @close="clearInput" v-model="dialogVisible" title="人机验证" :width="300" :close-on-press-escape=false
+    <el-dialog @close="beforeClose" v-model="dialogVisible" title="人机验证" :width="300" :close-on-press-escape=false
       :close-on-click-modal=false :align-center=true>
       <div style="display: flex;">
         <el-input @keyup.enter.native="verify" maxlength="4" v-model="input" class="vi" placeholder="请输入右侧图片中的数字" />
-        <Image :url="captchaUrl" :w="100" :h="30" border style="border-left: none;"></Image>
+        <Image @click="reloadCaptcha" :url="captchaUrl" :w="100" :h="30" border style="border-left: none;"
+          :style="{ cursor: reloadCDing ? 'not-allowed' : 'pointer' }"></Image>
       </div>
       <template #footer>
-        <el-button v-blur @click="verify" :disabled="input.length !== 4" type="primary">验证</el-button>
+        <el-button v-blur id="verify-btn" @click="verify" :disabled="!verifyBtnCheck()" type="primary">验证</el-button>
       </template>
     </el-dialog>
   </div>
@@ -16,6 +17,15 @@
 <script setup lang="ts">
 import cmjs from '@/cmjs'
 import { useStore } from '@/store'
+import * as API from '@/api/captcha'
+
+type disabledEleResp = {
+  disabled: () => void,
+  cancelDisabled: () => void,
+  isCounting: () => boolean,
+  countDown: (second: number, endStatus?: Function, endDo?: Function) => void,
+  endCountDown: (disabled: boolean) => void,
+}
 
 const store = useStore()
 store.openCaptchaWindow = show
@@ -24,34 +34,176 @@ defineExpose({
   show
 })
 
+let verifyBtn: HTMLButtonElement
+let vbDis: disabledEleResp
+
 let dialogVisible = ref(false)
 let afterSuccDo: Function
+let captchaId = ref("")
 let captchaUrl = ref("")
 let input = ref("")
+let captchaLoadFail = ref(false)
+let reloadCDing = ref(false)
 
 function show(afterSuccDoP: Function) {
-  dialogVisible.value = true
-  afterSuccDo = afterSuccDoP
+  API.generateCaptchaId()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error("获取验证码失败")
+        return
+      }
+
+      captchaId.value = res.data.id
+      API.getCaptcha(captchaId.value)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error("获取验证码失败")
+            return
+          }
+
+          captchaUrl.value = res.data.image
+          dialogVisible.value = true
+          afterSuccDo = afterSuccDoP
+          return
+        })
+        .catch(() => {
+          cmjs.prompt.error("获取验证码失败")
+          return
+        })
+    })
+    .catch(() => {
+      cmjs.prompt.error("获取验证码失败")
+    })
 }
 
-function clearInput() {
+function beforeClose() {
   input.value = ""
+  captchaId.value = ""
   captchaUrl.value = ""
+  captchaLoadFail.value = false
 }
 
-function checkCaptchaInput(): boolean {
+function reloadCaptcha() {
+  if (reloadCDing.value) {
+    return
+  }
+
+  reloadCDing.value = true
+  setTimeout(() => {
+    reloadCDing.value = false
+  }, 3000)
+
+  API.reloadCaptcha(captchaId.value)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error("刷新验证码失败")
+        return
+      }
+
+      API.getCaptcha(captchaId.value)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error("获取验证码失败")
+            captchaUrl.value = ""
+            captchaLoadFail.value = true
+            return
+          }
+
+          captchaUrl.value = res.data.image
+          captchaLoadFail.value = false
+          return
+        })
+        .catch(() => {
+          cmjs.prompt.error("获取验证码失败")
+          captchaUrl.value = ""
+          captchaLoadFail.value = true
+          return
+        })
+    })
+    .catch(() => {
+      cmjs.prompt.error("刷新验证码失败")
+    })
+}
+
+function verifyBtnCheck(): boolean {
+  if (vbDis && vbDis.isCounting()) {
+    return false
+  }
+
   const vcodeRegex = /^[0-9]{4}$/
-  return vcodeRegex.test(input.value)
+  return vcodeRegex.test(input.value) && !captchaLoadFail.value
 }
 
 function verify() {
-  if (!checkCaptchaInput()) {
-    cmjs.prompt.error("请输入4位数字")
+  if (!verifyBtnCheck()) {
     return
   }
-  // TODO api
-  dialogVisible.value = false
-  afterSuccDo()
+
+  if (!verifyBtn) {
+    verifyBtn = document.getElementById("verify-btn") as HTMLButtonElement
+    vbDis = cmjs.util.disabledButton(verifyBtn)
+  }
+
+  vbDis.disabled()
+
+  API.verifyCaptcha(captchaId.value, input.value)
+    .then((res) => {
+      vbDis.cancelDisabled()
+      vbDis.countDown(3, verifyBtnCheck)
+
+      if (res.code === 0) {
+        dialogVisible.value = false
+        afterSuccDo(captchaId.value)
+        return
+      }
+
+      cmjs.prompt.error("验证验证码失败")
+      input.value = ""
+
+      API.generateCaptchaId()
+        .then((res) => {
+          if (res.code !== 0) {
+            captchaId.value = ""
+            captchaUrl.value = ""
+            captchaLoadFail.value = true
+            cmjs.prompt.error("重置验证码失败")
+            return
+          }
+
+          captchaId.value = res.data.id
+          API.getCaptcha(captchaId.value)
+            .then((res) => {
+              if (res.code !== 0) {
+                captchaUrl.value = ""
+                captchaLoadFail.value = true
+                cmjs.prompt.error("重置验证码失败")
+                return
+              }
+
+              captchaLoadFail.value = false
+              captchaUrl.value = res.data.image
+              return
+            })
+            .catch(() => {
+              captchaUrl.value = ""
+              captchaLoadFail.value = true
+              cmjs.prompt.error("重置验证码失败")
+              return
+            })
+        })
+        .catch(() => {
+          cmjs.prompt.error("重置验证码失败")
+          captchaId.value = ""
+          captchaUrl.value = ""
+          captchaLoadFail.value = true
+        })
+    })
+    .catch(() => {
+      vbDis.cancelDisabled()
+      vbDis.countDown(3, verifyBtnCheck)
+      cmjs.prompt.error("验证验证码失败")
+      input.value = ""
+    })
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" width="25%" custom-class="dpw" :close-on-click-modal="false"
+  <el-dialog v-model="dialogVisible" :title="title" width="25%" class="dpw" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">
@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
 import cmjs from '@/cmjs'
-import zhCn from 'element-plus/lib/locale/lang/zh-cn'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
 withDefaults(defineProps<{
   title: string,

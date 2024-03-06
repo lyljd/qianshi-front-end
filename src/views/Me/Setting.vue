@@ -42,11 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import zhCn from 'element-plus/lib/locale/lang/zh-cn'
-import mockMeSetting from "@/mock/me/setting.json"
-import cmjs from '@/cmjs'
-import { useStore } from "@/store"
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import TagInput from '@/components/common/TagInput.vue'
+import { useStore } from "@/store"
+import cmjs from '@/cmjs'
+import * as API from '@/api/user'
 
 type MeSetting = {
   nickname: string
@@ -59,26 +59,83 @@ type MeSetting = {
 const store = useStore()
 store.setMeCurTitle("我的信息")
 
-let meSetting: MeSetting = reactive(getMeSetting())
+let meSetting = ref<MeSetting>({ nickname: "", signature: "", gender: "保密", birthday: "", tags: [] })
+getMeInfo()
 
 const locale = zhCn
-const oldNickname = meSetting.nickname
+let oldNickname = ref("")
 
 let saveSettingBtn: HTMLButtonElement
 
-let nnmdy = ref(false)
+let nnmdy = ref(false) // nickname modify
 
 onMounted(() => {
   saveSettingBtn = document.getElementById("sava-setting-btn") as HTMLButtonElement
 })
 
-function getMeSetting() {
-  return mockMeSetting //TODO api
+function getMeInfo() {
+  API.meInfo()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error("获取我的信息失败")
+        return
+      }
+
+      if (res.data.tags === null) {
+        res.data.tags = []
+      }
+      meSetting.value = res.data
+      oldNickname.value = meSetting.value.nickname
+    })
+    .catch(() => {
+      cmjs.prompt.error("获取我的信息失败")
+    })
+}
+
+function saveSetting() {
+  if (saveSettingBtn.disabled) {
+    return
+  }
+
+  meSetting.value.nickname = meSetting.value.nickname.trim()
+  meSetting.value.signature = meSetting.value.signature.trim()
+  if (meSetting.value.nickname.length === 0) {
+    cmjs.prompt.error("请输入昵称")
+    return
+  }
+  if (meSetting.value.nickname.length > 20) {
+    cmjs.prompt.error("昵称的长度最大为20")
+    return
+  }
+  if (meSetting.value.signature.length > 50) {
+    cmjs.prompt.error("签名的长度最大为50")
+    return
+  }
+  
+  if (!meSetting.value.birthday) {
+    meSetting.value.birthday = ""
+  }
+
+  API.meInfoUpdate(meSetting.value)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      nnmdy.value = false
+      cmjs.prompt.success("保存成功")
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+
+  cmjs.util.btnCD(saveSettingBtn, 5)
 }
 
 function showNNMDY() {
-  meSetting.nickname = meSetting.nickname.trim()
-  if (meSetting.nickname !== oldNickname) {
+  meSetting.value.nickname = meSetting.value.nickname.trim()
+  if (meSetting.value.nickname !== oldNickname.value) {
     nnmdy.value = true
   } else {
     nnmdy.value = false
@@ -87,32 +144,6 @@ function showNNMDY() {
 
 function birthdaySelectCheck(date: Date) {
   return date.getTime() > Date.now()
-}
-
-function saveSetting() {
-  if (saveSettingBtn.disabled) {
-    return
-  }
-
-  meSetting.nickname = meSetting.nickname.trim()
-  meSetting.signature = meSetting.signature.trim()
-  if (meSetting.nickname.length === 0) {
-    cmjs.prompt.error("请输入昵称")
-    return
-  }
-  if (meSetting.nickname.length > 20) {
-    cmjs.prompt.error("昵称的长度最大为20")
-    return
-  }
-  if (meSetting.signature.length > 50) {
-    cmjs.prompt.error("签名的长度最大为50")
-    return
-  }
-
-  // TODO api
-  cmjs.util.btnCD(saveSettingBtn, 5)
-  nnmdy.value = false
-  cmjs.prompt.success("保存成功")
 }
 </script>
 

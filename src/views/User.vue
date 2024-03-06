@@ -102,8 +102,8 @@
         <div class="num-container">
           <div class="num-box">
             <div class="num-span">关注数</div>
-            <div :title="(user.focuNum).toString()" @click="cmjs.jump.follow(uid)" class="num focu-num">{{
-              cmjs.fmt.numWE(user.focuNum) }}</div>
+            <div :title="(user.followNum).toString()" @click="cmjs.jump.follow(uid)" class="num focu-num">{{
+              cmjs.fmt.numWE(user.followNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">粉丝数</div>
@@ -162,7 +162,7 @@ type User = {
   postNum: number
   collectionNum: number
   favlistNum: number
-  focuNum: number
+  followNum: number
   fanNum: number
   likeNum: number
   playNum: number

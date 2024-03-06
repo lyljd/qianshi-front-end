@@ -144,3 +144,9 @@ function calcHash(file: File): string {
   }
 }
 </style>
+
+<style>
+.progress .el-progress__text {
+  margin-left: 0 !important;
+}
+</style>

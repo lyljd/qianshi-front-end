@@ -12,7 +12,7 @@ export const useStore = defineStore("qianshi", {
     openLoginWindow: (tip?: string) => { },
     setTopMenuBarAvatar: (avatarUrl: string) => { },
     openCaptchaWindow: (afterSuccDo: Function) => { },
-    openEVWindow: (email: string, afterSuccDo: Function) => { },
+    openEVWindow: (email: string, option: "pass" | "email-1" | "email-2", afterSuccDo: Function) => { },
     openFSWindow: (opt: FSOpt) => { },
     openPVWindow: (videoUrl: string) => { },
     openSMSWindow: (openParameter?: { afterSuccDo?: Function, to?: Receiver[] }) => { },
@@ -24,6 +24,8 @@ export const useStore = defineStore("qianshi", {
     setUserMenuPostNum: (newNum: number) => { },
     setUserMenuCollectionNum: (newNum: number) => { },
     setUserMenuFavlistNum: (newNum: number) => { },
+    setNewMessageNum: (num: number) => { },
+    setNewDynamicNum: (num: number) => { },
   }
 })
 
