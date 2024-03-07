@@ -12,34 +12,16 @@ const routes: Array<RouteRecordRaw> = [
 
   {
     path: "/:pathMatch(.*)",
-    component: () => import("@/views/Error.vue")
-  },
-
-  {
-    path: "/400",
     component: () => import("@/views/Error.vue"),
     meta: {
-      code: 400,
-      msg: "参数异常",
+      code: 404,
+      msg: "未找到页面",
     }
   },
 
   {
-    path: "/401",
+    path: "/error",
     component: () => import("@/views/Error.vue"),
-    meta: {
-      code: 401,
-      msg: "未登录",
-    }
-  },
-
-  {
-    path: "/403",
-    component: () => import("@/views/Error.vue"),
-    meta: {
-      code: 403,
-      msg: "拒绝服务",
-    }
   },
 
   {
@@ -230,7 +212,7 @@ async function beforeEach(to: any, from: any, next: Function) {
   store.topPath = to.path.split('/')[1]
 
   if (to.meta.needLogin && !store.isLogin) {
-    next(`/401?from=${to.href}`)
+    cmjs.jump.error(401)
     return
   }
 
@@ -259,7 +241,7 @@ async function beforeEach(to: any, from: any, next: Function) {
   }
 
   if (to.meta.power && store.power < to.meta.power) {
-    next("/403")
+    cmjs.jump.error(403)
     return
   }
 

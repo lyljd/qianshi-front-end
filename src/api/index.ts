@@ -30,7 +30,7 @@ apiInstance.interceptors.response.use(function (res) {
   if (rft) {
     return apiInstance.post('/api/v1/auth/token/refresh', { refresh_token: rft })
       .then((res) => {
-        if (res.data.config !== 0) {
+        if (res.data.code !== 0) {
           return Promise.reject("登录状态已失效，请重新登录！")
         }
 
@@ -53,7 +53,7 @@ function handleLogout() {
   const store = useStore()
   store.isLogin = false
   cmjs.biz.clearLoginInfo()
-  router.push(`/401?from=${location.pathname}`)
+  cmjs.jump.error(401)
   store.openLoginWindow("")
 }
 

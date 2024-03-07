@@ -1,6 +1,6 @@
 <template>
   <div :id="`comment-${data.cid}`" class="comment-container">
-    <Avatar :url="data.avatarUrl" size="medium" :home="{ uid: data.uid }"></Avatar>
+    <Avatar v-model="data.avatarUrl" size="medium" :home="{ uid: data.uid }"></Avatar>
     <div class="right">
       <div class="main">
         <div class="user-info">

@@ -6,21 +6,21 @@
       <div class="interaction-bar">
         <span :title="video.likeNum.toString()" @click="likeVideo" :class="{ highLight: video.isLike && isLogin }"
           class="iconfont el-icon-good icon"><span class="num">{{
-            cmjs.fmt.numWE(video.likeNum)
-          }}</span></span>
+        cmjs.fmt.numWE(video.likeNum)
+      }}</span></span>
 
         <span :title="video.coinNum.toString()" @click="coinVideo" :class="{ highLight: video.isCoin && isLogin }"
           class="iconfont el-icon-Bbi icon"><span class="num">{{
-            cmjs.fmt.numWE(video.coinNum) }}</span></span>
+        cmjs.fmt.numWE(video.coinNum) }}</span></span>
 
         <span :title="video.starNum.toString()" @click="starVideo" :class="{ highLight: video.isStar && isLogin }"
           class="iconfont el-icon-collection icon"><span class="num">{{
-            cmjs.fmt.numWE(video.starNum)
-          }}</span></span>
+        cmjs.fmt.numWE(video.starNum)
+      }}</span></span>
 
         <span :title="video.shareNum.toString()" class="iconfont el-icon-fenxiang icon"><span class="num">{{
-          cmjs.fmt.numWE(video.shareNum)
-        }}</span></span>
+        cmjs.fmt.numWE(video.shareNum)
+      }}</span></span>
 
         <el-popover ref="extraPop" placement="bottom-end">
           <template #reference>
@@ -29,7 +29,8 @@
           <div class="extra-menu">
             <ul>
               <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报&emsp;&emsp;</li>
-              <li @click="cmjs.biz.watchLater(video.vid)"><span class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看
+              <li @click="cmjs.biz.watchLater(video.vid)"><span
+                  class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看
               </li>
             </ul>
           </div>
@@ -80,12 +81,12 @@
 
     <div class="right">
       <div class="avatar-container">
-        <Avatar :url="video.author.avatarUrl" size="medium" :home="{ uid: video.author.uid }"></Avatar>
+        <Avatar v-model="video.author.avatarUrl" size="medium" :home="{ uid: video.author.uid }"></Avatar>
 
         <div class="info">
           <div class="nickname-row">
             <div :title="video.author.nickname" @click="cmjs.jump.user(video.author.uid)" class="nickname">{{
-              video.author.nickname }}</div>
+        video.author.nickname }}</div>
             <span class="iconfont el-icon-sixin send-msg">发消息</span>
           </div>
 
@@ -93,8 +94,8 @@
 
           <el-button v-blur @click="focuAuthor" class="focus"
             :type="video.author.isFocu && isLogin ? 'info' : 'primary'">{{
-              video.author.isFocu && isLogin ? '已关注 ' : '+ 关注 ' +
-              cmjs.fmt.numWE(video.author.fanNum) }}</el-button>
+        video.author.isFocu && isLogin ? '已关注 ' : '+ 关注 ' +
+          cmjs.fmt.numWE(video.author.fanNum) }}</el-button>
         </div>
       </div>
 
@@ -131,11 +132,12 @@
       <div class="gap"></div>
 
       <el-card v-if="video.collection" class="collection-container" shadow="never">
+
         <template #header>
           <div class="header">
             <span @click="cmjs.jump.collection(video.author.uid, video.collection.id)" class="name"
               :title="video.collection.name">{{
-                video.collection.name }}</span>
+        video.collection.name }}</span>
             <div style="font-size: 13px;" class="autoStreaming">自动连播<el-switch @click="setAutoStreaming"
                 v-model="autoStreaming" /></div>
           </div>
@@ -187,7 +189,6 @@ import Data from '@/mock/video.json'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 import { onBeforeRouteUpdate, onBeforeRouteLeave, useRoute } from "vue-router"
-import { useRouter } from "vue-router"
 import cache from '@/cmjs/impl/cache'
 
 type Video = {
@@ -317,7 +318,6 @@ type DanmuCtl = {
 }
 
 const route = useRoute()
-const router = useRouter()
 const store = useStore()
 let { isLogin } = storeToRefs(store)
 watch(() => store.isLogin, (newVal: boolean) => {
@@ -336,7 +336,7 @@ let collectionActiveItemEle: HTMLLIElement
 let danmuListEle: HTMLElement
 let dmCtlEle: HTMLDivElement
 
-let video = ref<Video>(undefined as unknown as Video)
+let video = ref<Video>({ vid: 0, title: "", playNum: 0, date: 0, empower: false, likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "", signature: "", fanNum: 0, isFocu: false }, danmu: [] })
 let init = ref(false) // 页面是否初始化完成；在onMounted执行完毕后则初始化完成
 let autoStreaming = ref(cache.getLS("autoStreaming") !== "false" ? true : false) // 自动连播
 let nextVid = ref(-1)
@@ -593,7 +593,7 @@ function focuAuthor() {
 }
 
 function selectEpisode(vid: number) {
-  router.push(`/v/${vid}`)
+  cmjs.jump.pushVideo(vid)
 }
 
 function calcNextVid() {

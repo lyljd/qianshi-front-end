@@ -1,3 +1,6 @@
+import router from "@/router"
+import { useStore } from '@/store'
+
 export default {
   // new 不带http(s)://前缀时为相对路径跳转
   new(url: string) {
@@ -52,11 +55,32 @@ export default {
     this.new("https://github.com/lyljd")
   },
 
-  error(code: 400 | 401 | 403 | 404) {
-    if (code === 401) {
-      location.href = `/401?from=${location.pathname}`
+  push(url: string) {
+    router.push(url)
+  },
+
+  pushVideo(vid: number, t?: number) {
+    this.push(`/v/${vid}${t !== undefined ? `?t=${t}` : ''}`)
+  },
+
+  error(code: number, msg?: string) {
+    const store = useStore()
+    store.errCode = code
+    store.errMsg = msg ? msg : getErrorMsg(code)
+    if (code !== 401) {
+      this.push("/error")
     } else {
-      location.href = `/${code}`
+      this.push(`/error?from=${location.pathname}`)
     }
+  },
+}
+
+function getErrorMsg(code: number): string {
+  switch (code) {
+    case 400: return "请求参数异常"
+    case 401: return "请登录"
+    case 403: return "无权访问"
+    case 404: return "资源未找到"
+    default: return "未知错误"
   }
 }

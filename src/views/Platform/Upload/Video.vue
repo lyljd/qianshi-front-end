@@ -64,7 +64,6 @@
 <script setup lang="ts">
 import { ElSelect, ElInput } from 'element-plus'
 import { useStore } from "@/store"
-import { useRouter } from "vue-router"
 import cmjs from '@/cmjs'
 import ImageUpload from "@/components/common/ImageUpload.vue"
 import VideoUpload from "@/components/common/VideoUpload.vue"
@@ -81,7 +80,6 @@ type Video = {
 }
 
 const store = useStore()
-const router = useRouter()
 store.setPlatformItemIndex(1, location.pathname)
 
 const titleInputRef = ref<InstanceType<typeof ElInput>>()
@@ -164,7 +162,7 @@ function submit() {
 
   store.switchAsk = false
   cmjs.prompt.success("投稿成功")
-  router.push("../article/video?tab=isPubing")
+  cmjs.jump.push("../article/video?tab=isPubing")
 }
 </script>
 

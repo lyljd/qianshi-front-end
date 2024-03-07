@@ -1,15 +1,23 @@
 <template>
   <div class="error-container">
     <span class="iconfont el-icon-cry ico"></span>
-    <span class="code">{{ route.meta.code ? route.meta.code : 404 }}</span>
-    <span class="msg">{{ route.meta.msg ? route.meta.msg : "未找到页面" }}</span>
+    <span class="code">{{ route.meta.code ? route.meta.code : code }}</span>
+    <span class="msg">{{ route.meta.msg ? route.meta.msg : msg }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from "vue-router"
+import { useStore } from '@/store'
 
 const route = useRoute()
+const store = useStore()
+
+const code = store.errCode
+const msg = store.errMsg
+
+store.errCode = 404
+store.errMsg = "未找到页面"
 </script>
 
 <style lang="less" scoped>

@@ -13,7 +13,7 @@ import { UploadInstance } from 'element-plus'
 import cmjs from '@/cmjs'
 
 const data = defineProps<{
-  url: string,
+  modelValue: string,
   size: "large" | "medium", // 60px | 40px
   upload?: {
     maxsize?: number, // 单位：MB；默认1MB
@@ -24,13 +24,19 @@ const data = defineProps<{
   }
 }>()
 
-const stf = defineEmits<{
-  (cen: "setUrl", f: Function): void
-}>()
+const emit = defineEmits(['update:modelValue'])
+
+const url = computed({
+  get() {
+    return data.modelValue
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  }
+})
 
 const uploadRef = ref<UploadInstance>()
 
-let url = ref(data.url)
 let preUrl = ""
 let hash = "" // 自定义hash；用于避免重复上传头像
 let preHash = ""
@@ -76,7 +82,6 @@ function beforeUpload(file: File) {
 function startUpload(file: File) {
   preUrl = url.value
   uploading.value = true
-  cmjs.prompt.info("开始上传")
   url.value = URL.createObjectURL(file)
   const handler = data.upload?.handler as (file: File, succ: Function, fail: Function) => void
   handler(file, succ, fail)
@@ -86,13 +91,7 @@ function endUpload() {
   uploading.value = false
 }
 
-function setUrl(newUrl: string) {
-  url.value = newUrl
-}
-stf('setUrl', setUrl)
-
 function succ() {
-  cmjs.prompt.success("上传成功")
   preHash = hash
   endUpload()
 }

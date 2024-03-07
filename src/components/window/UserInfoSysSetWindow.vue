@@ -5,7 +5,7 @@
     <div class="body">
       <div>
         <div class="span">头像：</div>
-        <Avatar :url="data.coverUrl" size="medium" :upload="{ handler: avatarHandler }"></Avatar>
+        <Avatar v-model="data.coverUrl" size="medium" :upload="{ handler: avatarHandler }"></Avatar>
       </div>
 
       <div>

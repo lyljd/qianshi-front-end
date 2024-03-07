@@ -12,17 +12,16 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router"
 import { useStore } from "@/store"
+import cmjs from '@/cmjs'
 
-const router = useRouter()
 const store = useStore()
 store.setManegeItemIndex(2, location.pathname)
 
 let viewItem = ref(location.href.split('/').pop())
 
 function tabChange(tbn: string) {
-  router.push(tbn)
+  cmjs.jump.push(tbn)
 }
 </script>
 

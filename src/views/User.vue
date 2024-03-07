@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <div class="head">
-      <Image :url="user.topImg" :w="1140" :h="180" errorText="头图加载失败" :errorTextFontSize="20"></Image>
+      <Image :url="`/userhome-top-img/${user.topImgNo}.png`" :w="1140" :h="180" errorText="头图加载失败"
+        :errorTextFontSize="20"></Image>
 
       <div v-show="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
@@ -9,11 +10,12 @@
         size="auto">
         <template #default>
           <div class="top-img-selecter">
-            <Image v-for="ti in topImgs" :url="ti" @click="user.topImg = ti"
-              :style="{ cursor: user.topImg === ti ? 'not-allowed' : 'pointer' }" class="top-img-select-item"
+            <Image v-for="(ti, idx) in topImgs" :url="ti" @click="user.topImgNo = idx + 1"
+              :style="{ cursor: user.topImgNo === idx + 1 ? 'not-allowed' : 'pointer' }" class="top-img-select-item"
               errorText="头图加载失败"></Image>
           </div>
         </template>
+
         <template #footer>
           <el-button v-blur @click="cancelTopImg">取消</el-button>
           <el-button v-blur @click="saveTopImg">保存</el-button>
@@ -21,14 +23,15 @@
       </el-drawer>
 
       <div class="info">
-        <Avatar :url="user.avatarUrl" size="large" :upload="isMe ? { handler: avatarUploadHandler } : undefined"></Avatar>
+        <Avatar v-model="user.avatarUrl" size="large" :upload="isMe ? { handler: avatarUploadHandler } : undefined">
+        </Avatar>
 
         <div class="right">
           <div class="head-row">
             <span class="nickname">{{ user.nickname }}</span>
 
             <span v-if="user.gender === '男'" style="color: #a0cfff;" class="iconfont el-icon-male"></span>
-            <span v-else style="color: #ff6699;" class="iconfont el-icon-female"></span>
+            <span v-if="user.gender === '女'" style="color: #ff6699;" class="iconfont el-icon-female"></span>
 
             <LevelIco :level="user.level"></LevelIco>
 
@@ -56,18 +59,20 @@
 
       <div v-show="!isMe" class="oper">
         <el-button v-blur @click="focu" :class="!user.isFocu ? 'not-focu' : ''">{{ !user.isFocu ? "关注" : "已关注"
-        }}</el-button>
+          }}</el-button>
 
         <el-button v-blur @click="sendMessage">发消息</el-button>
 
         <el-popover ref="extraPop" placement="bottom-end">
+
           <template #reference>
             <span class="iconfont el-icon-diandiandianshu icon extra"></span>
           </template>
           <div class="extra-menu">
             <ul>
               <li v-if="!user.isBlock || !isLogin" @click="blockUser"><span
-                  class="iconfont el-icon-lahei em-icon"></span>拉黑</li>
+                  class="iconfont el-icon-lahei em-icon"></span>拉黑
+              </li>
               <li v-else @click="cancelBlockUser"><span class="iconfont el-icon-lahei em-icon"></span>取消拉黑</li>
               <li @click="reportUser"><span class="iconfont el-icon-jubao2 em-icon"></span>举报</li>
             </ul>
@@ -82,15 +87,16 @@
         <el-menu-item :index="`/u/${$route.params.uid}`">主页</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/dynamic`">动态</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/post`">投稿<span class="item-num">{{ user.postNum
-        }}</span></el-menu-item>
+            }}</span></el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集<span class="item-num">{{ user.collectionNum
-        }}</span></el-menu-item>
+            }}</span></el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏<span class="item-num">{{ user.favlistNum
-        }}</span></el-menu-item>
+            }}</span></el-menu-item>
         <el-menu-item v-if="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
 
         <div class="search-container">
           <el-input v-model="searchKey" @keyup.enter.native="toSearch" class="search" placeholder="搜索视频、动态" clearable>
+
             <template #prefix><el-icon style="cursor: pointer;">
                 <search />
               </el-icon></template>
@@ -103,12 +109,12 @@
           <div class="num-box">
             <div class="num-span">关注数</div>
             <div :title="(user.followNum).toString()" @click="cmjs.jump.follow(uid)" class="num focu-num">{{
-              cmjs.fmt.numWE(user.followNum) }}</div>
+        cmjs.fmt.numWE(user.followNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">粉丝数</div>
             <div :title="(user.fanNum).toString()" @click="cmjs.jump.fan(uid)" class="num fan-num">{{
-              cmjs.fmt.numWE(user.fanNum) }}</div>
+        cmjs.fmt.numWE(user.fanNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">获赞数</div>
@@ -139,11 +145,11 @@ import LevelIco from '@/components/common/LevelIco.vue'
 import VipIco from '@/components/common/VipIco.vue'
 import Avatar from '@/components/common/Avatar.vue'
 import cmjs from '@/cmjs'
-import mockUser from "@/mock/user.json"
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
-import { onBeforeRouteUpdate, useRoute } from "vue-router"
+import { useRoute } from "vue-router"
 import { ElMessageBox } from "element-plus"
+import * as API from '@/api/user'
 
 type User = {
   uid: number
@@ -156,7 +162,7 @@ type User = {
   ipLocation: string
   isReview?: boolean
   isBan?: boolean
-  topImg: string
+  topImgNo: number
   isFocu: boolean
   isBlock: boolean
   postNum: number
@@ -174,23 +180,18 @@ const route = useRoute()
 const extraPop = ref()
 
 const uid = parseInt(route.params.uid as string)
-let user = ref<User>(getUser())
-document.title = user.value.nickname + "的个人空间 - 浅时"
-
-onBeforeRouteUpdate((to, from, next) => {
-  document.title = user.value.nickname + "的个人空间 - 浅时"
-  next()
-})
+let user = ref<User>({ uid: uid, nickname: "", signature: "", avatarUrl: "", gender: "保密", level: 1, isVip: false, ipLocation: "", topImgNo: 1, isFocu: false, isBlock: false, postNum: 0, collectionNum: 0, favlistNum: 0, followNum: 0, fanNum: 0, likeNum: 0, playNum: 0, readNum: 0 })
+getUser()
 
 const store = useStore()
 let { isLogin } = storeToRefs(store)
 watch(() => store.isLogin, (newVal: boolean) => {
   if (newVal) {
     isMe.value = cmjs.biz.verifyLoginUid(uid)
-    user.value = getUser()
+    getUser()
   } else {
     isMe.value = false
-    user.value = getUser()
+    getUser()
   }
 })
 
@@ -209,11 +210,23 @@ const topImgs: string[] = [
 let isMe = ref(cmjs.biz.verifyLoginUid(uid))
 let signature = ref(user.value.signature)
 let searchKey = ref("")
-let oldTopImg = ref("")
+let oldTopImgNo = ref(-1)
 let replaceTopImgDrawerShow = ref(false)
 
 function getUser() {
-  return mockUser //TODO
+  API.userInfo(uid)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.jump.error(res.code, res.msg)
+        return
+      }
+      user.value = res.data
+      signature.value = user.value.signature
+      document.title = user.value.nickname + "的个人空间 - 浅时"
+    })
+    .catch((err) => {
+      cmjs.jump.error(err.response.status, err.response.statusText)
+    })
 }
 
 function avatarUploadHandler(file: File, succ: Function, fail: Function) {
@@ -234,26 +247,46 @@ function saveSignature() {
     signatureInput.value!.focus()
     signatureInput.value!.setSelectionRange(50, signature.value.length)
   } else if (signature.value !== user.value.signature) {
-    // TODO api
-    user.value.signature = signature.value
-    cmjs.prompt.success('保存成功')
+    API.MeSignature(signature.value)
+      .then((res) => {
+        if (res.code !== 0) {
+          cmjs.prompt.error(res.msg)
+          return
+        }
+
+        user.value.signature = signature.value
+        cmjs.prompt.success('保存成功')
+      })
+      .catch((err) => {
+        cmjs.prompt.error(err)
+      })
   }
 }
 
 function replaceTopImg() {
   replaceTopImgDrawerShow.value = true
-  oldTopImg.value = user.value.topImg
+  oldTopImgNo.value = user.value.topImgNo
 }
 
 function cancelTopImg() {
   replaceTopImgDrawerShow.value = false
-  user.value.topImg = oldTopImg.value
+  user.value.topImgNo = oldTopImgNo.value
 }
 
 function saveTopImg() {
-  //TODO api
-  replaceTopImgDrawerShow.value = false
-  cmjs.prompt.success("更换成功")
+  API.MeTopImgNo(user.value.topImgNo)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      replaceTopImgDrawerShow.value = false
+      cmjs.prompt.success("更换成功")
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
 }
 
 function focu() {

@@ -32,6 +32,12 @@ const meAvatar = () => apiInstance.get("/api/v1/user/me/avatar").then(res => res
 
 const mePower = () => apiInstance.get("/api/v1/user/me/power").then(res => res.data)
 
+const userInfo = (uid: number) => apiInstance.get(`/api/v1/user/${uid}`).then(res => res.data)
+
+const MeSignature = (newSignature: string) => apiInstance.put('/api/v1/user/me/signature', { newSignature: newSignature }).then(res => res.data)
+
+const MeTopImgNo = (topImgNo: number) => apiInstance.put('/api/v1/user/me/top-img-no', { topImgNo: topImgNo }).then(res => res.data)
+
 export {
   emailLogin,
   passLogin,
@@ -45,4 +51,7 @@ export {
   meEmailChange,
   meAvatar,
   mePower,
+  userInfo,
+  MeSignature,
+  MeTopImgNo,
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="avatar-container">
     <div class="left">
-      <Avatar :url="cmjs.cache.getCookie('avatar')" size="large"></Avatar>
+      <Avatar v-model="avatarUrl" size="large"></Avatar>
     </div>
     <div class="right">
       <div class="nickname">{{ meHome.nickname }}</div>
@@ -59,6 +59,7 @@ store.setMeCurTitle("首页")
 
 let meHome = ref<MeHome>({ nickname: "", exp: 0, level: 1 })
 let reqExp = ref(0)
+let avatarUrl = ref(cmjs.cache.getCookie('avatar'))
 getMeHome()
 
 function getMeHome() {

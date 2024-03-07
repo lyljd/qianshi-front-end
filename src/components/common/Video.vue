@@ -338,7 +338,6 @@ import ColorPicker from '@/components/common/ColorPicker.vue'
 import cmjs from '@/cmjs'
 import { useStore } from '@/store'
 import { storeToRefs } from 'pinia'
-import { useRouter } from "vue-router"
 import { InputInstance, ElMessageBox } from 'element-plus'
 
 type VideoQuality = {
@@ -406,7 +405,6 @@ watch(vidRef, () => {
 })
 
 const store = useStore()
-const router = useRouter()
 
 const shortcutKeyDesc = [
   {
@@ -1147,7 +1145,7 @@ function changeVideoQuality(value: string) {
 
 function selectEpisode(vid: number) {
   collectionPop.value.hide()
-  router.push(`/v/${vid}`)
+  cmjs.jump.pushVideo(vid)
 }
 
 // locateTo 全屏状态下选集窗口弹出时自动定位到当前集的位置
@@ -1286,6 +1284,10 @@ function calcActiveItemPos() {
 }
 
 function calcVideoUrlAndQuality() {
+  if (props.video.length === 0) {
+    return
+  }
+
   const vq = cmjs.cache.getLS('videoQuality')
   if (!vq) {
     videoEle.src = props.video[0].url

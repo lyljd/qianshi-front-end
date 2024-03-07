@@ -3,7 +3,7 @@
     <el-card>
       <div class="avatar-container">
         <div class="left">
-          <Avatar :url="cmjs.cache.getCookie('avatar')" size="large"></Avatar>
+          <Avatar v-model="avatarUrl" size="large"></Avatar>
         </div>
         <div class="right">
           <div class="nickname">{{ getCurTimePeriod() }}好，<span class="normallight">{{
@@ -120,7 +120,6 @@
 
 <script setup lang="ts">
 import { useStore } from "@/store"
-import { useRouter } from "vue-router"
 import cmjs from '@/cmjs'
 import Avatar from '@/components/common/Avatar.vue'
 import SetCarouselWindow from "@/components/window/SetCarouselWindow.vue"
@@ -148,12 +147,12 @@ type HomeInfo = {
 }
 
 const store = useStore()
-const router = useRouter()
 
 let hi: HomeInfo = reactive(getHomeInfo())
 let openSCWindow = ref<Function>()
 let openSAWindow = ref<Function>()
 let openIPBanWindow = ref<Function>()
+let avatarUrl = ref(cmjs.cache.getCookie('avatar'))
 
 function getOpenSCWindow(f: Function) {
   openSCWindow.value = f
@@ -204,7 +203,7 @@ function getHomeInfo(): HomeInfo {
 }
 
 function pushToNewPage(url: string) {
-  router.push(url)
+  cmjs.jump.push(url)
 }
 
 function processReview() {

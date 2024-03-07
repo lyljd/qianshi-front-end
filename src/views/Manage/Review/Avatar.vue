@@ -8,7 +8,7 @@
 
     <el-table-column label="新头像" align="center">
       <template #default="scope">
-        <Avatar :url="scope.row.newAvatar" size="large"></Avatar>
+        <Avatar v-model="scope.row.newAvatar" size="large"></Avatar>
       </template>
     </el-table-column>
 

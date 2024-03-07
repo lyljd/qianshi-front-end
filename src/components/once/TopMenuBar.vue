@@ -54,7 +54,7 @@
       <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
 
         <template #reference>
-          <Avatar @setUrl="(f: Function) => { recSetAvatar(f) }" :url="avatar" size="medium" :home="{ uid: ahi.id }">
+          <Avatar v-model="avatar" size="medium" :home="{ uid: ahi.id }">
           </Avatar>
         </template>
         <el-button v-blur @click="signin" :type="!ahi.signinStatus ? 'success' : 'info'"
@@ -303,8 +303,8 @@ function toSearch() {
   cmjs.prompt.info(`searchKey: ${searchKey.value}`)
 }
 
-function recSetAvatar(f: Function) {
-  store.setTopMenuBarAvatar = f as () => void
+store.setTopMenuBarAvatar = (avatarUrl: string) => {
+  avatar.value = avatarUrl
 }
 
 store.setNewMessageNum = setNewMessageNum

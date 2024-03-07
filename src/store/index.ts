@@ -6,6 +6,8 @@ export const useStore = defineStore("qianshi", {
     switchAsk: false,
     topPath: '',
     power: -1,
+    errCode: 404,
+    errMsg: "未找到页面",
   }),
 
   actions: {
