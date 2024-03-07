@@ -157,9 +157,9 @@ function openCaptchaWindow() {
         gcbDis.countDown(180, checkEmailValid)
         cmjs.prompt.success("验证码已发送")
       })
-      .catch(() => {
+      .catch((err) => {
         gcbDis.cancelDisabled()
-        cmjs.prompt.error("发送验证码失败")
+        cmjs.prompt.error(err)
       })
   })
 }

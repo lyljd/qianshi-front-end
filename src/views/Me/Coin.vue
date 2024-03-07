@@ -48,8 +48,8 @@ function getMeCoin() {
 
       coinNum.value = res.data.coin
     })
-    .catch(() => {
-      cmjs.prompt.error("获取我的硬币失败")
+    .catch((err) => {
+      cmjs.prompt.error(err)
     })
 }
 </script>

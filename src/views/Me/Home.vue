@@ -72,8 +72,8 @@ function getMeHome() {
       meHome.value = res.data
       reqExp.value = cmjs.biz.levelReqExp(meHome.value.level)
     })
-    .catch(() => {
-      cmjs.prompt.error("获取首页失败")
+    .catch((err) => {
+      cmjs.prompt.error(err)
     })
 }
 </script>

@@ -87,8 +87,8 @@ function getMeInfo() {
       meSetting.value = res.data
       oldNickname.value = meSetting.value.nickname
     })
-    .catch(() => {
-      cmjs.prompt.error("获取我的信息失败")
+    .catch((err) => {
+      cmjs.prompt.error(err)
     })
 }
 

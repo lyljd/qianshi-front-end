@@ -219,8 +219,8 @@ async function getPower() {
 
       store.power = res.data.power
     })
-    .catch(() => {
-      cmjs.prompt.error("获取我的权限失败")
+    .catch((err) => {
+      cmjs.prompt.error(err)
       store.power = 0
     })
 }
@@ -247,8 +247,8 @@ async function beforeEach(to: any, from: any, next: Function) {
         cmjs.cache.setCookie("avatar", res.data.avatarUrl, 300)
         store.setTopMenuBarAvatar(res.data.avatarUrl)
       })
-      .catch(() => {
-        cmjs.prompt.error("获取我的头像失败")
+      .catch((err) => {
+        cmjs.prompt.error(err)
         cmjs.cache.setCookie("avatar", "", 300)
         store.setTopMenuBarAvatar("")
       })

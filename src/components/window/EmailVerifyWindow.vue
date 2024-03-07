@@ -102,9 +102,9 @@ function sendEmail() {
         chsDis.countDown(180)
         cmjs.prompt.success("验证码已发送")
       })
-      .catch(() => {
+      .catch((err) => {
         chsDis.cancelDisabled()
-        cmjs.prompt.error("发送验证码失败")
+        cmjs.prompt.error(err)
       })
   })
 }

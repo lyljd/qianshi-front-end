@@ -66,13 +66,13 @@ function show(afterSuccDoP: Function) {
           afterSuccDo = afterSuccDoP
           return
         })
-        .catch(() => {
-          cmjs.prompt.error("获取验证码失败")
+        .catch((err) => {
+          cmjs.prompt.error(err)
           return
         })
     })
-    .catch(() => {
-      cmjs.prompt.error("获取验证码失败")
+    .catch((err) => {
+      cmjs.prompt.error(err)
     })
 }
 
@@ -113,15 +113,15 @@ function reloadCaptcha() {
           captchaLoadFail.value = false
           return
         })
-        .catch(() => {
-          cmjs.prompt.error("获取验证码失败")
+        .catch((err) => {
+          cmjs.prompt.error(err)
           captchaUrl.value = ""
           captchaLoadFail.value = true
           return
         })
     })
-    .catch(() => {
-      cmjs.prompt.error("刷新验证码失败")
+    .catch((err) => {
+      cmjs.prompt.error(err)
     })
 }
 
@@ -184,24 +184,24 @@ function verify() {
               captchaUrl.value = res.data.image
               return
             })
-            .catch(() => {
+            .catch((err) => {
               captchaUrl.value = ""
               captchaLoadFail.value = true
-              cmjs.prompt.error("重置验证码失败")
+              cmjs.prompt.error(err)
               return
             })
         })
-        .catch(() => {
-          cmjs.prompt.error("重置验证码失败")
+        .catch((err) => {
+          cmjs.prompt.error(err)
           captchaId.value = ""
           captchaUrl.value = ""
           captchaLoadFail.value = true
         })
     })
-    .catch(() => {
+    .catch((err) => {
       vbDis.cancelDisabled()
       vbDis.countDown(3, verifyBtnCheck)
-      cmjs.prompt.error("验证验证码失败")
+      cmjs.prompt.error(err)
       input.value = ""
     })
 }

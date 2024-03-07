@@ -112,8 +112,8 @@ function getMeSecurity() {
 
       meSecurity.value = res.data
     })
-    .catch(() => {
-      cmjs.prompt.error("获取账号安全信息失败")
+    .catch((err) => {
+      cmjs.prompt.error(err)
     })
 }
 
