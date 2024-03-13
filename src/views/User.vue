@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="head">
-      <Image :url="`/userhome-top-img/${user.topImgNo}.png`" :w="1140" :h="180" errorText="头图加载失败"
-        :errorTextFontSize="20"></Image>
+      <Image :url="`https://cdn.qianshi.fun/userhome-top-img/${user.topImgNo}.png${aks[user.topImgNo - 1]}`" :w="1140"
+        :h="180" errorText="头图加载失败" :errorTextFontSize="20"></Image>
 
       <div v-show="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
@@ -180,7 +180,7 @@ const route = useRoute()
 const extraPop = ref()
 
 const uid = parseInt(route.params.uid as string)
-let user = ref<User>({ uid: uid, nickname: "", signature: "", avatarUrl: "", gender: "保密", level: 1, isVip: false, ipLocation: "", topImgNo: 1, isFocu: false, isBlock: false, postNum: 0, collectionNum: 0, favlistNum: 0, followNum: 0, fanNum: 0, likeNum: 0, playNum: 0, readNum: 0 })
+let user = ref<User>({ uid: uid, nickname: "", signature: "", avatarUrl: "", gender: "保密", level: 1, isVip: false, ipLocation: "", topImgNo: 0, isFocu: false, isBlock: false, postNum: 0, collectionNum: 0, favlistNum: 0, followNum: 0, fanNum: 0, likeNum: 0, playNum: 0, readNum: 0 })
 getUser()
 
 const store = useStore()
@@ -201,10 +201,16 @@ store.setUserMenuFavlistNum = setMenuFavlistNum
 
 const signatureInput = ref<HTMLInputElement>()
 const topImgs: string[] = [
-  "/userhome-top-img/1.png",
-  "/userhome-top-img/2.png",
-  "/userhome-top-img/3.png",
-  "/userhome-top-img/4.png",
+  "https://cdn.qianshi.fun/userhome-top-img/1.png?auth_key=1741881992-0-0-61f5f9a229eddc2f174fd03e783095e0",
+  "https://cdn.qianshi.fun/userhome-top-img/2.png?auth_key=1741882016-0-0-cc38f3c0b110f4c8c7856f18bdb862c0",
+  "https://cdn.qianshi.fun/userhome-top-img/3.png?auth_key=1741882023-0-0-7a52eb4a460952a53e07d95c9a60d8da",
+  "https://cdn.qianshi.fun/userhome-top-img/4.png?auth_key=1741882030-0-0-35c8b166af0e6d5629dc8de877403b30",
+]
+const aks: string[] = [
+  "?auth_key=1741881992-0-0-61f5f9a229eddc2f174fd03e783095e0",
+  "?auth_key=1741882016-0-0-cc38f3c0b110f4c8c7856f18bdb862c0",
+  "?auth_key=1741882023-0-0-7a52eb4a460952a53e07d95c9a60d8da",
+  "?auth_key=1741882030-0-0-35c8b166af0e6d5629dc8de877403b30",
 ]
 
 let isMe = ref(cmjs.biz.verifyLoginUid(uid))

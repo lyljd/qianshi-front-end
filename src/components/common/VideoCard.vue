@@ -12,31 +12,31 @@
     </el-tooltip>
 
     <div style="position: relative;">
-      <Image v-show="!playStatus" :url="data.coverUrl" :w="cs.w" :h="cs.ch" :errorText="!data.expire ? '封面加载失败' : '视频已失效'"
-        :errorTextFontSize="cs.bfs" class="cover" @click="!data.expire ? cmjs.jump.video(data.vid) : undefined"
-        @mouseenter="coverMouseEnter" @mouseleave="coverMouseLeave"
-        :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
+      <Image v-show="!playStatus" :url="data.coverUrl" :w="cs.w" :h="cs.ch"
+        :errorText="!data.expire ? '封面加载失败' : '视频已失效'" :errorTextFontSize="cs.bfs" class="cover"
+        @click="!data.expire ? cmjs.jump.video(data.vid) : undefined" @mouseenter="coverMouseEnter"
+        @mouseleave="coverMouseLeave" :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
       </Image>
 
       <div v-if="!data.expire" v-show="!playStatus && !hoverInfoStatus" class="inner-info"
-        :style="{ width: `${cs.w}px`, height: `${cs.ufs+10}px`, lineHeight: `${cs.ufs+10}px`, fontSize: `${cs.ufs}px`, justifyContent: innerInfoShow ? 'space-between' : 'right' }">
+        :style="{ width: `${cs.w}px`, height: `${cs.ufs + 10}px`, lineHeight: `${cs.ufs + 10}px`, fontSize: `${cs.ufs}px`, justifyContent: innerInfoShow ? 'space-between' : 'right' }">
         <span v-if="innerInfoShow" style="margin-left: 5px;">
           <span>
             <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
-              cmjs.fmt.numWE(data.playNum) }}
+    cmjs.fmt.numWE(data.playNum) }}
           </span>
           <span style="margin-left: 5px;">
             <span class="iconfont el-icon-danmushu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
-              cmjs.fmt.numWE(data.danmuNum) }}
+    cmjs.fmt.numWE(data.danmuNum) }}
           </span>
         </span>
         <span v-show="!hoverInfoStatus" style="margin-right: 5px;">{{ cmjs.fmt.videoDuration(data.duration) }}</span>
       </div>
     </div>
 
-    <video v-if="hoverStyleSwitch === 'preview'" v-show="playStatus" @mouseenter="videoMouseEnter"
+    <video v-if="hoverStyleSwitch === 'preview'" v-show="playStatus" @mouseenter="videoMouseEnter(data)"
       @mouseleave="videoMouseLeave" @click="cmjs.jump.video(data.vid)"
-      @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle" :src="data.videoUrl" muted
+      @contextmenu="(event: any) => { event.preventDefault() }" ref="videoEle" :id="`video-card-${data.vid}`" muted
       disablePictureInPicture class="video" :style="{ width: `${cs.w}px`, height: `${cs.ch}px` }"></video>
 
     <div v-if="hoverStyleSwitch === 'info'" v-show="hoverInfoStatus" @mouseleave="hoverInfoMouseLeave"
@@ -54,8 +54,8 @@
       <div class="title-row" :style="{ lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">
         <span v-if="!data.expire" @click="cmjs.jump.video(data.vid)" :title="data.title" class="title"
           :style="{ fontSize: `${cs.bfs}px` }">{{
-            data.title
-          }}</span>
+    data.title
+  }}</span>
         <el-tooltip v-else content="因为该视频已被删除或隐藏" placement="top">
           <div class="iconfont el-icon-info" style="cursor: default; display: inline-flex;"
             :style="{ fontSize: `${cs.bfs}px`, lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">视频为什么会失效？</div>
@@ -65,7 +65,7 @@
       <div class="util-container" :style="{ fontSize: `${cs.ufs}px` }">
         <div class="util-row">
           <span v-if="data.starDate && data.expire" style="cursor: default; margin-right: 10px;">收藏于：{{ data.starDate ?
-            cmjs.fmt.tsYRichTmpl(data.starDate, "MM-DD") : '未知' }}</span>
+    cmjs.fmt.tsYRichTmpl(data.starDate, "MM-DD") : '未知' }}</span>
           <span v-if="props.type === 'big' || data.expire" @click="cmjs.jump.user(data.uid)"
             :title="data.nickname + ' · ' + cmjs.fmt.tsYRichTmpl(data.date, 'MM-DD')" class="util util-hl">
             <span class="iconfont el-icon-UPzhu" :style="{ fontSize: `${cs.ufs}px` }"></span>
@@ -76,8 +76,8 @@
             <span v-if="props.type === 'small'" class="util">
               <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>
               {{ cmjs.fmt.numWE(data.playNum) }}<span style="margin-left: 10px;">{{ cmjs.fmt.tsYRichTmpl(data.date,
-                "MM-DD")
-              }}</span>
+    "MM-DD")
+                }}</span>
             </span>
 
             <span v-if="props.type === 'small-star'" class="util" style="cursor: default;">
@@ -112,21 +112,23 @@ type CardSize = {
   wlis: number, // watchLater ico size
 }
 
+type VideoCardData = {
+  vid: number
+  videoUrl: string
+  coverUrl: string
+  playNum: number
+  danmuNum: number
+  duration: number
+  title: string
+  uid: number
+  nickname: string
+  date: number
+  starDate?: number
+  expire?: boolean // 视频已失效
+}
+
 const props = withDefaults(defineProps<{
-  data: {
-    vid: number
-    videoUrl: string
-    coverUrl: string
-    playNum: number
-    danmuNum: number
-    duration: number
-    title: string
-    uid: number
-    nickname: string
-    date: number
-    starDate?: number
-    expire?: boolean // 视频已失效
-  },
+  data: VideoCardData,
   type: "big" | "small" | "small-star",
   hoverStyle: "preview" | "info",
   innerInfo: boolean,
@@ -229,7 +231,11 @@ function coverMouseLeave() {
   }, 1);
 }
 
-function videoMouseEnter() {
+function videoMouseEnter(d: VideoCardData) {
+  const vce = document.getElementById(`video-card-${d.vid}`) as HTMLVideoElement
+  if (!vce.src) {
+    vce.src = d.videoUrl
+  }
   videoHoverStatus.value = true
   coverHoverStatus.value = false
 }
@@ -329,7 +335,7 @@ function watchLaterFc(vid: number) {
   display: flex;
   pointer-events: none;
   bottom: 0;
-  background-image: linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.8) 100%);
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .8) 100%);
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }

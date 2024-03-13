@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img @click="onClick" @error="url = '/default-avatar.png'" :src="url" :class="'avatar-' + data.size"
+    <img @click="onClick" @error="url = 'https://cdn.qianshi.fun/default-avatar.png?auth_key=1741881639-0-0-8c52d45ef270f436878becd527a8c744'" :src="url" :class="'avatar-' + data.size"
       :style="{ cursor: data.upload || data.home ? uploading ? 'not-allowed' : 'pointer' : 'default', opacity: uploading ? 0.5 : 1 }" />
 
     <el-upload ref="uploadRef" accept="image/*" :before-upload="beforeUpload" v-if="data.upload"

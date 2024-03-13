@@ -3,7 +3,7 @@
 
   <el-menu id="menu" class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
     <div class="logo">
-      <Image url="/favicon.png" :w="40" :h="40"></Image>
+      <Image url="https://cdn.qianshi.fun/favicon.png?auth_key=1741881534-0-0-b53b6ef7f0d3c2756aa3f777d5ed8a8e" :w="40" :h="40"></Image>
     </div>
 
     <el-menu-item v-blur index="/">首页</el-menu-item>

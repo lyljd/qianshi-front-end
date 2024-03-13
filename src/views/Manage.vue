@@ -5,7 +5,7 @@
         <el-menu :default-active=$route.path router="true">
           <div class="page-title">
             <div>
-              <Image url="/favicon.png" :w="40" :h="40"></Image>
+              <Image url="https://cdn.qianshi.fun/favicon.png?auth_key=1741881534-0-0-b53b6ef7f0d3c2756aa3f777d5ed8a8e" :w="40" :h="40"></Image>
             </div>
             <div>后台管理</div>
             <div @click="cmjs.jump.new('/')" class="open-main-web">打开主站</div>

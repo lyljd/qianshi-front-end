@@ -69,12 +69,12 @@ export default {
   // 富日期：刚刚、x秒前、x分钟前、x小时前
   // *使用该函数时template不能含有"YYYY-"
   tsYRichTmpl(timestamp: number, template: string): string {
-    const curDay = new Date(Date.now()).getDate()
-    const tsDay = new Date(timestamp).getDate()
-    if (curDay !== tsDay) {
-      return this.tsYTmpl(timestamp, template)
+    const now = new Date()
+    const today0ClockTimestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    if (timestamp >= today0ClockTimestamp.getTime()) {
+      return tsRich(timestamp)
     }
-    return tsRich(timestamp)
+    return this.tsYTmpl(timestamp, template)
   },
 
   // numWE 将数字转换为x万或x亿

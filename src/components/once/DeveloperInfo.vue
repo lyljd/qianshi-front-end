@@ -4,7 +4,7 @@
       <a class="link" href="https://beian.miit.gov.cn" target="_blank">渝ICP备2023011499号-1</a>
       ·
       <span class="gaba">
-        <Image url="/gaba.png" :w="14" :h="14"></Image>
+        <Image url="https://cdn.qianshi.fun/gaba.png?auth_key=1741881682-0-0-3c234b83e7bd57df8366be373f4e3213" :w="14" :h="14"></Image>
         <a class="link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=50010602503726"
           target="_blank">渝公网安备50010602503726号</a>
       </span>
