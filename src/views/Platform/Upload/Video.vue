@@ -52,6 +52,16 @@
         </div>
       </div>
 
+      <div class="row">
+        <span class="notice">自动发布：</span>
+        <div>
+          <el-checkbox v-model="video.autoPublish" label="审批通过后自动发布" />
+          <div class="tip">
+            <span>若未勾选该项，则在审批通过后需要自行手动点击发布</span>
+          </div>
+        </div>
+      </div>
+
       <div class="row" style="justify-content: center;">
         <el-button v-blur
           :disabled="videoUploading || coverUploading || video.videoUrl === '' || video.coverUrl === '' || video.title === '' || video.region === ''"
@@ -76,7 +86,8 @@ type Video = {
   region: string,
   tags: string[],
   intro: string,
-  empower: boolean
+  empower: boolean,
+  autoPublish: boolean
 }
 
 const store = useStore()
@@ -91,7 +102,8 @@ let video: Video = reactive({
   region: "",
   tags: [],
   intro: "",
-  empower: false
+  empower: true,
+  autoPublish: true,
 })
 let coverUploading = ref(false)
 let videoUploading = ref(false)

@@ -38,6 +38,8 @@ const MeSignature = (newSignature: string) => apiInstance.put('/api/v1/user/me/s
 
 const MeTopImgNo = (topImgNo: number) => apiInstance.put('/api/v1/user/me/top-img-no', { topImgNo: topImgNo }).then(res => res.data)
 
+const MeAvatarHover = () => apiInstance.get('/api/v1/user/me/avatar-hover').then(res => res.data)
+
 export {
   emailLogin,
   passLogin,
@@ -54,4 +56,5 @@ export {
   userInfo,
   MeSignature,
   MeTopImgNo,
+  MeAvatarHover,
 }

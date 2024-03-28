@@ -3,7 +3,8 @@
 
   <el-menu id="menu" class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
     <div class="logo">
-      <Image url="https://cdn.qianshi.fun/favicon.png?auth_key=1741881534-0-0-b53b6ef7f0d3c2756aa3f777d5ed8a8e" :w="40" :h="40"></Image>
+      <Image url="https://cdn.qianshi.fun/favicon.png?auth_key=1741881534-0-0-b53b6ef7f0d3c2756aa3f777d5ed8a8e" :w="40"
+        :h="40"></Image>
     </div>
 
     <el-menu-item v-blur index="/">首页</el-menu-item>
@@ -51,7 +52,7 @@
     <LoginWindow ref="loginWindow"></LoginWindow>
 
     <div v-if="isLogin" class="after-login-menu">
-      <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
+      <el-popover :width="250" ref="avatarPop" :show-arrow=false>
 
         <template #reference>
           <Avatar v-model="avatar" size="medium" :home="{ uid: ahi.id }">
@@ -159,6 +160,7 @@ import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
+import * as API from '@/api/user'
 
 type AvatarHoverInfo = {
   id: number,
@@ -198,6 +200,9 @@ let ahi = ref<AvatarHoverInfo>({
   "dynamicNum": 0,
   "signinStatus": true,
 })
+if (store.isLogin) {
+  getMeAvatarHover()
+}
 let avatar = ref(cmjs.cache.getCookie('avatar'))
 let tpp = ref("不能为空") // topPath
 let newMessageNum = ref(0)
@@ -269,21 +274,20 @@ function logout() {
   }
 }
 
-function onAvatarPopShow() {
+function getMeAvatarHover() {
   if (ahi.value.id === -1) {
-    // TODO api
-    ahi.value = {
-      id: 1,
-      nickname: "Bonnenult",
-      isVip: true,
-      power: 6,
-      level: 6,
-      coin: 233,
-      followNum: 6,
-      fanNum: 114514,
-      dynamicNum: 0,
-      signinStatus: false,
-    }
+    API.MeAvatarHover()
+      .then((res) => {
+        if (res.code !== 0) {
+          cmjs.prompt.error(res.msg)
+          return
+        }
+
+        ahi.value = res.data
+      })
+      .catch((err) => {
+        cmjs.prompt.error(err)
+      })
   }
 }
 

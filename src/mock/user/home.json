@@ -12,7 +12,8 @@
       "title": "晴天",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": false
     },
     {
       "vid": 2,
@@ -24,7 +25,8 @@
       "title": "Borrow Your Time",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": true
     }
   ],
   "openLike": true,
@@ -40,7 +42,8 @@
       "title": "曼陀山庄",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": false
     },
     {
       "vid": 4,
@@ -52,7 +55,8 @@
       "title": "Paris",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": false
     },
     {
       "vid": 5,
@@ -64,7 +68,8 @@
       "title": "Running In The Dark",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": true
     },
     {
       "vid": 6,
@@ -76,7 +81,8 @@
       "title": "戒烟",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": false
     },
     {
       "vid": 7,
@@ -88,7 +94,8 @@
       "title": "Closer",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": false
     },
     {
       "vid": 8,
@@ -100,7 +107,8 @@
       "title": "雅俗共赏",
       "uid": 1,
       "nickname": "Bonnenult",
-      "date": 1696780800000
+      "date": 1696780800000,
+      "vip": false
     }
   ],
   "title": "浅时创始人（站长）",

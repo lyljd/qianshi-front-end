@@ -31,7 +31,8 @@
             class="normallight">专栏</span>待处理</div>
         <div v-if="hi.review.title !== 0" class="row"><span class="highlight">{{ hi.review.title }}</span>个<span
             class="normallight">个人认证</span>待处理</div>
-        <div v-if="hi.review.video === 0 && hi.review.read === 0 && hi.review.title === 0" class="row free">暂无待处理的审批</div>
+        <div v-if="hi.review.video === 0 && hi.review.read === 0 && hi.review.title === 0" class="row free">暂无待处理的审批
+        </div>
       </el-card>
 
       <el-card style="width: calc(50% - 10px);">
@@ -46,9 +47,9 @@
           </div>
         </template>
         <div v-if="hi.feedback.appeal !== 0" class="row"><span class="highlight">{{ hi.feedback.appeal
-        }}</span>个<span class="normallight">申诉</span>待处理</div>
+            }}</span>个<span class="normallight">申诉</span>待处理</div>
         <div v-if="hi.feedback.msg !== 0" class="row"><span class="highlight">{{ hi.feedback.msg
-        }}</span>个<span class="normallight">站内留言</span>待处理</div>
+            }}</span>个<span class="normallight">站内留言</span>待处理</div>
         <div v-if="hi.feedback.report !== 0" class="row"><span class="highlight">{{ hi.feedback.report }}</span>个<span
             class="normallight">举报</span>待处理</div>
         <div v-if="hi.feedback.msg === 0 && hi.feedback.appeal === 0 && hi.feedback.report === 0" class="row free">
@@ -99,6 +100,16 @@
         <span>设置广告</span>
       </el-button>
 
+      <el-button v-blur @click="openSRWindow">
+        <span class="iconfont el-icon-region"></span>
+        <span>设置分区</span>
+      </el-button>
+
+      <el-button v-blur @click="setVipPri">
+        <span class="iconfont el-icon-vip-pri-fill"></span>
+        <span>设置会员专享</span>
+      </el-button>
+
       <el-button v-blur @click="openIPBanWindow">
         <span class="iconfont el-icon-ip"></span>
         <span>IP封禁</span>
@@ -114,6 +125,8 @@
 
     <SetAdvertisementWindow @open="getOpenSAWindow"></SetAdvertisementWindow>
 
+    <RegionWindow @open="getOpenSRWindow"></RegionWindow>
+
     <IPBanlWindow @open="getIPBanWindow"></IPBanlWindow>
   </div>
 </template>
@@ -124,6 +137,7 @@ import cmjs from '@/cmjs'
 import Avatar from '@/components/common/Avatar.vue'
 import SetCarouselWindow from "@/components/window/SetCarouselWindow.vue"
 import SetAdvertisementWindow from "@/components/window/SetAdvertisementWindow.vue"
+import RegionWindow from "@/components/window/SetRegionWindow.vue"
 import IPBanlWindow from "@/components/window/IPBanWindow.vue"
 
 type HomeInfo = {
@@ -151,6 +165,7 @@ const store = useStore()
 let hi: HomeInfo = reactive(getHomeInfo())
 let openSCWindow = ref<Function>()
 let openSAWindow = ref<Function>()
+let openSRWindow = ref<Function>()
 let openIPBanWindow = ref<Function>()
 let avatarUrl = ref(cmjs.cache.getCookie('avatar'))
 
@@ -160,6 +175,10 @@ function getOpenSCWindow(f: Function) {
 
 function getOpenSAWindow(f: Function) {
   openSAWindow.value = f
+}
+
+function getOpenSRWindow(f: Function) {
+  openSRWindow.value = f
 }
 
 function getIPBanWindow(f: Function) {
@@ -224,6 +243,10 @@ function processFeedback() {
   } else if (hi.feedback.report !== 0) {
     pushToNewPage("/manage/feedback/report/video")
   }
+}
+
+function setVipPri() {
+  cmjs.prompt.info('请前往需要设置的视频页，在“四连”右边的“三点悬浮菜单”中点击【设置会员专享】')
 }
 </script>
 

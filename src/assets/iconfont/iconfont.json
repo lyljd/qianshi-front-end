@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10357554",
+      "name": "会员专享",
+      "font_class": "vip-pri-fill",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "24849349",
+      "name": "下架",
+      "font_class": "xiajia",
+      "unicode": "e644",
+      "unicode_decimal": 58948
+    },
+    {
+      "icon_id": "1111442",
+      "name": "发布",
+      "font_class": "fabu",
+      "unicode": "e63b",
+      "unicode_decimal": 58939
+    },
+    {
+      "icon_id": "11500203",
+      "name": "会员专享",
+      "font_class": "vip-pri",
+      "unicode": "e74b",
+      "unicode_decimal": 59211
+    },
+    {
+      "icon_id": "24068940",
+      "name": "分区",
+      "font_class": "region",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
       "icon_id": "8820131",
       "name": "举报",
       "font_class": "jubao2",

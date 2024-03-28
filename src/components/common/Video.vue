@@ -15,7 +15,8 @@
           :style="{ animationPlayState: d.id === dmHover.dm.id || !playStatus ? 'paused' : '', color: d.color, top: `${d.track! * trackHeight * thProportion + (trackHeight * thProportion - 20 * dmSize * dsProportion / 100) / 2 - (d.isUp ? 5 : 0)}px`, zIndex: dmShow ? 'auto' : '-1', opacity: dmOpacity / 100, fontSize: `${20 * dmSize * dsProportion / 100}px`, lineHeight: `${20 * dmSize * dsProportion / 100}px`, animationDuration: `${10 - dmSpeed + (d.aniDiff as number)}s` }"
           @mouseenter="(event: MouseEvent) => { hoverDanmu(d, event) }" :id="`dm-${d.id}`">
           <span v-show="!d.isUp && d.isLike && isLogin" @click="d.isLike ? cancelLikeDanmu(d) : likeDanmu(d)"
-            :style="{ fontSize: `${20 * dmSize * dsProportion / 100}px` }" class="iconfont el-icon-good-fill icon"></span>
+            :style="{ fontSize: `${20 * dmSize * dsProportion / 100}px` }"
+            class="iconfont el-icon-good-fill icon"></span>
           <div v-if="d.isUp"
             :style="{ fontSize: `${12 * dmSize * dsProportion / 100}px`, lineHeight: `${12 * dmSize * dsProportion / 100}px`, padding: `${4 * dmSize * dsProportion / 100}px` }"
             class="upzhu">UP主</div>
@@ -95,17 +96,18 @@
                     <div class="option">
                       <span>不透明度</span><el-slider v-model="dmOpacity" @change="cmjs.cache.setLS('dmOpacity', dmOpacity)"
                         :show-tooltip="false" class="slider"></el-slider>{{ dmOpacity
-                        }}%
+                      }}%
                     </div>
                     <div class="option">
                       <span>显示区域</span><el-slider v-model="dmRegion" @change="cmjs.cache.setLS('dmRegion', dmRegion)"
-                        :min="25" :step="25" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmRegionMark()
-                        }}
+                        :min="25" :step="25" show-stops :show-tooltip="false" class="slider"></el-slider>{{
+          dmRegionMark()
+        }}
                     </div>
                     <div class="option">
-                      <span>弹幕字号</span><el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)" :min="75"
-                        :max="150" :show-tooltip="false" class="slider"></el-slider>{{
-                          dmSize }}%
+                      <span>弹幕字号</span><el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)"
+                        :min="75" :max="150" :show-tooltip="false" class="slider"></el-slider>{{
+          dmSize }}%
                     </div>
                     <div class="option">
                       <span>弹幕放大率<el-tooltip :append-to="vContainerEle" content="弹幕在全屏时根据屏幕等比放大比例的占比" placement="top">
@@ -113,11 +115,12 @@
                         </el-tooltip></span><el-slider v-model="dmEnlargeRate"
                         @change="cmjs.cache.setLS('dmEnlargeRate', dmEnlargeRate)" :show-tooltip="false"
                         class="slider"></el-slider>{{
-                          dmEnlargeRate }}%
+          dmEnlargeRate }}%
                     </div>
                     <div class="option">
                       <span>弹幕速度</span><el-slider v-model="dmSpeed" @change="cmjs.cache.setLS('dmSpeed', dmSpeed)"
-                        :min="3" :max="7" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark() }}
+                        :min="3" :max="7" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark()
+                      }}
                     </div>
                   </div>
                 </el-popover>
@@ -166,7 +169,9 @@
                   <div class="collection-container">
                     <ul class="collection-item-container">
                       <li v-for="c in props.collection" :class="{ activeItem: c.vid === props.vid }"
-                        @click="selectEpisode(c.vid)">{{ c.title }}</li>
+                        @click="selectEpisode(c.vid)">
+                        <VipPriIco v-if="c.vip" :fs="12" style="margin-right: 10px;"></VipPriIco>{{ c.title }}
+                      </li>
                     </ul>
                   </div>
                 </el-popover>
@@ -174,10 +179,11 @@
                 <el-popover :teleported="false" :trigger="playSpeed === 3 ? 'never' : 'hover'" placement="top"
                   popper-style="min-width:unset; width: auto;" ref="playSpeedPop">
                   <template #reference>
-                    <span :style="{ cursor: playSpeed === 3 ? 'not-allowed' : 'pointer' }" class="speed">{{ playSpeed ===
-                      1
-                      ? '倍速' :
-                      `${playSpeed}x` }}</span>
+                    <span :style="{ cursor: playSpeed === 3 ? 'not-allowed' : 'pointer' }" class="speed">{{ playSpeed
+          ===
+          1
+          ? '倍速' :
+          `${playSpeed}x` }}</span>
                   </template>
                   <el-radio-group class="speed-radio-group" @change="setPlaySpeed" v-model="playSpeed"
                     :disabled="errorStatus">
@@ -198,7 +204,8 @@
                   <div class="row" style="gap: 10px;">
                     <span style="margin: 0;">{{ volume }}</span>
                     <div><el-slider @input="changeVolume" style="width: 185px; margin: 0;" v-model="volume"
-                        :show-tooltip="false" /></div>
+                        :show-tooltip="false" />
+                    </div>
                   </div>
                 </el-popover>
 
@@ -281,16 +288,16 @@
           <div class="option">
             <span>不透明度</span><el-slider v-model="dmOpacity" @change="cmjs.cache.setLS('dmOpacity', dmOpacity)"
               :show-tooltip="false" class="slider"></el-slider>{{ dmOpacity
-              }}%
+            }}%
           </div>
           <div class="option">
             <span>显示区域</span><el-slider v-model="dmRegion" @change="cmjs.cache.setLS('dmRegion', dmRegion)" :min="25"
               :step="25" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmRegionMark() }}
           </div>
           <div class="option">
-            <span>弹幕字号</span><el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)" :min="75" :max="150"
-              :show-tooltip="false" class="slider"></el-slider>{{
-                dmSize }}%
+            <span>弹幕字号</span><el-slider v-model="dmSize" @change="cmjs.cache.setLS('dmSize', dmSize)" :min="75"
+              :max="150" :show-tooltip="false" class="slider"></el-slider>{{
+          dmSize }}%
           </div>
           <div class="option">
             <span>弹幕放大率<el-tooltip content="弹幕在全屏时根据屏幕等比放大比例的占比" placement="top">
@@ -298,11 +305,11 @@
               </el-tooltip></span><el-slider v-model="dmEnlargeRate"
               @change="cmjs.cache.setLS('dmEnlargeRate', dmEnlargeRate)" :show-tooltip="false"
               class="slider"></el-slider>{{
-                dmEnlargeRate }}%
+          dmEnlargeRate }}%
           </div>
           <div class="option">
-            <span>弹幕速度</span><el-slider v-model="dmSpeed" @change="cmjs.cache.setLS('dmSpeed', dmSpeed)" :min="3" :max="7"
-              show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark() }}
+            <span>弹幕速度</span><el-slider v-model="dmSpeed" @change="cmjs.cache.setLS('dmSpeed', dmSpeed)" :min="3"
+              :max="7" show-stops :show-tooltip="false" class="slider"></el-slider>{{ dmSpeedMark() }}
           </div>
         </div>
       </el-popover>
@@ -335,6 +342,7 @@
 
 <script setup lang="ts">
 import ColorPicker from '@/components/common/ColorPicker.vue'
+import VipPriIco from '@/components/common/VipPriIco.vue'
 import cmjs from '@/cmjs'
 import { useStore } from '@/store'
 import { storeToRefs } from 'pinia'
@@ -349,6 +357,7 @@ type Collection = {
   vid: number
   title: string
   duration: number
+  vip: boolean
 }
 
 type Danmu = {
@@ -386,10 +395,12 @@ const props = defineProps<{
   danmus: Danmu[]
   isUp: boolean
   nextVid: number
+  vip: boolean
 }>()
 
 const vidRef = toRef(props, 'vid')
 watch(vidRef, () => {
+  firstPlay.value = true
   playSpeed.value = 1
   calcVideoUrlAndQuality()
   runningDanmus.value.forEach(d => {
@@ -521,6 +532,7 @@ let activeItemPos = ref(-1)
 let isRightArrowKeyPressed = ref(false) // 右方向键是否按下；为了实现长按时3倍速播放
 let rightArrowKeyPressedTimer: number
 let prePlaySpeed = ref(1)
+let firstPlay = ref(true) // 判断本次页面访问中是不是第一次播放视频（切视频后会重置为true）
 
 // 弹幕栏相关
 let dmShow = ref(cmjs.cache.getLS("dmShow") !== "false" ? true : false)
@@ -607,6 +619,12 @@ onMounted(() => {
   videoEle.addEventListener('play', function () {
     playStatus.value = true
     showCtlBar()
+    if (firstPlay.value) {
+      if (props.vip) {
+        showTip("您正在尊享会员专享视频", 2)
+      }
+      firstPlay.value = false
+    }
   })
 
   videoEle.addEventListener('pause', function () {
@@ -995,7 +1013,6 @@ function likeDanmu(d: Danmu) {
   // TODO api
   d.isLike = true
   d.likeNum++
-  cmjs.prompt.success("点赞成功", vContainerEle)
 }
 
 function cancelLikeDanmu(d: Danmu) {
@@ -1009,12 +1026,11 @@ function cancelLikeDanmu(d: Danmu) {
   // TODO api
   d.isLike = false
   d.likeNum--
-  cmjs.prompt.success("取消点赞成功", vContainerEle)
 }
 
 function reportDanmu(did: number) {
-  const fs = fullScreenStatus
-  if (fullScreenStatus.value) {
+  const fs = fullScreenStatus.value
+  if (fs) {
     cancelFullScreen()
   }
 
@@ -1062,7 +1078,6 @@ function recallDanmu(d: Danmu) {
     .then(() => {
       destroyDanmu(d)
       cancelHoverDanmu()
-      cmjs.prompt.success("撤回成功", vContainerEle)
     })
 }
 stf('recall-danmu', recallDanmu)
@@ -1081,7 +1096,6 @@ function deleteDanmu(d: Danmu) {
     .then(() => {
       destroyDanmu(d)
       cancelHoverDanmu()
-      cmjs.prompt.success("删除成功", vContainerEle)
     })
 }
 stf('delete-danmu', deleteDanmu)
@@ -1151,7 +1165,7 @@ function selectEpisode(vid: number) {
 // locateTo 全屏状态下选集窗口弹出时自动定位到当前集的位置
 function locateTo() {
   collectionActiveItemEle = document.querySelector(".v-container .activeItem") as HTMLLIElement
-  collectionItemContainerEle.scrollTop = collectionActiveItemEle.offsetTop - collectionItemContainerEle.offsetTop
+  cmjs.util.scrollIntoViewInContainer(collectionActiveItemEle, collectionItemContainerEle)
 }
 
 function setPlaySpeed(value: number) {
@@ -1555,13 +1569,14 @@ function hidePreview() {
               overflow: auto;
 
               li {
-                padding: 0px 10px; // 左右间距10px
+                padding: 0 10px; // 左右间距10px
                 line-height: 34px; // font-size默认10px；上下间距10px
                 cursor: pointer;
-                max-width: 150px;
+                max-width: 200px;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
+                font-size: 14px;
               }
 
               li:hover {

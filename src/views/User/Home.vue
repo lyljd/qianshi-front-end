@@ -125,6 +125,7 @@ type Video = {
   uid: number
   nickname: string
   date: number
+  vip: boolean
 }
 
 const store = useStore()

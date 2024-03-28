@@ -3,57 +3,69 @@
     <div class="left">
       <div class="title"><span :title="video.title">{{ video.title }}</span></div>
 
-      <div class="interaction-bar">
-        <span :title="video.likeNum.toString()" @click="likeVideo" :class="{ highLight: video.isLike && isLogin }"
-          class="iconfont el-icon-good icon"><span class="num">{{
+      <div style="position: relative;">
+        <div class="interaction-bar">
+          <span :title="video.likeNum.toString()" @click="likeVideo" :class="{ highLight: video.isLike && isLogin }"
+            class="iconfont el-icon-good icon"><span class="num">{{
         cmjs.fmt.numWE(video.likeNum)
       }}</span></span>
 
-        <span :title="video.coinNum.toString()" @click="coinVideo" :class="{ highLight: video.isCoin && isLogin }"
-          class="iconfont el-icon-Bbi icon"><span class="num">{{
+          <span :title="video.coinNum.toString()" @click="coinVideo" :class="{ highLight: video.isCoin && isLogin }"
+            class="iconfont el-icon-Bbi icon"><span class="num">{{
         cmjs.fmt.numWE(video.coinNum) }}</span></span>
 
-        <span :title="video.starNum.toString()" @click="starVideo" :class="{ highLight: video.isStar && isLogin }"
-          class="iconfont el-icon-collection icon"><span class="num">{{
+          <span :title="video.starNum.toString()" @click="starVideo" :class="{ highLight: video.isStar && isLogin }"
+            class="iconfont el-icon-collection icon"><span class="num">{{
         cmjs.fmt.numWE(video.starNum)
       }}</span></span>
 
-        <span :title="video.shareNum.toString()" class="iconfont el-icon-fenxiang icon"><span class="num">{{
+          <span :title="video.shareNum.toString()" class="iconfont el-icon-fenxiang icon"><span class="num">{{
         cmjs.fmt.numWE(video.shareNum)
       }}</span></span>
 
-        <el-popover ref="extraPop" placement="bottom-end">
-          <template #reference>
-            <span style="font-size: 20px;" class="iconfont el-icon-diandiandianshu icon"></span>
-          </template>
-          <div class="extra-menu">
-            <ul>
-              <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报&emsp;&emsp;</li>
-              <li @click="cmjs.biz.watchLater(video.vid)"><span
-                  class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看
-              </li>
-            </ul>
-          </div>
-        </el-popover>
+          <el-popover ref="extraPop" placement="bottom-end" @before-enter="beforeEnterExtraPop">
+            <template #reference>
+              <span style="font-size: 20px;" class="iconfont el-icon-diandiandianshu icon"></span>
+            </template>
+            <div class="extra-menu">
+              <ul>
+                <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报</li>
+                <li @click="cmjs.biz.watchLater(video.vid)"><span
+                    class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
+                <li v-if="store.power >= 4 && !video.vip" @click="setVipPri(video.vid)"><span
+                    class="iconfont el-icon-vip-pri em-icon"></span>设置会员专享
+                </li>
+                <li v-if="store.power >= 4 && video.vip" @click="cancelVipPri(video.vid)"><span
+                    class="iconfont el-icon-vip-pri em-icon"></span>取消会员专享
+                </li>
+              </ul>
+            </div>
+          </el-popover>
+        </div>
       </div>
 
       <div class="info">
+        <VipPriIco v-if="video.vip" :fs="14"></VipPriIco>
+
         <span class="item">
           <span class="iconfont el-icon-bofangshu icon"></span>
-          <span>{{ cmjs.fmt.numWE(video.playNum) }}</span>
+          <span :title="video.playNum.toString()">{{ cmjs.fmt.numWE(video.playNum) }}</span>
         </span>
 
         <span class="item">
           <span class="iconfont el-icon-danmushu icon"></span>
-          <span>{{ cmjs.fmt.numWE(video.danmu.length) }}</span>
+          <span :title="video.danmu.length.toString()">{{ cmjs.fmt.numWE(video.danmu.length) }}</span>
         </span>
 
         <span class="item">
           <span class="iconfont el-icon-lishijilu icon"></span>
-          <span>{{ cmjs.fmt.tsStandard(video.date) }}</span>
+          <span
+            :title="video.firstPublishAt === video.date ? '此视频为首次发布' : `首次发布时间：${cmjs.fmt.tsStandard(video.firstPublishAt)}`"
+            style="cursor: alias;">{{ cmjs.fmt.tsStandard(video.date)
+            }}</span>
         </span>
 
-        <span v-if="!video.empower">
+        <span v-if="!video.empower" class="item">
           <svg class="icon-symbol" aria-hidden="true">
             <use xlink:href="#el-icon-jinzhi"></use>
           </svg>
@@ -62,8 +74,8 @@
       </div>
 
       <Video :vid="video.vid" :video="video.video" :collection="video.collection ? video.collection.videos : undefined"
-        :danmus="video.danmu" :isUp="isUp" :nextVid="nextVid" @delete-danmu="(f: Function) => { delDm = f }"
-        @recall-danmu="(f: Function) => { recDm = f }"></Video>
+        :danmus="video.danmu" :isUp="isUp" :nextVid="nextVid" :vip="video.vip"
+        @delete-danmu="(f: Function) => { delDm = f }" @recall-danmu="(f: Function) => { recDm = f }"></Video>
 
       <el-card class="intro-tag-container">
         <textarea id="intro-textarea" class="introduction" rows="1" readonly>{{ video.intro || "-" }}</textarea>
@@ -132,7 +144,6 @@
       <div class="gap"></div>
 
       <el-card v-if="video.collection" class="collection-container" shadow="never">
-
         <template #header>
           <div class="header">
             <span @click="cmjs.jump.collection(video.author.uid, video.collection.id)" class="name"
@@ -153,7 +164,8 @@
           <ul id="collection-item-container">
             <li :id="item.vid === video.vid ? 'collectionActiveItem' : ''" v-for="item in video.collection.videos"
               @click="selectEpisode(item.vid)">
-              <span class="title">{{ item.title }}</span>
+              <VipPriIco v-if="item.vip" :fs="13" style="margin-right: 10px;"></VipPriIco>
+              <span :title="item.title" class="title">{{ item.title }}</span>
               <span class="duration">{{ cmjs.fmt.videoDuration(item.duration) }}</span>
             </li>
           </ul>
@@ -184,18 +196,22 @@ import CommentArea from "@/components/common/CommentArea.vue"
 import VideoTag from "@/components/common/VideoTag.vue"
 import Video from '@/components/common/Video.vue'
 import Avatar from '@/components/common/Avatar.vue'
+import VipPriIco from '@/components/common/VipPriIco.vue'
 import cmjs from '@/cmjs'
 import Data from '@/mock/video.json'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 import { onBeforeRouteUpdate, onBeforeRouteLeave, useRoute } from "vue-router"
+import { ElMessageBox } from "element-plus"
 import cache from '@/cmjs/impl/cache'
+import * as API from '@/api/user'
 
 type Video = {
   vid: number,
   title: string
   playNum: number
   date: number
+  firstPublishAt: number
   empower: boolean
   likeNum: number
   coinNum: number
@@ -217,6 +233,7 @@ type Video = {
   advertisement?: Advertisement
   collection?: Collection
   recommend?: Recommend[]
+  vip: boolean
 }
 
 type VideoQuality = {
@@ -281,6 +298,7 @@ type Collection = {
     vid: number
     title: string
     duration: number
+    vip: boolean
   }[]
 }
 
@@ -295,6 +313,7 @@ type Recommend = {
   uid: number
   nickname: string
   date: number
+  vip: boolean
 }
 
 type Advertisement = {
@@ -336,7 +355,7 @@ let collectionActiveItemEle: HTMLLIElement
 let danmuListEle: HTMLElement
 let dmCtlEle: HTMLDivElement
 
-let video = ref<Video>({ vid: 0, title: "", playNum: 0, date: 0, empower: false, likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "", signature: "", fanNum: 0, isFocu: false }, danmu: [] })
+let video = ref<Video>({ vid: 0, title: "", playNum: 0, date: 0, firstPublishAt: 0, empower: false, likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
 let init = ref(false) // 页面是否初始化完成；在onMounted执行完毕后则初始化完成
 let autoStreaming = ref(cache.getLS("autoStreaming") !== "false" ? true : false) // 自动连播
 let nextVid = ref(-1)
@@ -367,7 +386,7 @@ onMounted(() => {
   setIntroArea()
 
   if (video.value.collection) {
-    collectionItemContainerEle.scrollTop = collectionActiveItemEle.offsetTop - collectionItemContainerEle.offsetTop
+    cmjs.util.scrollIntoViewInContainer(collectionActiveItemEle, collectionItemContainerEle, -5)
   }
 
   const cards = document.querySelectorAll('.right .card:nth-child(2)') as NodeListOf<HTMLElement>
@@ -415,8 +434,8 @@ function setVideo(vid?: number) {
     setTimeout(() => {
       setIntroArea()
       collectionActiveItemEle = document.getElementById("collectionActiveItem") as HTMLLIElement
-      collectionItemContainerEle.scrollTop = collectionActiveItemEle.offsetTop - collectionItemContainerEle.offsetTop
-    }, 0);
+      cmjs.util.scrollIntoViewInContainer(collectionActiveItemEle, collectionItemContainerEle, -5)
+    }, 0)
   }
 }
 
@@ -474,9 +493,9 @@ function likeVideo() {
 
   video.value.isLike = !video.value.isLike
   if (video.value.isLike) {
-    cmjs.prompt.success("点赞成功")
+    video.value.likeNum++
   } else {
-    cmjs.prompt.success("取消点赞成功")
+    video.value.likeNum--
   }
 }
 
@@ -493,9 +512,9 @@ function coinVideo() {
 
   video.value.isCoin = !video.value.isCoin
   if (video.value.isCoin) {
-    cmjs.prompt.success("点赞成功")
+    video.value.coinNum++
   } else {
-    cmjs.prompt.success("取消点赞成功")
+    video.value.coinNum--
   }
 }
 
@@ -505,8 +524,12 @@ function starVideo() {
     return
   }
 
-  cmjs.prompt.info("敬请期待")
-  // TODO 弹出收藏窗口
+  video.value.isStar = !video.value.isStar
+  if (video.value.isStar) {
+    video.value.starNum++
+  } else {
+    video.value.starNum--
+  }
 }
 
 function reportVideo() {
@@ -533,6 +556,58 @@ function reportVideo() {
       closeWindow()
     },
   })
+}
+
+function setVipPri(vid: number) {
+  ElMessageBox.confirm('你确认要设置该视频为会员专享视频吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+  })
+    .then(() => {
+      //TODO api
+      video.value.vip = true
+      const vc = video.value.collection
+      if (vc) {
+        for (let i = 0; i < vc.videos.length; i++) {
+          if (vc.videos[i].vid === video.value.vid) {
+            vc.videos[i].vip = true
+            break
+          }
+        }
+      }
+      cmjs.prompt.success('操作成功')
+    })
+}
+
+function cancelVipPri(vid: number) {
+  ElMessageBox.confirm('你确认要取消该视频为会员专享视频吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+  })
+    .then(() => {
+      //TODO api
+      video.value.vip = false
+      const vc = video.value.collection
+      if (vc) {
+        for (let i = 0; i < vc.videos.length; i++) {
+          if (vc.videos[i].vid === video.value.vid) {
+            vc.videos[i].vip = false
+            break
+          }
+        }
+      }
+      cmjs.prompt.success('操作成功')
+    })
 }
 
 function reportDanmu(did: number) {
@@ -585,11 +660,6 @@ function focuAuthor() {
   }
 
   video.value.author.isFocu = !video.value.author.isFocu
-  if (video.value.author.isFocu) {
-    cmjs.prompt.success("关注成功")
-  } else {
-    cmjs.prompt.success("取消关注成功")
-  }
 }
 
 function selectEpisode(vid: number) {
@@ -634,6 +704,29 @@ function danmuItemHoverLeave() {
     dmCtl.value.show = false
   }, 0)
 }
+
+async function beforeEnterExtraPop() {
+  if (store.isLogin && store.power === -1) {
+    await getPower() // 同步阻塞
+  }
+}
+
+async function getPower() {
+  await API.mePower()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error("获取我的权限失败")
+        store.power = 0
+        return
+      }
+
+      store.power = res.data.power
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+      store.power = 0
+    })
+}
 </script>
 
 <style lang="less" scoped>
@@ -665,16 +758,20 @@ function danmuItemHoverLeave() {
       }
 
       .item {
-        margin-right: 10px;
+        cursor: default;
+      }
+
+      .item:not(:first-child) {
+        margin-left: 10px;
       }
     }
 
     .interaction-bar {
       position: absolute;
-      width: 850px;
       display: flex;
       justify-content: right;
       align-items: center;
+      right: 0;
 
       .icon {
         font-size: 25px;
@@ -688,12 +785,11 @@ function danmuItemHoverLeave() {
       }
 
       .icon:hover {
-        font-size: 25px;
-        color: #409EFF;
+        color: #909399;
       }
 
       .highLight {
-        color: #409EFF;
+        color: #409EFF !important;
       }
     }
 
@@ -897,22 +993,30 @@ function danmuItemHoverLeave() {
 
           li {
             width: 238px;
-            padding: 10px;
+            padding: 5px 10px;
             font-size: 15px;
             margin-top: 5px;
             margin-bottom: 5px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+
+            .title {
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              margin-right: 10px;
+            }
 
             .duration {
               color: #909399;
               font-size: 13px;
+              margin-left: auto;
             }
           }
 
           li:hover {
             cursor: pointer;
+            background-color: white;
           }
 
           li:hover .title {

@@ -17,12 +17,22 @@
 
           <el-table-column align="center" prop="title" label="标题" />
 
+          <el-table-column align="center" :width="89" label="发布状态">
+            <template #default="scope">
+              <span v-if="pubed.list[scope.$index].isPublish" style="color: #67C23A;">已发布</span>
+              <span v-else style="color: #E6A23C;">未发布</span>
+            </template>
+          </el-table-column>
+
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
-              <div style="display: flex; flex-direction: column; ">
+              <div class="oper">
+                <el-button v-blur v-if="!pubed.list[scope.$index].isPublish" @click="publish(scope.$index)" size="small"
+                  type="success"><span class="iconfont el-icon-fabu"></span>发布</el-button>
+                <el-button v-blur v-else @click="cancelPublish(scope.$index)" size="small" type="warning"><span
+                    class="iconfont el-icon-xiajia"></span>下架</el-button>
                 <el-button v-blur @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
-                <br>
                 <el-button v-blur @click="deleteItem(scope.$index)" size="small" type="danger"><span
                     class="iconfont el-icon-ashbin"></span>删除</el-button>
               </div>
@@ -31,20 +41,14 @@
         </el-table>
 
         <div v-if="listNum.pubedNum > 10" class="page-container">
-          <el-pagination :total="listNum.pubedNum" v-model:current-page="pubedCurPage" :page-size="10" hide-on-single-page
-            background layout="prev, pager, next" />
+          <el-pagination :total="listNum.pubedNum" v-model:current-page="pubedCurPage" :page-size="10"
+            hide-on-single-page background layout="prev, pager, next" />
         </div>
       </el-tab-pane>
 
       <el-tab-pane :label="`进行中 ${listNum.isPubingNum}`" name="isPubing">
-        <el-table @cell-click="isPubingCellClick" :cell-class-name="isPubingCellClassName" :cell-style="isPubingCellStyle"
-          :data="isPubing.list" class="is-pubing">
-          <el-table-column label="修改后信息" :width="100" type="expand">
-            <template #default="props"> <!--数据默认懒加载-->
-              <VideoDescriptions :data="(props.row.modifyInfo)" title=""></VideoDescriptions>
-            </template>
-          </el-table-column>
-
+        <el-table @cell-click="isPubingCellClick" :cell-style="isPubingCellStyle" :data="isPubing.list"
+          class="is-pubing">
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
               <Image :url="isPubing.list[scope.$index].coverUrl" :w="210" :h="118.13" round errorText="封面加载失败"
@@ -58,15 +62,13 @@
 
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
-              <div style="display: flex; flex-direction: column; ">
+              <div class="oper">
                 <el-button v-blur @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
-                <br v-if="!isPubing.list[scope.$index].vid">
                 <el-button v-blur v-if="!isPubing.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
                   type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
-                <br v-if="isPubing.list[scope.$index].vid">
-                <el-button v-blur v-if="isPubing.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
-                  type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
+                <el-button v-blur v-if="isPubing.list[scope.$index].vid" @click="cancelModify(scope.$index)"
+                  size="small" type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
               </div>
             </template>
           </el-table-column>
@@ -79,6 +81,9 @@
       </el-tab-pane>
 
       <el-tab-pane :label="`未通过 ${listNum.notPubedNum}`" name="notPubed">
+        <div class="tip">
+          <span style="margin-top: 0; margin-bottom: 3px; color:red">在超过处理时间1天后，未通过的视频和封面资源将被删除。</span>
+        </div>
         <el-table @cell-click="notPubedCellClick" :cell-style="notPubedCellStyle" border :data="notPubed.list"
           class="not-pubed">
           <el-table-column align="center" :width="235" label="封面">
@@ -90,11 +95,10 @@
 
           <el-table-column align="center" prop="title" label="标题" />
 
-          <el-table-column align="center" :width="175" label="申请/处理时间">
-
+          <el-table-column align="center" :width="175" label="申请～处理 时间">
             <template #default="scope">
               <div>{{ tableTimeFormatter(null, null, notPubed.list[scope.$index].applyTime) }}</div>
-              <div>/</div>
+              <div>～</div>
               <div>{{ tableTimeFormatter(null, null, notPubed.list[scope.$index].processTime) }}</div>
             </template>
           </el-table-column>
@@ -103,20 +107,17 @@
 
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
-              <div style="display: flex; flex-direction: column; ">
+              <div class="oper">
                 <el-button v-blur @click="edit(scope.$index)" size="small"><span
                     class="iconfont el-icon-edit"></span>编辑</el-button>
-                <br v-if="!notPubed.list[scope.$index].vid">
                 <el-button v-blur v-if="!notPubed.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
                   type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
-                <br v-if="notPubed.list[scope.$index].vid">
-                <el-button v-blur v-if="notPubed.list[scope.$index].vid" @click="cancelModify(scope.$index)" size="small"
-                  type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
-                <br>
+                <el-button v-blur v-if="notPubed.list[scope.$index].vid" @click="cancelModify(scope.$index)"
+                  size="small" type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
                 <el-button v-blur :class="{ appealBtnT: notPubed.list[scope.$index].appealStatus }"
                   @click="appealIdx = scope.$index; appeal()" size="small" type="info"><span
                     class="iconfont el-icon-appeal"></span>{{
-                      notPubed.list[scope.$index].appealStatus ? "已申诉" : "申诉" }}</el-button>
+      notPubed.list[scope.$index].appealStatus ? "已申诉" : "申诉" }}</el-button>
               </div>
             </template>
           </el-table-column>
@@ -143,8 +144,8 @@
 
         <div class="row">
           <span class="notice"><span class="require">*</span>封面：</span>
-          <ImageUpload @setImgUrl="(f: Function) => { setCoverUrl = f }" :initImgUrl="video.coverUrl" :w="270" :h="151.88"
-            proportion="16:9" :uploadHandler="coverUploadHandler">
+          <ImageUpload @setImgUrl="(f: Function) => { setCoverUrl = f }" :initImgUrl="video.coverUrl" :w="270"
+            :h="151.88" proportion="16:9" :uploadHandler="coverUploadHandler">
           </ImageUpload>
         </div>
 
@@ -171,7 +172,8 @@
 
         <div class="row">
           <span class="notice">简介：</span>
-          <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="请输入简介" type="textarea" show-word-limit />
+          <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="请输入简介" type="textarea"
+            show-word-limit />
         </div>
 
         <div class="row">
@@ -181,6 +183,16 @@
             <div class="tip">
               <span>勾选后该文案会显示在视频播放页中</span>
               <span style="color: #FF6699;">若在修改时取消勾选该项，后续在编辑时将不能恢复勾选。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="notice">自动发布：</span>
+          <div>
+            <el-checkbox v-model="video.autoPublish" label="审批通过后自动发布" />
+            <div class="tip">
+              <span>若未勾选该项，则在审批通过后需要自行手动点击发布</span>
             </div>
           </div>
         </div>
@@ -203,7 +215,6 @@ import cmjs from '@/cmjs'
 import { Search } from '@element-plus/icons-vue'
 import { ElMessageBox, ElSelect, ElInput } from 'element-plus'
 import { useStore } from "@/store"
-import VideoDescriptions from "@/components/util/VideoDescriptions.vue"
 import ImageUpload from "@/components/common/ImageUpload.vue"
 import VideoUpload from "@/components/common/VideoUpload.vue"
 import TagInput from '@/components/common/TagInput.vue'
@@ -215,12 +226,13 @@ type Num = {
 }
 
 type Pubed = {
-  total: number,
+  total: number
   list: {
-    id: number,
-    coverUrl: string,
-    title: string,
+    id: number
+    coverUrl: string
+    title: string
     vid: number
+    isPublish: boolean
   }[]
 }
 
@@ -232,15 +244,6 @@ type IsPubing = {
     title: string,
     applyTime: number,
     vid?: number,
-    modifyInfo?: {
-      videoUrl?: string,
-      coverUrl?: string,
-      title?: string,
-      region?: string,
-      tags?: string[],
-      intro?: string,
-      empower?: boolean
-    }
   }[]
 }
 
@@ -265,7 +268,8 @@ type Video = {
   region: string,
   tags: string[],
   intro: string,
-  empower: boolean
+  empower: boolean,
+  autoPublish?: boolean
 }
 
 const store = useStore()
@@ -444,7 +448,7 @@ function deleteItem(idx: number) {
 
 function appeal() {
   if (notPubed.list[appealIdx.value].appealStatus) {
-    cmjs.prompt.info("你已申诉，请耐心等待！管理员会尽快处理的，请留意系统消息")
+    cmjs.prompt.info("请耐心等待，并留意系统消息")
     return
   }
 
@@ -460,7 +464,7 @@ function appeal() {
           id: notPubed.list[appealIdx.value].id,
         },
       })
-      cmjs.prompt.success("提交成功！管理员会尽快处理的，请留意系统消息")
+      cmjs.prompt.success("提交成功！请留意系统消息")
       notPubed.list[appealIdx.value].appealStatus = true
       closeWindow()
     },
@@ -471,7 +475,7 @@ function getVideo(id: number): Video {
   //TODO api（通过id和viewItem去请求后端获取数据）
   console.log(id, viewItem.value)
 
-  return {
+  const v: Video = {
     "videoUrl": "/resource/video/8.mp4",
     "coverUrl": "/resource/cover/8.jpeg",
     "title": "许嵩-雅俗共赏",
@@ -486,6 +490,11 @@ function getVideo(id: number): Video {
     "intro": "满纸荒唐中窥见满脸沧桑，触到神经就要懂得鼓掌。",
     "empower": true
   }
+  if (viewItem.value !== "pubed") {
+    v.autoPublish = false
+  }
+
+  return v
 }
 
 function setVideo(v: Video) {
@@ -496,6 +505,7 @@ function setVideo(v: Video) {
   video.tags = v.tags
   video.intro = v.intro
   video.empower = v.empower
+  video.autoPublish = v.autoPublish !== undefined ? v.autoPublish : true
 
   videoCopy.videoUrl = v.videoUrl
   videoCopy.coverUrl = v.coverUrl
@@ -504,8 +514,46 @@ function setVideo(v: Video) {
   videoCopy.tags = [...v.tags] //深拷贝
   videoCopy.intro = v.intro
   videoCopy.empower = v.empower
+  video.autoPublish = v.autoPublish !== undefined ? v.autoPublish : true
 
   editEmpowerDisabled.value = !video.empower
+}
+
+function publish(idx: number) {
+  ElMessageBox.confirm('你确认要发布该视频吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+  })
+    .then(() => {
+      //TODO api
+
+      pubed.list[idx].isPublish = true
+      cmjs.prompt.success('发布成功')
+    })
+}
+
+function cancelPublish(idx: number) {
+  ElMessageBox.confirm('你确认要下架该视频吗？下架后其他人将无法观看该视频，且正在观看的人将立刻被终止观看！注意：视频的相关数据<span style="color: red;">不会受到影响</span>。', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+    dangerouslyUseHTMLString: true,
+  })
+    .then(() => {
+      //TODO api
+
+      pubed.list[idx].isPublish = false
+      cmjs.prompt.success('下架成功')
+    })
 }
 
 function edit(idx: number) {
@@ -603,7 +651,7 @@ function submit() {
   }
 
   // TODO api
-  // TODO 若在pubed页则需删除该条数据并跳转到isPubing
+  // TODO 若在pubed页则需跳转到isPubing
   console.log(video)
 
   editWindowVisible.value = false
@@ -623,32 +671,18 @@ function cancelModify(idx: number) {
   })
     .then(() => {
       //TODO api
+
       if (viewItem.value === "isPubing") {
-        pubed.list.push({
-          id: isPubing.list[idx].id,
-          coverUrl: isPubing.list[idx].coverUrl,
-          title: isPubing.list[idx].title,
-          vid: isPubing.list[idx].vid as number
-        })
         isPubing.list.splice(idx, 1)
         isPubing.total--
         listNum.isPubingNum--
       } else if (viewItem.value === "notPubed") {
-        pubed.list.push({
-          id: notPubed.list[idx].id,
-          coverUrl: notPubed.list[idx].coverUrl,
-          title: notPubed.list[idx].title,
-          vid: notPubed.list[idx].vid as number
-        })
         notPubed.list.splice(idx, 1)
         notPubed.total--
         listNum.notPubedNum--
       }
 
-      pubed.total++
-      listNum.pubedNum++
-      viewItem.value = "pubed"
-      cmjs.prompt.success('取消修改成功')
+      cmjs.prompt.success('操作成功')
     })
 }
 
@@ -666,6 +700,7 @@ function pubedCellStyle(cell: any) {
   if (cell.columnIndex === 0 || cell.columnIndex === 1) {
     return { cursor: "pointer" }
   }
+
   return {}
 }
 
@@ -677,21 +712,11 @@ function isPubingCellClick(row: any, column: any) {
 }
 
 function isPubingCellStyle(cell: any) {
-  if (isPubing.list[cell.rowIndex].vid !== undefined) {
-    if (cell.columnIndex === 1 || cell.columnIndex === 2) {
-      return { cursor: "pointer" }
-    }
-  } else if (cell.columnIndex === 0) {
-    return { cursor: "not-allowed" }
+  if (isPubing.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
+    return { cursor: "pointer" }
   }
-  return {}
-}
 
-function isPubingCellClassName(cell: any) {
-  if (isPubing.list[cell.rowIndex].vid === undefined && cell.columnIndex === 0) {
-    return "no-vid"
-  }
-  return ""
+  return {}
 }
 
 function notPubedCellClick(row: any, column: any) {
@@ -740,6 +765,18 @@ function handleUrlQueryTab(): string {
 
 <style lang="less" scoped>
 .v-container {
+  cursor: default;
+
+  .oper {
+    display: flex;
+    flex-direction: column;
+
+    .el-button+.el-button {
+      margin-left: 0;
+      margin-top: 10px;
+    }
+  }
+
   .appealBtnT {
     cursor: not-allowed;
     background-color: #c8c9cc;
@@ -800,10 +837,6 @@ function handleUrlQueryTab(): string {
 
 .v-container .el-tabs__header {
   margin-bottom: 10px;
-}
-
-.v-container .no-vid .el-table__expand-icon {
-  pointer-events: none;
 }
 
 .v-container .el-table__expanded-cell {

@@ -18,6 +18,8 @@
         @mouseleave="coverMouseLeave" :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
       </Image>
 
+      <VipPriIco v-if="data.vip && !data.expire" :fs="cs.ufs" class="vc-vpi" v-show="!playStatus"></VipPriIco>
+
       <div v-if="!data.expire" v-show="!playStatus && !hoverInfoStatus" class="inner-info"
         :style="{ width: `${cs.w}px`, height: `${cs.ufs + 10}px`, lineHeight: `${cs.ufs + 10}px`, fontSize: `${cs.ufs}px`, justifyContent: innerInfoShow ? 'space-between' : 'right' }">
         <span v-if="innerInfoShow" style="margin-left: 5px;">
@@ -102,6 +104,7 @@
 
 <script setup lang="ts">
 import cmjs from '@/cmjs'
+import VipPriIco from '@/components/common/VipPriIco.vue'
 
 type CardSize = {
   w: number,
@@ -125,6 +128,7 @@ type VideoCardData = {
   date: number
   starDate?: number
   expire?: boolean // 视频已失效
+  vip: boolean
 }
 
 const props = withDefaults(defineProps<{
@@ -137,7 +141,6 @@ const props = withDefaults(defineProps<{
     name: string,
     cb: Function, // callback
   }[],
-
 }>(), {
   hoverStyle: undefined,
   innerInfo: undefined,
@@ -276,6 +279,12 @@ function watchLaterFc(vid: number) {
 <style lang="less" scoped>
 .video-card {
   position: relative;
+
+  .vc-vpi {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
 }
 
 .video-card .wli-container {

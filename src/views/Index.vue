@@ -68,6 +68,7 @@ type Video = {
   uid: number
   nickname: string
   date: number
+  vip: boolean
 }
 
 type Region = {

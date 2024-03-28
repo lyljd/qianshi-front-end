@@ -1,9 +1,9 @@
 <template>
-  <el-dialog v-model="mainWindowVisible" title="IP封禁" class="ipb" :close-on-click-modal="false"
+  <el-dialog v-model="mainWindowVisible" width="33%" title="IP封禁" class="ipb" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">
-      <el-card style="max-height: 50vh; overflow: auto;">
+      <el-card style="max-height: 33vh; overflow: auto;">
         <div v-if="data.length > 0" v-for="(_, idx) in data" class="row">
           <el-input :id="`ip-input-${idx}`" v-model="data[idx]" />
           <el-button v-blur @click="delItem(idx)" type="danger" tabindex="-1"><span
@@ -98,8 +98,10 @@ function save() {
     }
   }
 
-  //TODO api
-  console.log(data)
+  if (store.switchAsk) {
+    //TODO api
+    console.log(data)
+  }
 
   store.switchAsk = false
   closeMainWindow()

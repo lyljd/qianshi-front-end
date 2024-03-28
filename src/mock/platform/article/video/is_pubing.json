@@ -12,22 +12,7 @@
       "title": "雅俗共赏",
       "coverUrl": "/resource/cover/8.jpeg",
       "applyTime": 1698084000000,
-      "vid": 8,
-      "modifyInfo": {
-        "videoUrl": "/resource/video/8.mp4",
-        "coverUrl": "/resource/cover/8.jpeg",
-        "title": "许嵩-雅俗共赏",
-        "region": "music",
-        "tags": [
-          "许嵩",
-          "vae",
-          "青年晚报",
-          "雅俗共赏",
-          "音乐"
-        ],
-        "intro": "满纸荒唐中窥见满脸沧桑，触到神经就要懂得鼓掌。",
-        "empower": true
-      }
+      "vid": 8
     }
   ]
 }

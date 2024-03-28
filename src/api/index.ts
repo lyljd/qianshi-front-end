@@ -1,7 +1,6 @@
 import axios from "axios"
 import cmjs from '@/cmjs'
 import { useStore } from '@/store'
-import router from "@/router"
 
 const apiInstance = axios.create({
   timeout: 6000,

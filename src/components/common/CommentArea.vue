@@ -114,7 +114,7 @@ watch(curPage, newVal => {
 })
 
 onBeforeRouteUpdate((to, from, next) => {
-  notGetData.value = true // 重置为1会触发watch导致再次获取评论，这是不必要的
+  notGetData.value = true // 重置为1会触发watch导致再次获取评论，这是不必要的（因为在切视频后上层会获取第一页的评论，如果之前的视频评论区不在第一页，则会因为跳到第一页再次获取评论）
   curPage.value = 1 // 切集后评论区页数应该重置为1；子评论区通过:key规避了这个问题
   next()
 })
@@ -217,8 +217,9 @@ function deleteComment(cid: number) {
   for (let i = 0; i < props.data.length; i++) {
     if (props.data[i].cid === cid) {
       props.incrTotal(props.data[i].reply ? -(props.data[i].reply!.total + 1) : -1)
+      props.incrTotalTop(-1)
       props.data.splice(i, 1)
-      // TODO api：若还有评论，则向后端再请求一条评论补充进来
+      // TODO api
       return
     }
   }

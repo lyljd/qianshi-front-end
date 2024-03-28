@@ -144,7 +144,7 @@ function deleteChildComment(cid: number) {
       props.data.reply!.data.splice(i, 1)
       props.data.reply!.total--
       props.incrTotal(-1)
-      // TODO api：若还有评论，后端则会返回下一条评论，应补充进去
+      // TODO api
       return
     }
   }

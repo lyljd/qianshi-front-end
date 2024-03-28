@@ -51,6 +51,13 @@ function newTag() {
       inputRef.value!.focus()
       return
     }
+
+    if (val.includes(';')) {
+      cmjs.prompt.warning("Tag中不能包含\";\"")
+      inputRef.value!.focus()
+      return
+    }
+
     data.tags.push(val)
   }
   inputStatus.value = false

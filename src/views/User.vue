@@ -1,8 +1,7 @@
 <template>
   <div class="container">
     <div class="head">
-      <Image :url="`https://cdn.qianshi.fun/userhome-top-img/${user.topImgNo}.png${aks[user.topImgNo - 1]}`" :w="1140"
-        :h="180" errorText="头图加载失败" :errorTextFontSize="20"></Image>
+      <Image :url="topImgUrl" :w="1140" :h="180" errorText="头图加载失败" :errorTextFontSize="20"></Image>
 
       <div v-show="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
 
@@ -214,6 +213,7 @@ const aks: string[] = [
 ]
 
 let isMe = ref(cmjs.biz.verifyLoginUid(uid))
+let topImgUrl = ref("")
 let signature = ref(user.value.signature)
 let searchKey = ref("")
 let oldTopImgNo = ref(-1)
@@ -227,6 +227,7 @@ function getUser() {
         return
       }
       user.value = res.data
+      topImgUrl.value = `https://cdn.qianshi.fun/userhome-top-img/${user.value.topImgNo}.png${aks[user.value.topImgNo - 1]}`
       signature.value = user.value.signature
       document.title = user.value.nickname + "的个人空间 - 浅时"
     })

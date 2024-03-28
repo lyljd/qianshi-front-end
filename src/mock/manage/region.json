@@ -1,0 +1,22 @@
+[
+  {
+    "sort":1,
+    "name":"音乐",
+    "slag":"music"
+  },
+  {
+    "sort":2,
+    "name":"MMD",
+    "slag":"mmd"
+  },
+  {
+    "sort":3,
+    "name":"搞笑",
+    "slag":"funny"
+  },
+  {
+    "sort":4,
+    "name":"知识",
+    "slag":"knowledge"
+  }
+]

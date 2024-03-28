@@ -5,19 +5,22 @@
       "id": 1,
       "title": "晴天",
       "coverUrl": "/resource/cover/1.jpeg",
-      "vid": 1
+      "vid": 1,
+      "isPublish": false
     },
     {
       "id": 2,
       "title": "Paris",
       "coverUrl": "/resource/cover/4.jpeg",
-      "vid": 4
+      "vid": 4,
+      "isPublish": true
     },
     {
       "id": 3,
       "title": "Running In The Dark",
       "coverUrl": "/resource/cover/5.jpeg",
-      "vid": 5
+      "vid": 5,
+      "isPublish": true
     }
   ]
 }

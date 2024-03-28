@@ -94,6 +94,7 @@ type Video = {
   date: number
   starDate: number
   expire?: boolean // 视频已失效
+  vip: boolean
 }
 
 const route = useRoute()

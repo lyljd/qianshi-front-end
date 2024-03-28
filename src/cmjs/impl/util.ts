@@ -32,10 +32,23 @@ export default {
     return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i) !== null
   },
 
-  // isVisible 判断某元素是否处于页面可见区域内
+  // isVisible 判断某元素是否处于页面的可见区域内
   isVisible(ele: HTMLElement): boolean {
     const rect = ele.getBoundingClientRect()
     return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  },
+
+  // isVisibleInContainer 判断某元素是否处于某个容器（另一个元素）的可见区域内
+  isVisibleInContainer(ele: HTMLElement, container: HTMLElement) {
+    const eleRect = ele.getBoundingClientRect()
+    const containerRect = container.getBoundingClientRect()
+
+    return (
+      eleRect.top >= containerRect.top &&
+      eleRect.left >= containerRect.left &&
+      eleRect.bottom <= containerRect.bottom &&
+      eleRect.right <= containerRect.right
+    )
   },
 
   scrollTo(top: number, ele?: HTMLElement) {
@@ -53,13 +66,20 @@ export default {
     })
   },
 
-  // scrollIntoView 如果某元素不在页面可见区域内，则滚动页面到该元素可见的指定位置
+  // scrollIntoView 如果某元素不在页面的可见区域内，则滚动页面直至元素可见，并让元素出现在页面的pos位置处
   scrollIntoView(pos: 'start' | 'center' | 'end', ele: HTMLElement) {
     if (!this.isVisible(ele)) {
       ele.scrollIntoView({
         block: pos,
         behavior: "smooth",
       })
+    }
+  },
+
+  // scrollIntoViewInContainer 如果某元素不在某个容器（另一个元素）的可见区域内，则在该容器内滚动直至元素可见，offset为偏移量（在滚动后对位置进行上下调整）
+  scrollIntoViewInContainer(ele: HTMLElement, container: HTMLElement, offset?: number) {
+    if (!this.isVisibleInContainer(ele, container)) {
+      container.scrollTop = ele.offsetTop - container.offsetTop + (offset ? offset : 0)
     }
   },
 
