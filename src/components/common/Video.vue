@@ -1501,6 +1501,7 @@ function hidePreview() {
       padding: 10px;
       border-radius: 5px;
       font-size: 14px;
+      cursor: default;
     }
 
     #ps {

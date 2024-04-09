@@ -48,6 +48,11 @@
         <VipPriIco v-if="video.vip" :fs="14"></VipPriIco>
 
         <span class="item">
+          <span class="iconfont el-icon-region icon"></span>
+          <span>{{ video.region }}</span>
+        </span>
+
+        <span class="item">
           <span class="iconfont el-icon-bofangshu icon"></span>
           <span :title="video.playNum.toString()">{{ cmjs.fmt.numWE(video.playNum) }}</span>
         </span>
@@ -70,6 +75,11 @@
             <use xlink:href="#el-icon-jinzhi"></use>
           </svg>
           <span>未经作者授权，禁止转载</span>
+        </span>
+
+        <span class="item">
+          <span class="iconfont el-icon-ip icon"></span>
+          <span>{{ video.ipLocation }}</span>
         </span>
       </div>
 
@@ -134,7 +144,7 @@
       <transition name="danmu-list">
         <el-table v-if="showDanmuList" id="danmu-list" class="danmu-list" :data="video.danmu" size="small"
           empty-text="暂无弹幕" @cell-mouse-enter="danmuItemHoverEnter" @cell-mouse-leave="danmuItemHoverLeave">
-          <el-table-column prop="time" label="时间" width="65" sortable :formatter="danmuTimeFormatter" />
+          <el-table-column prop="time" label="时间" show-overflow-tooltip width="65" sortable :formatter="danmuTimeFormatter" />
           <el-table-column prop="content" label="弹幕内容" show-overflow-tooltip width="108" />
           <el-table-column prop="date" label="发送时间" show-overflow-tooltip width="97" sortable
             :formatter="danmuDateFormatter" />
@@ -207,12 +217,14 @@ import cache from '@/cmjs/impl/cache'
 import * as API from '@/api/user'
 
 type Video = {
-  vid: number,
+  vid: number
   title: string
+  region: string
   playNum: number
   date: number
   firstPublishAt: number
   empower: boolean
+  ipLocation: string
   likeNum: number
   coinNum: number
   starNum: number
@@ -355,7 +367,7 @@ let collectionActiveItemEle: HTMLLIElement
 let danmuListEle: HTMLElement
 let dmCtlEle: HTMLDivElement
 
-let video = ref<Video>({ vid: 0, title: "", playNum: 0, date: 0, firstPublishAt: 0, empower: false, likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
+let video = ref<Video>({ vid: 0, title: "", region: "", playNum: 0, date: 0, firstPublishAt: 0, empower: false, ipLocation: "", likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
 let init = ref(false) // 页面是否初始化完成；在onMounted执行完毕后则初始化完成
 let autoStreaming = ref(cache.getLS("autoStreaming") !== "false" ? true : false) // 自动连播
 let nextVid = ref(-1)

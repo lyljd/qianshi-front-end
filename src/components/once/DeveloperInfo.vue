@@ -17,7 +17,7 @@
       <span>Developed by <a class="link" href="https://github.com/lyljd" target="__blank">Bonnenult</a></span>
     </div>
 
-    <div>此网站仅供学习使用，侵权请联系：qianshi_fun#163.com(#换@)</div>
+    <div>此网站仅供学习使用，侵权请联系：admin@qianshi.fun</div>
   </div>
 </template>
 

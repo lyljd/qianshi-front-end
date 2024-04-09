@@ -1,43 +1,45 @@
 <template>
-  <div class="avatar-container">
-    <div class="left">
-      <Avatar v-model="avatarUrl" size="large"></Avatar>
-    </div>
-    <div class="right">
-      <div class="nickname">{{ meHome.nickname }}</div>
-      <div class="level-bar">
-        <span class="level">LV{{ meHome.level }}</span>
-        <el-progress :percentage="meHome.exp / reqExp * 100" stroke-width="20" color="#ff905a" :show-text="false" />
-        <div class="exp">{{ meHome.exp }} /<span style="color: #909399;">&nbsp;{{ reqExp }}</span></div>
+  <div v-loading="loading">
+    <div class="avatar-container">
+      <div class="left">
+        <Avatar v-model="avatarUrl" size="large"></Avatar>
+      </div>
+      <div class="right">
+        <div class="nickname">{{ meHome.nickname }}</div>
+        <div class="level-bar">
+          <span class="level">LV{{ meHome.level }}</span>
+          <el-progress :percentage="meHome.exp / reqExp * 100" stroke-width="20" color="#ff905a" :show-text="false" />
+          <div class="exp">{{ meHome.exp }} /<span style="color: #909399;">&nbsp;{{ reqExp }}</span></div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="req-exp-table">
-    <strong>升级所需经验表</strong>
-    <table border="1" cellspacing="0" style="margin-top: 5px;">
-      <tr>
-        <td style="color: #bfbfbf;">LV1</td>
-        <td style="color: #8bd29b;">LV2</td>
-        <td style="color: #7BCDEF;">LV3</td>
-        <td style="color: #FEBB8B;">LV4</td>
-        <td style="color: #EE672A;">LV5</td>
-        <td style="color: #F04C49;">LV6</td>
-      </tr>
-      <tr>
-        <td>0</td>
-        <td>350</td>
-        <td>1500</td>
-        <td>4500</td>
-        <td>9000</td>
-        <td>18000</td>
-      </tr>
-    </table>
-  </div>
-  <div class="notice">
-    <strong style="margin-bottom: 5px;">如何获得经验？</strong>
-    <div class="item">
-      <span class="iconfont el-icon-dian dian"></span>
-      每次给视频投币后增加10点经验（每日最多可获得50点）
+    <div class="req-exp-table">
+      <strong>升级所需经验表</strong>
+      <table border="1" cellspacing="0" style="margin-top: 5px;">
+        <tr>
+          <td style="color: #bfbfbf;">LV1</td>
+          <td style="color: #8bd29b;">LV2</td>
+          <td style="color: #7BCDEF;">LV3</td>
+          <td style="color: #FEBB8B;">LV4</td>
+          <td style="color: #EE672A;">LV5</td>
+          <td style="color: #F04C49;">LV6</td>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>350</td>
+          <td>1500</td>
+          <td>4500</td>
+          <td>9000</td>
+          <td>18000</td>
+        </tr>
+      </table>
+    </div>
+    <div class="notice">
+      <strong style="margin-bottom: 5px;">如何获得经验？</strong>
+      <div class="item">
+        <span class="iconfont el-icon-dian dian"></span>
+        每次给视频投币后增加10点经验（每日最多可获得50点）
+      </div>
     </div>
   </div>
 </template>
@@ -60,9 +62,11 @@ store.setMeCurTitle("首页")
 let meHome = ref<MeHome>({ nickname: "", exp: 0, level: 1 })
 let reqExp = ref(0)
 let avatarUrl = ref(cmjs.cache.getCookie('avatar'))
+let loading = ref(false)
 getMeHome()
 
 function getMeHome() {
+  loading.value = true
   API.meExp()
     .then((res) => {
       if (res.code !== 0) {
@@ -75,6 +79,9 @@ function getMeHome() {
     })
     .catch((err) => {
       cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      loading.value = false
     })
 }
 </script>

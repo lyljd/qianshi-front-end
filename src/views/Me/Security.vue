@@ -1,5 +1,5 @@
 <template>
-  <div class="sec-container">
+  <div v-loading="loading" class="sec-container">
     <div>
       <span>
         <svg class="icon-symbol" aria-hidden="true">
@@ -89,6 +89,7 @@ let emailConfirmBtn: HTMLButtonElement
 let ecbDis: disabledEleResp
 
 let meSecurity = ref<MeSecurity>({ isSetPassword: false, email: "******" })
+let loading = ref(false)
 getMeSecurity()
 
 let setPwdWindowVisible = ref(false)
@@ -103,6 +104,7 @@ let setEmailTimerId: number
 let newEmail = ref("")
 
 function getMeSecurity() {
+  loading.value = true
   API.meSecurity()
     .then((res) => {
       if (res.code !== 0) {
@@ -114,6 +116,9 @@ function getMeSecurity() {
     })
     .catch((err) => {
       cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      loading.value = false
     })
 }
 

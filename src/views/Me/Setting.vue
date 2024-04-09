@@ -1,5 +1,5 @@
 <template>
-  <div class="set-container">
+  <div v-loading="loading" class="set-container">
     <div>
       <span class="notice">&emsp;&emsp;昵称：</span>
       <input v-model="meSetting.nickname" id="nickname" class="nickname" @blur="showNNMDY">
@@ -60,6 +60,7 @@ const store = useStore()
 store.setMeCurTitle("我的信息")
 
 let meSetting = ref<MeSetting>({ nickname: "", signature: "", gender: "保密", birthday: "", tags: [] })
+let loading = ref(false)
 getMeInfo()
 
 const locale = zhCn
@@ -74,6 +75,7 @@ onMounted(() => {
 })
 
 function getMeInfo() {
+  loading.value = true
   API.meInfo()
     .then((res) => {
       if (res.code !== 0) {
@@ -89,6 +91,9 @@ function getMeInfo() {
     })
     .catch((err) => {
       cmjs.prompt.error(err)
+    })
+    .finally(()=>{
+      loading.value = false
     })
 }
 
@@ -111,7 +116,7 @@ function saveSetting() {
     cmjs.prompt.error("签名的长度最大为50")
     return
   }
-  
+
   if (!meSetting.value.birthday) {
     meSetting.value.birthday = ""
   }

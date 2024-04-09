@@ -21,13 +21,12 @@
       </div>
 
       <div class="row">
-        <span class="notice"><span class="require">*</span>分区：</span>
-        <el-select ref="regionSelect" v-model="video.region" placeholder="请选择分区">
-          <el-option label="番剧" value="anime" />
-          <el-option label="游戏" value="game" />
-          <el-option label="音乐" value="music" />
-          <el-option label="科技" value="tech" />
-          <el-option label="其它" value="other" />
+        <span class="notice">分区：</span>
+        <el-select @visible-change="selectShow" ref="regionSelect" v-model="video.region" placeholder="请选择分区">
+          <template #empty>
+            <div v-loading="loading">暂无分区</div>
+          </template>
+          <el-option v-for="r in store.regions" :label="r.name" :value="r.slug" />
         </el-select>
       </div>
 
@@ -64,7 +63,7 @@
 
       <div class="row" style="justify-content: center;">
         <el-button v-blur
-          :disabled="videoUploading || coverUploading || video.videoUrl === '' || video.coverUrl === '' || video.title === '' || video.region === ''"
+          :disabled="videoUploading || coverUploading || video.videoUrl === '' || video.coverUrl === '' || video.title === ''"
           @click="submit" type="primary" size="large">投稿</el-button>
       </div>
     </div>
@@ -109,6 +108,7 @@ let coverUploading = ref(false)
 let videoUploading = ref(false)
 let setCoverUrl: Function
 let setVideoUrl: Function
+let loading = ref(false)
 
 const unwatch = watch(video, () => {
   store.switchAsk = true
@@ -175,6 +175,14 @@ function submit() {
   store.switchAsk = false
   cmjs.prompt.success("投稿成功")
   cmjs.jump.push("../article/video?tab=isPubing")
+}
+
+async function selectShow() {
+  if (store.regions.length === 0) {
+    loading.value = true
+    await store.getRegions()
+    loading.value = false
+  }
 }
 </script>
 

@@ -1,7 +1,8 @@
 <template>
   <TopMenuImg id="top-menu-img" v-if="tpp === ''"></TopMenuImg>
 
-  <el-menu id="menu" class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
+  <el-menu id="menu" class="menu" @open="menuUnfold" mode="horizontal" :default-active=$route.path :ellipsis="false"
+    router="true">
     <div class="logo">
       <Image url="https://cdn.qianshi.fun/favicon.png?auth_key=1741881534-0-0-b53b6ef7f0d3c2756aa3f777d5ed8a8e" :w="40"
         :h="40"></Image>
@@ -9,13 +10,12 @@
 
     <el-menu-item v-blur index="/">首页</el-menu-item>
     <el-menu-item v-blur index="/hot">热门</el-menu-item>
-    <el-sub-menu>
+    <el-sub-menu index="/region" :popper-offset="-10">
       <template #title>分区</template>
-      <el-menu-item index="/region/anime">番剧</el-menu-item>
-      <el-menu-item index="/region/game">游戏</el-menu-item>
-      <el-menu-item index="/region/music">音乐</el-menu-item>
-      <el-menu-item index="/region/tech">科技</el-menu-item>
-      <el-menu-item index="/region/other">其它</el-menu-item>
+      <span v-loading="regionLoading" v-show="store.regions.length === 0" class="no-region">暂无分区</span>
+      <el-menu-item v-show="store.regions.length !== 0" v-for="r in store.regions" :index="`/region/${r.slug}`">{{
+    r.name
+  }}</el-menu-item>
     </el-sub-menu>
     <el-menu-item v-blur index="/read">专栏</el-menu-item>
     <el-menu-item v-blur index="/live">直播</el-menu-item>
@@ -52,43 +52,46 @@
     <LoginWindow ref="loginWindow"></LoginWindow>
 
     <div v-if="isLogin" class="after-login-menu">
-      <el-popover :width="250" ref="avatarPop" :show-arrow=false>
+      <el-popover @show="getMeAvatarHover" :width="250" ref="avatarPop" :show-arrow=false>
 
         <template #reference>
           <Avatar v-model="avatar" size="medium" :home="{ uid: ahi.id }">
           </Avatar>
         </template>
-        <el-button v-blur @click="signin" :type="!ahi.signinStatus ? 'success' : 'info'"
-          :style="{ cursor: !ahi.signinStatus ? 'pointer' : 'not-allowed' }" class="signin" size="small">签到</el-button>
-        <ul class="almul">
-          <div class="nickname">
-            <span @click="cmjs.jump.user(ahi.id)" class="nickname-span">{{ ahi.nickname }}</span>
-          </div>
-          <div class="tags">
-            <VipIco v-if="ahi.isVip" style="margin-right: 5px;"></VipIco>
-            <LevelIco :level="ahi.level"></LevelIco>
-          </div>
-          <div class="coin-row">
-            <span @click="cmjs.jump.new('/me/coin')">硬币:<span class="coin">{{ ahi.coin }}</span></span>
-          </div>
-          <div class="num-container">
-            <div class="num">
-              <div class="number" @click="cmjs.jump.follow(ahi.id)">{{ cmjs.fmt.numWE(ahi.followNum) }}</div>
-              <div class="text">关注</div>
+        <div v-loading="ahiLoading" style="position: relative;">
+          <el-button v-blur @click="signin" :type="!ahi.signinStatus ? 'success' : 'info'"
+            :style="{ cursor: !ahi.signinStatus ? 'pointer' : 'not-allowed' }" class="signin"
+            size="small">签到</el-button>
+          <ul class="almul">
+            <div class="nickname">
+              <span @click="cmjs.jump.user(ahi.id)" class="nickname-span">{{ ahi.nickname }}</span>
             </div>
-            <div class="num">
-              <div class="number" @click="cmjs.jump.fan(ahi.id)">{{ cmjs.fmt.numWE(ahi.fanNum) }}</div>
-              <div class="text">粉丝</div>
+            <div class="tags">
+              <VipIco v-if="ahi.isVip" style="margin-right: 5px;"></VipIco>
+              <LevelIco :level="ahi.level"></LevelIco>
             </div>
-            <div class="num">
-              <div class="number" @click="cmjs.jump.dynamic(ahi.id)">{{ cmjs.fmt.numWE(ahi.dynamicNum) }}</div>
-              <div class="text">动态</div>
+            <div class="coin-row">
+              <span @click="cmjs.jump.new('/me/coin')">硬币:<span class="coin">{{ ahi.coin }}</span></span>
             </div>
-          </div>
-          <li @click="cmjs.jump.new('/manage')" v-if="ahi.power > 0">后台管理</li>
-          <li @click="cmjs.jump.new('/me')">个人中心</li>
-          <li @click="logout">退出登录</li>
-        </ul>
+            <div class="num-container">
+              <div class="num">
+                <div class="number" @click="cmjs.jump.follow(ahi.id)">{{ cmjs.fmt.numWE(ahi.followNum) }}</div>
+                <div class="text">关注</div>
+              </div>
+              <div class="num">
+                <div class="number" @click="cmjs.jump.fan(ahi.id)">{{ cmjs.fmt.numWE(ahi.fanNum) }}</div>
+                <div class="text">粉丝</div>
+              </div>
+              <div class="num">
+                <div class="number" @click="cmjs.jump.dynamic(ahi.id)">{{ cmjs.fmt.numWE(ahi.dynamicNum) }}</div>
+                <div class="text">动态</div>
+              </div>
+            </div>
+            <li @click="cmjs.jump.new('/manage')" v-if="ahi.power > 0">后台管理</li>
+            <li @click="cmjs.jump.new('/me')">个人中心</li>
+            <li @click="logout">退出登录</li>
+          </ul>
+        </div>
       </el-popover>
 
       <div @click="cmjs.jump.new('/vip')" class="ico-btn">
@@ -97,7 +100,6 @@
       </div>
 
       <el-popover :show-arrow=false>
-
         <template #reference>
           <div class="ico-btn" style="margin-top: 1px;">
             <el-button v-blur circle><el-badge :value="newMessageNum" :max="99" :show-zero="false"><el-icon class="ico">
@@ -160,7 +162,8 @@ import cmjs from '@/cmjs'
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
-import * as API from '@/api/user'
+import * as UserAPI from '@/api/user'
+import * as VideoAPI from '@/api/video'
 
 type AvatarHoverInfo = {
   id: number,
@@ -179,6 +182,22 @@ const route = useRoute()
 const store = useStore()
 const { isLogin } = storeToRefs(store)
 store.openLoginWindow = openLoginWindow
+watch(() => store.isLogin, (newVal: boolean) => {
+  if (newVal) {
+    ahi.value = {
+      "id": -1,
+      "nickname": "",
+      "isVip": false,
+      "power": 0,
+      "level": 1,
+      "coin": 0,
+      "followNum": 0,
+      "fanNum": 0,
+      "dynamicNum": 0,
+      "signinStatus": true,
+    }
+  }
+})
 
 const loginWindow = ref<InstanceType<typeof LoginWindow>>()
 const loginPop = ref()
@@ -200,13 +219,12 @@ let ahi = ref<AvatarHoverInfo>({
   "dynamicNum": 0,
   "signinStatus": true,
 })
-if (store.isLogin) {
-  getMeAvatarHover()
-}
 let avatar = ref(cmjs.cache.getCookie('avatar'))
 let tpp = ref("不能为空") // topPath
 let newMessageNum = ref(0)
 let newDynamicNum = ref(0)
+let regionLoading = ref(false)
+let ahiLoading = ref(false)
 
 watch(() => route.path, (newPath) => {
   if (newPath === "/") {
@@ -276,7 +294,8 @@ function logout() {
 
 function getMeAvatarHover() {
   if (ahi.value.id === -1) {
-    API.MeAvatarHover()
+    ahiLoading.value = true
+    UserAPI.MeAvatarHover()
       .then((res) => {
         if (res.code !== 0) {
           cmjs.prompt.error(res.msg)
@@ -287,6 +306,9 @@ function getMeAvatarHover() {
       })
       .catch((err) => {
         cmjs.prompt.error(err)
+      })
+      .finally(() => {
+        ahiLoading.value = false
       })
   }
 }
@@ -320,6 +342,31 @@ store.setNewDynamicNum = setNewDynamicNum
 function setNewDynamicNum(num: number) {
   newDynamicNum.value = num
 }
+
+store.getRegions = getRegions
+async function getRegions() {
+  await VideoAPI.getRegions()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      store.regions = res.data
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+}
+
+function menuUnfold(index: string) {
+  if (index === "/region") {
+    if (store.regions.length === 0) {
+      regionLoading.value = true
+      getRegions()
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -340,6 +387,11 @@ function setNewDynamicNum(num: number) {
   top: 0px;
   z-index: 2000;
   /* z-index不能大于2000，否则会造成遮罩层内出现顶部菜单栏 */
+}
+
+.no-region {
+  cursor: default;
+  color: #909399;
 }
 
 .el-menu--horizontal>.el-menu-item.is-active,
@@ -440,7 +492,8 @@ function setNewDynamicNum(num: number) {
   position: absolute;
   width: 30px;
   height: 20px;
-  left: calc(100% - 40px);
+  right: 0;
+  top: 7px;
 }
 
 .almul {
@@ -571,6 +624,9 @@ function setNewDynamicNum(num: number) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: -1px !important;
+}
+
+.el-menu--popup {
+  padding: 0;
 }
 </style>

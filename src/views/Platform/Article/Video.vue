@@ -131,8 +131,8 @@
     </el-tabs>
   </div>
 
-  <el-dialog width="75%" v-model="editWindowVisible" class="edit-dialog" :before-close="beforeEditWindowClose"
-    title="视频编辑" align-center>
+  <el-dialog width="75%" @open="store.regions.length === 0 ? store.getRegions() : null" v-model="editWindowVisible"
+    class="edit-dialog" :before-close="beforeEditWindowClose" title="视频编辑" align-center>
     <div class="v-container">
       <div class="upload-form">
         <div class="row">
@@ -155,13 +155,12 @@
         </div>
 
         <div class="row">
-          <span class="notice"><span class="require">*</span>分区：</span>
+          <span class="notice">分区：</span>
           <el-select ref="regionSelect" v-model="video.region" placeholder="请选择分区">
-            <el-option label="番剧" value="anime" />
-            <el-option label="游戏" value="game" />
-            <el-option label="音乐" value="music" />
-            <el-option label="科技" value="tech" />
-            <el-option label="其它" value="other" />
+            <template #empty>
+              <div>暂无分区</div>
+            </template>
+            <el-option v-for="r in store.regions" :label="r.name" :value="r.slug" />
           </el-select>
         </div>
 

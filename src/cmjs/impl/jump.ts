@@ -20,7 +20,9 @@ export default {
   },
 
   user(uid: number) {
-    this.new(`/u/${uid}`)
+    if (uid > 0) {
+      this.new(`/u/${uid}`)
+    }
   },
 
   follow(uid: number) {
