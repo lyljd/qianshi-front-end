@@ -1,29 +1,35 @@
 <template>
   <div v-if="data.records.length > 0" class="rv-container">
-    <el-card v-for="(r, idx) in data.records">
-      <template #header>
-        <div class="header">
-          <span class="flex-center">作者：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
-          }}</span></span>
-          <span>申请时间：{{ cmjs.fmt.tsStandard(r.applyTime) }}</span>
-          <div class="flex-center">
-            <span>操作：{{ r.vid ? "修改" : "新发布" }}</span>
-            <el-button v-blur v-if="r.vid" @click="cmjs.jump.video(r.vid)" class="to-video" type="primary">原视频</el-button>
-          </div>
-          <div>
-            <el-button v-blur @click="pass(idx)" type="success">通过</el-button>
-            <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
-          </div>
-        </div>
-      </template>
-
-      <div class="body">
-        <VideoDescriptions class="vd" v-if="r.infoOld" title="原信息" :data="r.infoOld"></VideoDescriptions>
-
-        <VideoDescriptions :class="r.infoOld ? 'vd' : 'vdFull'" :title="r.infoOld ? '新信息' : ''" :data="r.info">
-        </VideoDescriptions>
+    <div v-for="(r, idx) in data.records" class="r-item">
+      <div v-if="now - r.applyTime <= 300000" class="tip" style="margin-top: 0; margin-bottom: 3px;">
+        <span style="color: red;">除非绝对信任该作者，否则请在申请时间过5分钟后再处理本条申请</span>
       </div>
-    </el-card>
+      <el-card>
+        <template #header>
+          <div class="header">
+            <span class="flex-center">作者：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
+                }}</span></span>
+            <span>申请时间：{{ cmjs.fmt.tsStandard(r.applyTime) }}</span>
+            <div class="flex-center">
+              <span>操作：{{ r.vid ? "修改" : "新发布" }}</span>
+              <el-button v-blur v-if="r.vid" @click="cmjs.jump.video(r.vid)" class="to-video"
+                type="primary">原视频</el-button>
+            </div>
+            <div>
+              <el-button v-blur @click="pass(idx)" type="success">通过</el-button>
+              <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
+            </div>
+          </div>
+        </template>
+
+        <div class="body">
+          <VideoDescriptions class="vd" v-if="r.infoOld" title="原信息" :data="r.infoOld"></VideoDescriptions>
+
+          <VideoDescriptions :class="r.infoOld ? 'vd' : 'vdFull'" :title="r.infoOld ? '新信息' : ''" :data="r.info">
+          </VideoDescriptions>
+        </div>
+      </el-card>
+    </div>
 
     <el-pagination :total="data.total" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
       hide-on-single-page background layout="prev, pager, next" />
@@ -65,6 +71,8 @@ type Data = {
 
 const store = useStore()
 store.setManegeItemIndex(1, location.pathname)
+
+const now = Date.now()
 
 let curPage = ref(1)
 let data = ref<Data>(getData())
@@ -115,7 +123,7 @@ function deny(formIdx: number) {
   cursor: default;
 }
 
-.rv-container>.el-card:not(:last-child) {
+.rv-container>.r-item:not(:last-child) {
   margin-bottom: 20px;
 }
 

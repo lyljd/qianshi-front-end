@@ -196,7 +196,6 @@ function listenChange() {
   })
 
   watch(textContent, newVal => {
-    cmjs.prompt.info("text change")
     const dcc = dataCopy.value.content as Text
     if (newVal.text !== dcc.text || newVal.fontSize !== dcc.fontSize || newVal.fontColor !== dcc.fontColor || newVal.bgColor !== dcc.bgColor) {
       tcChange.value = true

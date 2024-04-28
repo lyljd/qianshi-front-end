@@ -412,7 +412,7 @@ function menuUnfold(index: string) {
 }
 
 .el-menu-item:hover,
-.el-sub-menu:hover,
+.el-menu-item:focus,
 .el-sub-menu :deep(.el-sub-menu__title:hover) {
   background-color: transparent !important;
 }

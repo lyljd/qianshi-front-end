@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="left">
+    <div id="left-column" class="left">
       <div class="title"><span :title="video.title">{{ video.title }}</span></div>
 
       <div style="position: relative;">
@@ -101,7 +101,7 @@
     </div>
 
 
-    <div class="right">
+    <div id="right-column" class="right">
       <div class="avatar-container">
         <Avatar v-model="video.author.avatarUrl" size="medium" :home="{ uid: video.author.uid }"></Avatar>
 
@@ -144,7 +144,8 @@
       <transition name="danmu-list">
         <el-table v-if="showDanmuList" id="danmu-list" class="danmu-list" :data="video.danmu" size="small"
           empty-text="暂无弹幕" @cell-mouse-enter="danmuItemHoverEnter" @cell-mouse-leave="danmuItemHoverLeave">
-          <el-table-column prop="time" label="时间" show-overflow-tooltip width="65" sortable :formatter="danmuTimeFormatter" />
+          <el-table-column prop="time" label="时间" show-overflow-tooltip width="65" sortable
+            :formatter="danmuTimeFormatter" />
           <el-table-column prop="content" label="弹幕内容" show-overflow-tooltip width="108" />
           <el-table-column prop="date" label="发送时间" show-overflow-tooltip width="97" sortable
             :formatter="danmuDateFormatter" />
@@ -366,6 +367,8 @@ let collectionItemContainerEle: HTMLUListElement
 let collectionActiveItemEle: HTMLLIElement
 let danmuListEle: HTMLElement
 let dmCtlEle: HTMLDivElement
+let leftColumn: HTMLDivElement
+let rightColumn: HTMLDivElement
 
 let video = ref<Video>({ vid: 0, title: "", region: "", playNum: 0, date: 0, firstPublishAt: 0, empower: false, ipLocation: "", likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
 let init = ref(false) // 页面是否初始化完成；在onMounted执行完毕后则初始化完成
@@ -393,6 +396,22 @@ onMounted(() => {
   collectionItemContainerEle = document.getElementById("collection-item-container") as HTMLUListElement
   collectionActiveItemEle = document.getElementById("collectionActiveItem") as HTMLLIElement
   dmCtlEle = document.getElementById('dm-ctl') as HTMLDivElement
+  leftColumn = document.getElementById('left-column') as HTMLDivElement
+  rightColumn = document.getElementById('right-column') as HTMLDivElement
+
+  window.addEventListener('scroll', () => {
+    // 因为窗口的高度以及左右栏的高度随时可能发生变化，所以必须实时取值
+    const viewHeight = window.innerHeight
+    const leftColumnHeight = leftColumn.clientHeight
+    const rightColumnHeight = rightColumn.clientHeight
+
+    // 让左右栏某一栏滑到底时保持不动，直到另一栏也滑到底后才可继续滑动（20是离窗口底部的距离）
+    if (leftColumnHeight > rightColumnHeight) {
+      rightColumn.style.top = `${-rightColumnHeight + viewHeight - 20}px`
+    } else {
+      leftColumn.style.top = `${-leftColumnHeight + viewHeight - 20}px`
+    }
+  })
 
   calcNextVid()
   setIntroArea()
@@ -751,6 +770,8 @@ async function getPower() {
 
   .left {
     width: 850px;
+    height: 100%;
+    position: sticky; // 滑到底时保持不动的关键
 
     .title {
       font-size: 25px;
@@ -841,8 +862,9 @@ async function getPower() {
 
   .right {
     width: 270px;
+    height: 100%;
     margin-left: 20px;
-    position: relative;
+    position: sticky; // 滑到底时保持不动的关键
 
     .avatar-container {
       display: flex;

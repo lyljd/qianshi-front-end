@@ -1,4 +1,7 @@
 <template>
+  <div class="tip" style="margin-top: 0; margin-bottom: 3px;">
+        <span style="color: red;">除非绝对信任某用户，否则请在每条申请时间过5分钟后再处理此条申请</span>
+      </div>
   <el-table :data="data.records" empty-text="暂无待处理的头像" class="table" stripe border>
     <el-table-column label="用户" align="center">
       <template #default="scope">

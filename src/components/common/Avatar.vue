@@ -14,7 +14,7 @@ import cmjs from '@/cmjs'
 
 const data = defineProps<{
   modelValue: string,
-  size: "large" | "medium", // 60px | 40px
+  size: "large" | "medium" | 'small', // 60px | 40px | 30px
   upload?: {
     maxsize?: number, // 单位：MB；默认1MB
     handler: (file: File, succ: Function, fail: Function) => void,
@@ -118,6 +118,12 @@ function calcHash(file: File): string {
 .avatar-medium {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
+}
+
+.avatar-small {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
 }
 </style>

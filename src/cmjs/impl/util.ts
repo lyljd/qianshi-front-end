@@ -12,7 +12,7 @@ type disabledEleResp = {
 
 export default {
   browserAlert() {
-    if (cache.checkCookieExist('browserAlert')) {
+    if (this.isMobile() || cache.checkCookieExist('browserAlert')) {
       return
     }
 

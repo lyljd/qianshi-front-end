@@ -64,7 +64,6 @@ function sendEmail() {
   store.openCaptchaWindow((captchaId: string) => {
     chsDis.endCountDown(false)
     chsDis.disabled()
-    cmjs.prompt.info("发送验证码中，请稍等")
 
     let sendEmailOption = ""
     let sendEmail
@@ -90,12 +89,6 @@ function sendEmail() {
         if (res.code === 200) {
           cmjs.prompt.info("你在短时内验证过，验证码未发送，跳过邮箱验证")
           verifySuccDo(res.data.ttl)
-          return
-        }
-
-        if (res.data.ttl > 0) {
-          chsDis.countDown(res.data.ttl)
-          cmjs.prompt.info("你有未使用的验证码，请检查邮箱")
           return
         }
 

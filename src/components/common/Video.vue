@@ -125,9 +125,10 @@
                   </div>
                 </el-popover>
 
+                <!-- 该弹幕输入栏为全屏下的 -->
                 <div style="display: flex;">
                   <div class="danmu-input-container">
-                    <el-popover :append-to="vContainerEle" placement="top" :show-arrow="false"
+                    <el-popover popper-class="fs-pop-fs" :append-to="vContainerEle" placement="top" :show-arrow="false"
                       popper-style="min-width:unset; width: auto;">
                       <template #reference>
                         <span class="iconfont el-icon-font-set icon font-set-ico"></span>
@@ -135,7 +136,7 @@
 
                       <div class="ftsz-container">
                         <div class="option">
-                          颜色：<ColorPicker v-model="ftColor" :append-to="vContainerEle"></ColorPicker>
+                          颜色：<ColorPicker v-model="ftColor" :append-to="fsPopFs"></ColorPicker>
                         </div>
                       </div>
                     </el-popover>
@@ -316,8 +317,9 @@
 
       <div class="flex-grow" />
 
+      <!-- 该弹幕输入栏为非全屏下的 -->
       <div class="danmu-input-container">
-        <el-popover :append-to="vContainerEle" placement="top" :show-arrow="false"
+        <el-popover popper-class="fs-pop-nfs" :append-to="vContainerEle" placement="top" :show-arrow="false"
           popper-style="min-width:unset; width: auto;">
           <template #reference>
             <span class="iconfont el-icon-font-set icon font-set-ico"></span>
@@ -325,7 +327,7 @@
 
           <div class="ftsz-container">
             <div class="option">
-              颜色：<ColorPicker v-model="ftColor" :append-to="vContainerEle"></ColorPicker>
+              颜色：<ColorPicker v-model="ftColor" :append-to="fsPopNfs"></ColorPicker>
             </div>
           </div>
         </el-popover>
@@ -478,6 +480,8 @@ let collectionItemContainerEle: HTMLUListElement
 let collectionActiveItemEle: HTMLLIElement
 let psEle: HTMLDivElement // preview screen
 let psvEle: HTMLVideoElement // preview screen video
+let fsPopFs: HTMLElement // font set popover fullscreen
+let fsPopNfs: HTMLElement // font set popover not-fullscreen
 
 // hmb：hover-menu::before(菜单上下方的小三角)；css绑定变量
 let hmbTop = ref("")
@@ -561,6 +565,8 @@ onMounted(() => {
   collectionItemContainerEle = document.querySelector(".v-container .collection-item-container") as HTMLUListElement
   psEle = document.getElementById('ps') as HTMLDivElement
   psvEle = document.getElementById('psv') as HTMLVideoElement
+  fsPopFs = document.querySelector('.fs-pop-fs') as HTMLElement
+  fsPopNfs = document.querySelector('.fs-pop-nfs') as HTMLElement
 
   psEle.style.width = vContainerOriginWidth.value / 4 + 'px'
   psEle.style.height = vContainerOriginHeight.value / 4 + 'px'

@@ -1,11 +1,11 @@
 <template>
   <div :id="`comment-${data.cid}`" class="comment-container">
-    <Avatar v-model="data.avatarUrl" size="medium" :home="{ uid: data.uid }"></Avatar>
+    <Avatar v-model="data.avatarUrl" :size="data.isChild ? 'small' : 'medium'" :home="{ uid: data.uid }"></Avatar>
     <div class="right">
       <div class="main">
         <div class="user-info">
           <span :class="{ nicknameVip: data.isVip }" @click="cmjs.jump.user(data.uid)" class="nickname">{{ data.nickname
-          }}</span>
+            }}</span>
 
           <LevelIco :level="data.level" style="margin-left: 6px;"></LevelIco>
 
@@ -15,7 +15,7 @@
         </div>
 
         <div class="to" v-if="data.to !== undefined">回复 @<span @click="cmjs.jump.user(data.to.uid)" class="nickname">{{
-          data.to?.nickname }}</span>：</div>
+    data.to?.nickname }}</span>：</div>
 
         <textarea :id="`content-${data.cid}`" class="comment" rows="1" readonly>{{ data.content }}</textarea>
 
@@ -43,7 +43,7 @@
             <div class="extra-container">
               <div class="item" v-if="isUp && !props.data.isChild" @click="setTop"><span
                   :class="!data.isTop ? 'el-icon-zhiding' : 'el-icon-quxiaozhiding'" class="iconfont em-icon"></span>{{
-                    !data.isTop ? '置顶' : '取消置顶' }}</div>
+    !data.isTop ? '置顶' : '取消置顶' }}</div>
 
               <el-popconfirm @confirm="deleteComment(data.cid)" hide-icon
                 :title="!data.isChild ? '删除评论后，评论下所有回复都会被删除，是否继续?' : '你确认要删除该评论吗？'" confirm-button-text="确认"

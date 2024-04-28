@@ -2,8 +2,8 @@
   <ManageTopMenuBar title="统计" icon="statistic"></ManageTopMenuBar>
 
   <div class="ms-container">
-    <div class="tip">
-      <span style="margin-top: 0; margin-bottom: 3px;">数据截止时间：{{ cmjs.fmt.tsStandard(timestamp) }}</span>
+    <div class="tip" style="margin-top: 0; margin-bottom: 3px;">
+      <span>数据截止时间：{{ cmjs.fmt.tsStandard(timestamp) }}</span>
     </div>
 
     <el-card>

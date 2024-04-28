@@ -16,7 +16,7 @@
     </template>
 
     <div class="body">
-      <div class="video-send-area">
+      <div id="top-video-send-area" class="video-send-area">
         <textarea class="comment-input" v-model="VSAInput" placeholder="快来发表评论吧～"></textarea>
         <el-button v-blur class="comment-send" @click="send()" type="primary">发布</el-button>
       </div>
@@ -45,9 +45,22 @@
           <hr class="divide" v-if="idx !== props.data.length - 1">
         </div>
 
-        <el-pagination class="video-page" :total="props.totalTop" v-model:current-page="curPage" :default-page-size="10"
+        <el-pagination class="video-page" :total="totalTop" v-model:current-page="curPage" :default-page-size="10"
           background hide-on-single-page layout="prev, pager, next" />
       </div>
+
+      <transition leaveActiveClass="animate__animated animate__faster animate__fadeOut"
+        enterActiveClass="animate__animated animate__faster animate__fadeIn">
+        <el-affix position="bottom" :offset="0" v-show="bottomVideoSendAreaVisible" style="margin-top: 20px;">
+          <i class="bottom-video-send-area-box-shadow"></i>
+          <div class="bottom-video-send-area-box">
+            <div class="video-send-area">
+              <textarea class="comment-input" v-model="VSAInput" placeholder="快来发表评论吧～"></textarea>
+              <el-button v-blur class="comment-send" @click="send()" type="primary">发布</el-button>
+            </div>
+          </div>
+        </el-affix>
+      </transition>
     </div>
   </el-card>
 </template>
@@ -101,9 +114,14 @@ let props = defineProps<{
   incrTotalTop: (incr: number) => void
 }>()
 
+const sendBtnCDSecond = 15
+
+let topVideoSendArea: HTMLDivElement
+
 let curPage = ref(1)
 let notGetData = ref(false)
 let sortBy = ref("hot")
+let bottomVideoSendAreaVisible = ref(false)
 
 watch(curPage, newVal => {
   if (!notGetData.value) {
@@ -117,6 +135,14 @@ onBeforeRouteUpdate((to, from, next) => {
   notGetData.value = true // 重置为1会触发watch导致再次获取评论，这是不必要的（因为在切视频后上层会获取第一页的评论，如果之前的视频评论区不在第一页，则会因为跳到第一页再次获取评论）
   curPage.value = 1 // 切集后评论区页数应该重置为1；子评论区通过:key规避了这个问题
   next()
+})
+
+onMounted(() => {
+  topVideoSendArea = document.getElementById('top-video-send-area') as HTMLDivElement
+
+  window.addEventListener('scroll', () => {
+    bottomVideoSendAreaVisible.value = !cmjs.util.isVisible(topVideoSendArea) && document.documentElement.scrollTop > topVideoSendArea.clientHeight + topVideoSendArea.offsetTop + 20
+  })
 })
 
 watch(sortBy, newVal => {
@@ -160,7 +186,7 @@ function send() {
   }
 
   sendBtns.forEach((ele) => {
-    cmjs.util.btnCD(ele, 5)
+    cmjs.util.btnCD(ele, sendBtnCDSecond)
   })
 
   // TODO api
@@ -191,8 +217,8 @@ function send() {
   // 由于刚才新插入了一个元素，所以会导致该页最后一条评论的发布按钮未被禁止
   setTimeout(() => {
     sendBtns = document.querySelectorAll(".comment-send") as NodeListOf<HTMLButtonElement>
-    let lastSendBtn = sendBtns[sendBtns.length - 1]
-    cmjs.util.btnCD(lastSendBtn, 5)
+    let lastSendBtn = sendBtns[sendBtns.length - 2] // 最后一个发布按钮是底部顶级发送框的
+    cmjs.util.btnCD(lastSendBtn, sendBtnCDSecond)
   }, 0);
 
   VSAInput.value = ""
@@ -243,7 +269,7 @@ function childSend() {
   }
 
   sendBtns.forEach((ele) => {
-    cmjs.util.btnCD(ele, 5)
+    cmjs.util.btnCD(ele, sendBtnCDSecond)
   })
 
   //TODO api
@@ -373,6 +399,7 @@ function viewMore(c: Comment, page: number) {
   .body {
     .video-send-area {
       display: flex;
+      width: 100%;
     }
 
     .comment-input {
@@ -444,6 +471,27 @@ function viewMore(c: Comment, page: number) {
         display: flex;
         justify-content: center;
       }
+    }
+
+    .bottom-video-send-area-box-shadow {
+      position: absolute;
+      top: -20px;
+      z-index: 1;
+      width: 100%;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #00000014;
+      filter: blur(10px);
+    }
+
+    .bottom-video-send-area-box {
+      width: 100%;
+      height: 107px;
+      display: flex;
+      align-items: center;
+      background-color: white;
+      border-top: 1px solid rgb(222, 223, 224);
+      margin-bottom: -20px;
     }
   }
 }

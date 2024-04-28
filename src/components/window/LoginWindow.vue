@@ -138,19 +138,12 @@ function openCaptchaWindow() {
   store.openCaptchaWindow((captchaId: string) => {
     gcbDis.endCountDown(false)
     gcbDis.disabled()
-    cmjs.prompt.info("发送验证码中，请稍等")
 
     VCodeAPI.login(email.value, captchaId)
       .then((res) => {
         gcbDis.cancelDisabled()
         if (res.code !== 0) {
           cmjs.prompt.error("验证码发送失败")
-          return
-        }
-
-        if (res.data.ttl > 0) {
-          gcbDis.countDown(res.data.ttl, checkEmailValid)
-          cmjs.prompt.info("你有未使用的验证码，请检查邮箱")
           return
         }
 
