@@ -2,10 +2,30 @@
   <div class="lw-container">
     <el-dialog @close="beforeClose" v-model="dialogVisible" :width="480" :close-on-press-escape=false
       :close-on-click-modal=false :align-center=true>
-      <el-tabs @tab-change="tabChange" v-model="option">
+      <el-tabs v-model="option">
+        <el-tab-pane name="password">
+          <template #label>
+            <span :style="{ cursor: option === 'password' ? 'not-allowed' : 'pointer' }">密码登录</span>
+          </template>
+          <div class="input-box">
+            <div class="row">
+              <span class="tag">邮箱</span>
+              <el-input class="input" v-model="email" placeholder="请输入邮箱" />
+            </div>
+            <div class="row">
+              <span class="tag">密码</span>
+              <el-input :autocomplete="autocomplete" @keyup.enter.native="login" class="input" maxlength="20" type="password" show-password
+                v-model="password" placeholder="请输入密码" />
+            </div>
+          </div>
+          <div class="tip" style="text-align: center;">
+            <span>首次登录请使用【验证码登录】</span>
+          </div>
+        </el-tab-pane>
+
         <el-tab-pane name="vcode">
           <template #label>
-            <span :style="{ cursor: option === 'vcode' ? 'not-allowed' : 'pointer' }">邮箱登录/注册</span>
+            <span :style="{ cursor: option === 'vcode' ? 'not-allowed' : 'pointer' }">验证码登录</span>
           </template>
           <div class="input-box">
             <div class="row">
@@ -19,31 +39,15 @@
               <el-input @keyup.enter.native="login" class="input" maxlength="6" v-model="vcode" placeholder="请输入验证码" />
             </div>
           </div>
-        </el-tab-pane>
-
-        <el-tab-pane name="password">
-
-          <template #label>
-            <span :style="{ cursor: option === 'password' ? 'not-allowed' : 'pointer' }">密码登录</span>
-          </template>
-          <div class="input-box">
-            <div class="row">
-              <span class="tag">邮箱</span>
-              <el-input class="input" v-model="email" placeholder="请输入邮箱" />
-            </div>
-            <div class="row">
-              <span class="tag">密码</span>
-              <el-input @keyup.enter.native="login" class="input" maxlength="20" type="password" show-password
-                v-model="password" placeholder="请输入密码" />
-            </div>
+          <div class="tip" style="text-align: center;">
+            <span>当您首次登录成功后，将自动为您注册账号。</span>
           </div>
         </el-tab-pane>
       </el-tabs>
 
       <template #footer>
-        <el-button v-blur @click="login" :disabled="!loginBtnCheck()" class="btn" id="login-btn" type="primary">{{
-      btnText
-          }}</el-button>
+        <el-button v-blur @click="login" :disabled="!loginBtnCheck()" class="btn" id="login-btn"
+          type="primary">登录</el-button>
       </template>
     </el-dialog>
   </div>
@@ -87,40 +91,40 @@ let loginBtn: HTMLButtonElement
 let lbDis: disabledEleResp
 
 let dialogVisible = ref(false)
-let option = ref("vcode")
-let btnText = ref("登录/注册")
+let option = ref("")
 let email = ref("")
 let vcode = ref("")
 let password = ref("")
+let autocomplete = ref("")
 
-function show(tip?: string) {
-  dialogVisible.value = true
-
-  if (tip === undefined) {
-    tip = "请登录后再操作"
+function show(cfg?: { tip?: string, option?: 'password' | 'vcode' }) {
+  if (!cfg) {
+    cfg = {}
   }
-  tip = tip.trim()
-  if (tip.length > 0) {
-    cmjs.prompt.info(tip)
+
+  if (cfg.tip === undefined) {
+    cfg.tip = "请登录后再操作"
+  }
+  cfg.tip = cfg.tip.trim()
+
+  if (!cfg.option) {
+    cfg.option = 'password'
+  }
+  if (cfg.option !== 'password') {
+    autocomplete.value = 'new-password'
+  }
+
+  option.value = cfg.option
+  dialogVisible.value = true
+  if (cfg.tip.length > 0) {
+    cmjs.prompt.info(cfg.tip)
   }
 }
 
 function beforeClose() {
   vcode.value = ""
-  password.value = ""
-}
-
-function tabChange(newTabName: string) {
-  switch (newTabName) {
-    case "vcode": {
-      btnText.value = "登录/注册"
-      break
-    }
-    case "password": {
-      btnText.value = "登录"
-      break
-    }
-  }
+  // 清除密码会导致关闭再打开窗口时浏览器的密码自动填充失效
+  // password.value = ""
 }
 
 function openCaptchaWindow() {
@@ -162,13 +166,13 @@ function checkEmailValid(): boolean {
   return emailRegex.test(email.value)
 }
 
+function checkPasswordValid(): boolean {
+  return password.value.length >= 6 && password.value.length <= 20
+}
+
 function checkVcodeValid(): boolean {
   const vcodeRegex = /^[0-9A-Za-z]{6}$/
   return vcodeRegex.test(vcode.value)
-}
-
-function checkPasswordValid(): boolean {
-  return password.value.length >= 6 && password.value.length <= 20
 }
 
 function getCaptchaBtnCheck(): boolean {
@@ -185,11 +189,11 @@ function loginBtnCheck(): boolean {
   }
 
   switch (option.value) {
-    case "vcode": {
-      return checkEmailValid() && checkVcodeValid()
-    }
     case "password": {
       return checkEmailValid() && checkPasswordValid()
+    }
+    case "vcode": {
+      return checkEmailValid() && checkVcodeValid()
     }
   }
 
@@ -209,8 +213,8 @@ function login() {
   lbDis.disabled()
 
   switch (option.value) {
-    case "vcode": {
-      UserAPI.emailLogin(email.value, vcode.value)
+    case "password": {
+      UserAPI.passLogin(email.value, password.value)
         .then((res) => {
           lbDis.cancelDisabled()
           lbDis.countDown(3, loginBtnCheck)
@@ -229,8 +233,8 @@ function login() {
         })
       break
     }
-    case "password": {
-      UserAPI.passLogin(email.value, password.value)
+    case "vcode": {
+      UserAPI.emailLogin(email.value, vcode.value)
         .then((res) => {
           lbDis.cancelDisabled()
           lbDis.countDown(3, loginBtnCheck)

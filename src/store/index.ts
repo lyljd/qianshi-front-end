@@ -42,7 +42,7 @@ export const useStore = defineStore("qianshi", {
   }),
 
   actions: {
-    openLoginWindow: (tip?: string) => { },
+    openLoginWindow: (cfg?: { tip?: string, option?: 'password' | 'vcode' }) => { },
     setTopMenuBarAvatar: (avatarUrl: string) => { },
     openCaptchaWindow: (afterSuccDo: Function) => { },
     openEVWindow: (email: string, option: "pass" | "email-1" | "email-2", afterSuccDo: Function) => { },
@@ -59,6 +59,6 @@ export const useStore = defineStore("qianshi", {
     setUserMenuFavlistNum: (newNum: number) => { },
     setNewMessageNum: (num: number) => { },
     setNewDynamicNum: (num: number) => { },
-    getRegions: () => {},
+    getRegions: () => { },
   }
 })

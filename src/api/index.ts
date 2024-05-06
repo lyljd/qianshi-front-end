@@ -53,7 +53,7 @@ function handleLogout() {
   store.isLogin = false
   cmjs.biz.clearLoginInfo()
   cmjs.jump.error(401)
-  store.openLoginWindow("")
+  store.openLoginWindow({ tip: "" })
 }
 
 

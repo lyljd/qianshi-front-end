@@ -87,7 +87,7 @@ function sendEmail() {
         }
 
         if (res.code === 200) {
-          cmjs.prompt.info("你在短时内验证过，验证码未发送，跳过邮箱验证")
+          cmjs.prompt.info("跳过邮箱验证")
           verifySuccDo(res.data.ttl)
           return
         }

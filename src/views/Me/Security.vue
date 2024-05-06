@@ -32,8 +32,8 @@
 
   <el-dialog :width="400" v-model="setPwdWindowVisible" :title="meSecurity.isSetPassword ? '修改密码' : '设置密码'"
     :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false" align-center>
-    <el-input v-model="newPwd" placeholder="请输入新密码(6~20位)" type="password" show-password style="margin-bottom: 10px;" />
-    <el-input v-model="newPwdConfirm" placeholder="请再次输入新密码" type="password" show-password />
+    <el-input autocomplete="new-password" v-model="newPwd" placeholder="请输入新密码(6~20位)" type="password" show-password style="margin-bottom: 10px;" />
+    <el-input autocomplete="new-password" v-model="newPwdConfirm" placeholder="请再次输入新密码" type="password" show-password />
     <div class="tip" style="margin-top: 8px;">
       <span v-if="setPwdTtl > 0">请在{{ setPwdTtl }}秒内完成操作</span>
       <span v-else style="color: #F56C6C;">操作已过期，请重新验证！</span>

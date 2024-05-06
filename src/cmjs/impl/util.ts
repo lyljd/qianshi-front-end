@@ -309,5 +309,5 @@ export default {
     } else {
       return prefix.substring(0, 2) + "**" + prefix.substring(l - 2) + suffix
     }
-  }
+  },
 }

@@ -3,13 +3,13 @@
     <div class="head">
       <Image :url="topImgUrl" :w="1140" :h="180" errorText="头图加载失败" :errorTextFontSize="20"></Image>
 
-      <div v-show="isMe" @click="replaceTopImg" class="replace-top-img">更换头图</div>
+      <div v-show="isMe" @click="openReplaceTopImgDrawer" class="replace-top-img">更换头图</div>
 
       <el-drawer v-model="replaceTopImgDrawerShow" title="头图" :direction="'btt'" :modal="false" :show-close="false"
         size="auto">
         <template #default>
           <div class="top-img-selecter">
-            <Image v-for="(ti, idx) in topImgs" :url="ti" @click="user.topImgNo = idx + 1"
+            <Image v-for="(ti, idx) in topImgs" :url="ti" @click="selectTopImg(ti, idx + 1)"
               :style="{ cursor: user.topImgNo === idx + 1 ? 'not-allowed' : 'pointer' }" class="top-img-select-item"
               errorText="头图加载失败"></Image>
           </div>
@@ -216,6 +216,7 @@ let isMe = ref(cmjs.biz.verifyLoginUid(uid))
 let topImgUrl = ref("")
 let signature = ref(user.value.signature)
 let searchKey = ref("")
+let oldTopImgUrl = ref("")
 let oldTopImgNo = ref(-1)
 let replaceTopImgDrawerShow = ref(false)
 
@@ -270,13 +271,20 @@ function saveSignature() {
   }
 }
 
-function replaceTopImg() {
+function openReplaceTopImgDrawer() {
   replaceTopImgDrawerShow.value = true
+  oldTopImgUrl.value = topImgUrl.value
   oldTopImgNo.value = user.value.topImgNo
+}
+
+function selectTopImg(url: string, no: number) {
+  topImgUrl.value = url
+  user.value.topImgNo = no
 }
 
 function cancelTopImg() {
   replaceTopImgDrawerShow.value = false
+  topImgUrl.value = oldTopImgUrl.value
   user.value.topImgNo = oldTopImgNo.value
 }
 

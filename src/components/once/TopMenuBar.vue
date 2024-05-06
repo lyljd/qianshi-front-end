@@ -37,15 +37,17 @@
     <el-popover ref="loginPop" :width="400">
 
       <template #reference>
-        <div @click="openLoginWindow('')" v-if="!isLogin" class="login-btn">登录</div>
+        <div @click="openLoginWindow({ tip: '' })" v-if="!isLogin" class="login-btn">登录</div>
       </template>
       <div class="before-login-pop">
         <div class="info1">登录后你可以：</div>
         <div class="good">免费看高清视频</div>
         <div class="good">同步播放记录</div>
         <div class="good">发表弹幕/评论</div>
-        <el-button v-blur @click="openLoginWindow('')" class="pop-login-btn" type="primary">立即登录</el-button>
-        <div class="info2">首次使用？<span @click="openLoginWindow('')" class="register-span">点我注册</span></div>
+        <el-button v-blur @click="openLoginWindow({ tip: '' })" class="pop-login-btn" type="primary">立即登录</el-button>
+        <div class="info2">首次使用？<span @click="openLoginWindow({ tip: '', option: 'vcode' })"
+            class="register-span">点我注册</span>
+        </div>
       </div>
     </el-popover>
 
@@ -278,9 +280,9 @@ function scrollListenerHandler() {
   menu.style.marginLeft = -document.documentElement.scrollLeft.toString() + "px"
 }
 
-function openLoginWindow(tip?: string) {
+function openLoginWindow(cfg?: { tip?: string, option?: 'password' | 'vcode' }) {
   loginPop.value.hide()
-  loginWindow.value?.show(tip)
+  loginWindow.value?.show(cfg)
 }
 
 function logout() {

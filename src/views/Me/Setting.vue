@@ -47,6 +47,7 @@ import TagInput from '@/components/common/TagInput.vue'
 import { useStore } from "@/store"
 import cmjs from '@/cmjs'
 import * as API from '@/api/user'
+import _ from 'lodash'
 
 type MeSetting = {
   nickname: string
@@ -60,6 +61,7 @@ const store = useStore()
 store.setMeCurTitle("我的信息")
 
 let meSetting = ref<MeSetting>({ nickname: "", signature: "", gender: "保密", birthday: "", tags: [] })
+let meSettingCopy = ref<MeSetting>({ nickname: "", signature: "", gender: "保密", birthday: "", tags: [] })
 let loading = ref(false)
 getMeInfo()
 
@@ -87,12 +89,21 @@ function getMeInfo() {
         res.data.tags = []
       }
       meSetting.value = res.data
+      meSettingCopy.value = _.cloneDeep(res.data)
       oldNickname.value = meSetting.value.nickname
+
+      watch(meSetting.value, newVal => {
+        if (!_.isEqual(newVal, meSettingCopy.value)) {
+          store.switchAsk = true
+        } else {
+          store.switchAsk = false
+        }
+      })
     })
     .catch((err) => {
       cmjs.prompt.error(err)
     })
-    .finally(()=>{
+    .finally(() => {
       loading.value = false
     })
 }
