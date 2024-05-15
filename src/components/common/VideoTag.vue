@@ -1,5 +1,5 @@
 <template>
-  <div class="vt-container">
+  <div v-if="tags" class="vt-container">
     <div id="tag-row" class="tag-row">
       <el-tag class="tag" v-for="(tag) in tags" type="info" round>{{ tag }}</el-tag>
     </div>

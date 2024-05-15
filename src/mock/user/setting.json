@@ -2,5 +2,6 @@
   "openStar": true,
   "openCoin": true,
   "openLike": true,
-  "openFan": false
+  "openFollow": true,
+  "openFan": true
 }

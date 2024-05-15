@@ -2,14 +2,14 @@
   <div v-loading="loading" class="set-container">
     <div>
       <span class="notice">&emsp;&emsp;昵称：</span>
-      <input v-model="meSetting.nickname" id="nickname" class="nickname" @blur="showNNMDY">
+      <input v-model="meSetting.nickname" id="nickname" class="nickname" @blur="showNNMDY" :maxlength="20">
       <span v-show="nnmdy" class="iconfont el-icon-info nnmdy">已修改</span>
       <span class="info">注：修改一次昵称需要消耗5个硬币</span>
     </div>
 
     <div>
       <span class="notice">我的签名：</span>
-      <input v-model="meSetting.signature" class="signature">
+      <input v-model="meSetting.signature" class="signature" :maxlength="50">
     </div>
 
     <div>
@@ -132,19 +132,24 @@ function saveSetting() {
     meSetting.value.birthday = ""
   }
 
-  API.meInfoUpdate(meSetting.value)
-    .then((res) => {
-      if (res.code !== 0) {
-        cmjs.prompt.error(res.msg)
-        return
-      }
+  if (store.switchAsk) {
+    API.meInfoUpdate(meSetting.value)
+      .then((res) => {
+        if (res.code !== 0) {
+          cmjs.prompt.error(res.msg)
+          return
+        }
 
-      nnmdy.value = false
-      cmjs.prompt.success("保存成功")
-    })
-    .catch((err) => {
-      cmjs.prompt.error(err)
-    })
+        nnmdy.value = false
+        store.switchAsk = false
+        cmjs.prompt.success("保存成功")
+      })
+      .catch((err) => {
+        cmjs.prompt.error(err)
+      })
+  } else {
+    cmjs.prompt.success("保存成功") // 没修改内容就不发起请求；安慰剂按钮
+  }
 
   cmjs.util.btnCD(saveSettingBtn, 5)
 }

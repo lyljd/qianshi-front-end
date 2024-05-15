@@ -78,6 +78,7 @@ import LevelIco from '@/components/common/LevelIco.vue'
 import cmjs from '@/cmjs'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
+import { UploadUserFile } from 'element-plus'
 
 type Comment = {
   cid: number
@@ -207,7 +208,7 @@ function report() {
   store.openFSWindow({
     title: "评论举报",
     placeholder: "请输入举报理由",
-    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+    submitHandler: (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => {
       // TODO api
       console.log({
         "msg": msg,

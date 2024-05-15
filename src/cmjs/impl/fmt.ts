@@ -1,4 +1,5 @@
 // fmt.ts 将数据格式化
+// 由于js的时间戳相较于绝大多数后端而言都要多3个0，所以在tsRich和tsTmpl处理时会将时间戳*1000
 
 import util from "./util"
 
@@ -6,6 +7,7 @@ import util from "./util"
 // 富日期：刚刚、x秒前、x分钟前、x小时前
 // *使用该函数时需确保时间戳是今天
 function tsRich(ts: number): string {
+  ts *= 1000
   // diff 时间戳相减后再除以1000，可得到时间相差多少秒
   const diff = Math.floor((Date.now() - ts) / 1000)
 
@@ -29,6 +31,7 @@ function tsRich(ts: number): string {
 export default {
   // tsTmpl 将时间戳转换为指定格式的日期
   tsTmpl(timestamp: number, template: string): string {
+    timestamp *= 1000
     const date = new Date(timestamp)
 
     const year = date.getFullYear().toString()

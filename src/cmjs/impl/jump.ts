@@ -25,11 +25,19 @@ export default {
     }
   },
 
-  follow(uid: number) {
+  follow(uid: number, noJump?:boolean) {
+    if (noJump) {
+      this.push(`/u/${uid}/follow`)
+      return
+    }
     this.new(`/u/${uid}/follow`)
   },
 
-  fan(uid: number) {
+  fan(uid: number, noJump?:boolean) {
+    if (noJump) {
+      this.push(`/u/${uid}/fan`)
+      return
+    }
     this.new(`/u/${uid}/fan`)
   },
 

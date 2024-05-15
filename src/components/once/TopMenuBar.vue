@@ -320,11 +320,21 @@ function signin() {
     cmjs.prompt.info("今日已签到，请明日再来")
     return
   }
-  // TODO api
-  // 后端会返回一个签到后的level，需赋值到原level中；如果新的level变大了，则提示用户已升级
-  ahi.value.signinStatus = true
-  ahi.value.coin += 5
-  cmjs.prompt.success("签到成功")
+
+  UserAPI.SignIn()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      ahi.value.signinStatus = true
+      ahi.value.coin += 5
+      cmjs.prompt.success("签到成功")
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
 }
 
 function toSearch() {

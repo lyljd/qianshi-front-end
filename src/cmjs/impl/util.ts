@@ -310,4 +310,15 @@ export default {
       return prefix.substring(0, 2) + "**" + prefix.substring(l - 2) + suffix
     }
   },
+
+  // 获取的时间戳是后端所需要的格式；BE:back-end
+  getCurBETimestamp(): number {
+    return Math.trunc(Date.now() / 1000)
+  },
+
+  // 获取文件后缀名（不带.）
+  getFileSuffix(fileName: string): string {
+    let idx = fileName.lastIndexOf(".")
+    return fileName.substring(idx + 1)
+  },
 }

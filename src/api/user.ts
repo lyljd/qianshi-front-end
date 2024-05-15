@@ -40,6 +40,18 @@ const MeTopImgNo = (topImgNo: number) => apiInstance.put('/api/v1/user/me/top-im
 
 const MeAvatarHover = () => apiInstance.get('/api/v1/user/me/avatar-hover').then(res => res.data)
 
+const SignIn = () => apiInstance.post('/api/v1/user/sign-in').then(res => res.data)
+
+const IsSignIn = () => apiInstance.get('/api/v1/user/sign-in').then(res => res.data)
+
+const Follow = (followingId: number) => apiInstance.post(`/api/v1/user/follow/${followingId}`).then(res => res.data)
+
+const CancelFollow = (followingId: number) => apiInstance.delete(`/api/v1/user/follow/${followingId}`).then(res => res.data)
+
+const GetFollows = (uid: number, page: number, timestamp: number) => apiInstance.post('/api/v1/user/follows', { id: uid, page: page, timestamp: timestamp }).then(res => res.data)
+
+const GetFans = (uid: number, page: number, timestamp: number) => apiInstance.post('/api/v1/user/fans', { id: uid, page: page, timestamp: timestamp }).then(res => res.data)
+
 export {
   emailLogin,
   passLogin,
@@ -57,4 +69,10 @@ export {
   MeSignature,
   MeTopImgNo,
   MeAvatarHover,
+  SignIn,
+  IsSignIn,
+  Follow,
+  CancelFollow,
+  GetFollows,
+  GetFans,
 }

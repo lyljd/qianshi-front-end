@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading.fullscreen.lock="pageLoading" element-loading-text="加载中"
+    element-loading-background="rgba(0, 0, 0, 0.7)">
     <div id="left-column" class="left">
       <div class="title"><span :title="video.title">{{ video.title }}</span></div>
 
@@ -7,21 +8,21 @@
         <div class="interaction-bar">
           <span :title="video.likeNum.toString()" @click="likeVideo" :class="{ highLight: video.isLike && isLogin }"
             class="iconfont el-icon-good icon"><span class="num">{{
-        cmjs.fmt.numWE(video.likeNum)
-      }}</span></span>
+    cmjs.fmt.numWE(video.likeNum)
+  }}</span></span>
 
           <span :title="video.coinNum.toString()" @click="coinVideo" :class="{ highLight: video.isCoin && isLogin }"
             class="iconfont el-icon-Bbi icon"><span class="num">{{
-        cmjs.fmt.numWE(video.coinNum) }}</span></span>
+    cmjs.fmt.numWE(video.coinNum) }}</span></span>
 
           <span :title="video.starNum.toString()" @click="starVideo" :class="{ highLight: video.isStar && isLogin }"
             class="iconfont el-icon-collection icon"><span class="num">{{
-        cmjs.fmt.numWE(video.starNum)
-      }}</span></span>
+    cmjs.fmt.numWE(video.starNum)
+  }}</span></span>
 
           <span :title="video.shareNum.toString()" class="iconfont el-icon-fenxiang icon"><span class="num">{{
-        cmjs.fmt.numWE(video.shareNum)
-      }}</span></span>
+    cmjs.fmt.numWE(video.shareNum)
+  }}</span></span>
 
           <el-popover ref="extraPop" placement="bottom-end" @before-enter="beforeEnterExtraPop">
             <template #reference>
@@ -49,7 +50,7 @@
 
         <span class="item">
           <span class="iconfont el-icon-region icon"></span>
-          <span>{{ video.region }}</span>
+          <span class="region" @click="cmjs.jump.region(video.regionSlug)">{{ video.regionName }}</span>
         </span>
 
         <span class="item">
@@ -62,22 +63,23 @@
           <span :title="video.danmu.length.toString()">{{ cmjs.fmt.numWE(video.danmu.length) }}</span>
         </span>
 
-        <span class="item">
+        <span v-if="video.date && video.firstPublishAt" class="item">
           <span class="iconfont el-icon-lishijilu icon"></span>
           <span
-            :title="video.firstPublishAt === video.date ? '此视频为首次发布' : `首次发布时间：${cmjs.fmt.tsStandard(video.firstPublishAt)}`"
-            style="cursor: alias;">{{ cmjs.fmt.tsStandard(video.date)
-            }}</span>
+            :title="video.date === video.firstPublishAt ? '' : `首次发布时间：${cmjs.fmt.tsStandard(video.firstPublishAt)}`"
+            :style="{ cursor: video.date === video.firstPublishAt ? 'default' : 'alias' }">{{
+    cmjs.fmt.tsStandard(video.date)
+  }}</span>
         </span>
 
-        <span v-if="!video.empower" class="item">
+        <span v-if="video.empower" class="item">
           <svg class="icon-symbol" aria-hidden="true">
             <use xlink:href="#el-icon-jinzhi"></use>
           </svg>
           <span>未经作者授权，禁止转载</span>
         </span>
 
-        <span class="item">
+        <span v-if="video.ipLocation" class="item">
           <span class="iconfont el-icon-ip icon"></span>
           <span>{{ video.ipLocation }}</span>
         </span>
@@ -87,7 +89,7 @@
         :danmus="video.danmu" :isUp="isUp" :nextVid="nextVid" :vip="video.vip"
         @delete-danmu="(f: Function) => { delDm = f }" @recall-danmu="(f: Function) => { recDm = f }"></Video>
 
-      <el-card class="intro-tag-container">
+      <el-card v-show="video.intro || video.tags" class="intro-tag-container">
         <textarea id="intro-textarea" class="introduction" rows="1" readonly>{{ video.intro || "-" }}</textarea>
         <div v-show="!moreStatus && isMore" class="more-container"><span @click="setIntroFull" class="more">展开更多</span>
         </div>
@@ -97,7 +99,7 @@
 
       <CommentArea :total="video.comments.total" :totalTop="video.comments.totalTop" :data="video.comments.data"
         :vid="video.vid" :authorUid="video.author.uid" :incrTotal="(incr: number) => { video.comments.total += incr }"
-        :incrTotalTop="(incr: number) => { video.comments.totalTop += incr }"></CommentArea>
+        :incrTotalTop="(incr: number) => { video.comments.totalTop += incr }" style="margin-top: 20px;"></CommentArea>
     </div>
 
 
@@ -108,16 +110,16 @@
         <div class="info">
           <div class="nickname-row">
             <div :title="video.author.nickname" @click="cmjs.jump.user(video.author.uid)" class="nickname">{{
-        video.author.nickname }}</div>
+    video.author.nickname }}</div>
             <span class="iconfont el-icon-sixin send-msg">发消息</span>
           </div>
 
           <div class="signature"><span :title="video.author.signature">{{ video.author.signature || "-" }}</span></div>
 
-          <el-button v-blur @click="focuAuthor" class="focus"
+          <el-button v-loading="focuing" :disabled="focuing" v-blur @click="focuAuthor" class="focus"
             :type="video.author.isFocu && isLogin ? 'info' : 'primary'">{{
-        video.author.isFocu && isLogin ? '已关注 ' : '+ 关注 ' +
-          cmjs.fmt.numWE(video.author.fanNum) }}</el-button>
+    video.author.isFocu && isLogin ? '已关注 ' : '+ 关注 ' +
+      cmjs.fmt.numWE(video.author.fanNum) }}</el-button>
         </div>
       </div>
 
@@ -159,7 +161,7 @@
           <div class="header">
             <span @click="cmjs.jump.collection(video.author.uid, video.collection.id)" class="name"
               :title="video.collection.name">{{
-        video.collection.name }}</span>
+    video.collection.name }}</span>
             <div style="font-size: 13px;" class="autoStreaming">自动连播<el-switch @click="setAutoStreaming"
                 v-model="autoStreaming" /></div>
           </div>
@@ -196,6 +198,7 @@
         <VideoCard v-for="(item) in video.recommend" :data="item" type="big" class="card"
           :class="{ cardFCA: !video.collection && video.recommend.length > 1 }"></VideoCard>
       </div>
+      <el-divider v-else><span style="color: #909399;">无推荐视频</span></el-divider>
     </div>
   </div>
 </template>
@@ -209,21 +212,21 @@ import Video from '@/components/common/Video.vue'
 import Avatar from '@/components/common/Avatar.vue'
 import VipPriIco from '@/components/common/VipPriIco.vue'
 import cmjs from '@/cmjs'
-import Data from '@/mock/video.json'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 import { onBeforeRouteUpdate, onBeforeRouteLeave, useRoute } from "vue-router"
-import { ElMessageBox } from "element-plus"
-import cache from '@/cmjs/impl/cache'
-import * as API from '@/api/user'
+import { ElMessageBox, UploadUserFile } from "element-plus"
+import * as UserAPI from '@/api/user'
+import * as VideoAPI from '@/api/video'
 
 type Video = {
   vid: number
   title: string
-  region: string
+  regionName: string
+  regionSlug: string
   playNum: number
-  date: number
-  firstPublishAt: number
+  date?: number
+  firstPublishAt?: number
   empower: boolean
   ipLocation: string
   likeNum: number
@@ -354,12 +357,15 @@ const store = useStore()
 let { isLogin } = storeToRefs(store)
 watch(() => store.isLogin, (newVal: boolean) => {
   if (newVal) {
-    setVideo()
     isUp.value = cmjs.biz.verifyLoginUid(video.value.author.uid)
   } else {
     isUp.value = false
   }
+  setVideo()
 })
+
+let pageLoading = ref(false)
+let focuing = ref(false)
 
 const extraPop = ref()
 let introTextarea: HTMLTextAreaElement
@@ -370,12 +376,12 @@ let dmCtlEle: HTMLDivElement
 let leftColumn: HTMLDivElement
 let rightColumn: HTMLDivElement
 
-let video = ref<Video>({ vid: 0, title: "", region: "", playNum: 0, date: 0, firstPublishAt: 0, empower: false, ipLocation: "", likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
+let video = ref<Video>({ vid: 0, title: "-", regionSlug: "", regionName: "-", playNum: 0, date: 0, firstPublishAt: 0, empower: false, ipLocation: "", likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "-", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
 let init = ref(false) // 页面是否初始化完成；在onMounted执行完毕后则初始化完成
-let autoStreaming = ref(cache.getLS("autoStreaming") !== "false" ? true : false) // 自动连播
+let autoStreaming = ref(cmjs.cache.getLS("autoStreaming") !== "false" ? true : false) // 自动连播
 let nextVid = ref(-1)
 setVideo()
-let isUp = ref(cmjs.biz.verifyLoginUid(video.value.author.uid))
+let isUp = ref(false)
 let introFullHeight: string // 视频简介容器的高度
 let moreStatus = ref(false) // 视频简介是否展开
 let isMore = ref(false) // 视频简介是否超过设定的需展开的高度（若超过则会显示【展开更多】按钮）
@@ -407,7 +413,11 @@ onMounted(() => {
 
     // 让左右栏某一栏滑到底时保持不动，直到另一栏也滑到底后才可继续滑动（20是离窗口底部的距离）
     if (leftColumnHeight > rightColumnHeight) {
-      rightColumn.style.top = `${-rightColumnHeight + viewHeight - 20}px`
+      if (rightColumnHeight > viewHeight - 20) {
+        rightColumn.style.top = `${-rightColumnHeight + viewHeight - 20}px`
+      } else {
+        rightColumn.style.top = '77px'
+      }
     } else {
       leftColumn.style.top = `${-leftColumnHeight + viewHeight - 20}px`
     }
@@ -442,7 +452,7 @@ onBeforeRouteLeave((to, from, next) => {
   next()
 })
 
-function setVideo(vid?: number) {
+async function setVideo(vid?: number) {
   if (!vid) {
     const v = parseInt(route.params.vid as string)
     if (isNaN(v)) {
@@ -452,14 +462,25 @@ function setVideo(vid?: number) {
     vid = v
   }
 
-  // TODO api
-  if (vid >= 1 && vid <= Data.length) {
-    video.value = Data[vid - 1]
-    calcNextVid()
-    document.title = video.value.title + " - 浅时"
-  } else {
-    cmjs.jump.error(404)
-  }
+  pageLoading.value = true
+  await VideoAPI.getVideo(vid)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.jump.error(res.code, res.msg)
+        return
+      }
+
+      video.value = res.data
+      isUp.value = cmjs.biz.verifyLoginUid(video.value.author.uid)
+      calcNextVid()
+      document.title = video.value.title + " - 浅时"
+    })
+    .catch((err) => {
+      cmjs.jump.error(err.response.status, err.response.statusText)
+    })
+    .finally(() => {
+      pageLoading.value = false
+    })
 
   if (init.value) {
     setTimeout(() => {
@@ -574,7 +595,7 @@ function reportVideo() {
   store.openFSWindow({
     title: "视频举报",
     placeholder: "请输入举报理由",
-    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+    submitHandler: (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => {
       // TODO api
       console.log({
         "msg": msg,
@@ -652,7 +673,7 @@ function reportDanmu(did: number) {
   store.openFSWindow({
     title: "弹幕举报",
     placeholder: "请输入举报理由",
-    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+    submitHandler: (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => {
       // TODO api
       console.log({
         "msg": msg,
@@ -690,7 +711,31 @@ function focuAuthor() {
     return
   }
 
-  video.value.author.isFocu = !video.value.author.isFocu
+  const fl = video.value.author.isFocu ? UserAPI.CancelFollow : UserAPI.Follow
+  focuing.value = true
+  fl(video.value.author.uid)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      if (video.value.author.isFocu) {
+        cmjs.prompt.success("已取关")
+        video.value.author.fanNum--
+        video.value.author.isFocu = false
+      } else {
+        cmjs.prompt.success("关注成功")
+        video.value.author.fanNum++
+        video.value.author.isFocu = true
+      }
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      focuing.value = false
+    })
 }
 
 function selectEpisode(vid: number) {
@@ -743,7 +788,7 @@ async function beforeEnterExtraPop() {
 }
 
 async function getPower() {
-  await API.mePower()
+  await UserAPI.mePower()
     .then((res) => {
       if (res.code !== 0) {
         cmjs.prompt.error("获取我的权限失败")
@@ -792,6 +837,12 @@ async function getPower() {
 
       .item {
         cursor: default;
+
+        .region:hover {
+          cursor: pointer;
+          color: #409EFF;
+          text-decoration: underline;
+        }
       }
 
       .item:not(:first-child) {
@@ -828,7 +879,6 @@ async function getPower() {
 
     .intro-tag-container {
       margin-top: 20px;
-      margin-bottom: 20px;
 
       .introduction {
         width: 100%;

@@ -1,10 +1,14 @@
 <template>
-  <div @click="onClick">
-    <img @error="url = 'https://cdn.qianshi.fun/default-avatar.png?auth_key=1741881639-0-0-8c52d45ef270f436878becd527a8c744'" :src="url" :class="'avatar-' + data.size"
-      :style="{ cursor: data.upload || data.home ? uploading ? 'not-allowed' : 'pointer' : 'default', opacity: uploading ? 0.5 : 1 }" />
+  <div style="position: relative;" @click="onClick">
+    <img
+      @error="url = 'https://cdn.qianshi.fun/default-avatar.png?auth_key=1741881639-0-0-8c52d45ef270f436878becd527a8c744'"
+      :src="url" :class="'avatar-' + data.size"
+      :style="{ cursor: data.upload || data.home ? uploading ? 'not-allowed' : 'pointer' : 'default', opacity: uploading ? 0.5 : text ? 0.25 : 1 }" />
 
     <el-upload ref="uploadRef" accept="image/*" :before-upload="beforeUpload" v-if="data.upload"
       v-show="false"></el-upload>
+
+    <div v-if="text" v-show="!uploading" :class="'avatar-' + data.size" class="inner-text flex-center">{{ text }}</div>
   </div>
 </template>
 
@@ -22,6 +26,7 @@ const data = defineProps<{
   home?: {
     uid: number,
   }
+  text?: string,
 }>()
 
 const emit = defineEmits(['update:modelValue'])
@@ -96,8 +101,8 @@ function succ() {
   endUpload()
 }
 
-function fail() {
-  cmjs.prompt.error("上传失败")
+function fail(msg?: string) {
+  cmjs.prompt.error(msg ? msg : "上传失败")
   url.value = preUrl
   hash = preHash
   endUpload()
@@ -113,17 +118,28 @@ function calcHash(file: File): string {
   width: 60px;
   height: 60px;
   border-radius: 50%;
+  font-size: 14px;
 }
 
 .avatar-medium {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  font-size: 12px;
 }
 
 .avatar-small {
   width: 30px;
   height: 30px;
   border-radius: 50%;
+  font-size: 10px;
+}
+
+.inner-text {
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+  text-align: center;
+  color: white;
 }
 </style>

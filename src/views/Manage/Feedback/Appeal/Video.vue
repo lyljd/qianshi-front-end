@@ -1,91 +1,138 @@
 <template>
-  <div v-if="data.records.length > 0" class="fav-container">
-    <el-card v-for="(r, idx) in data.records">
-      <template #header>
-        <div class="header">
-          <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
-          }}</span></span>
-          <span>反馈时间：{{ cmjs.fmt.tsStandard(r.feedbackTime) }}</span>
-          <div>
-            <el-button v-blur @click="pass(idx)" type="success">通过</el-button>
-            <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
+  <div v-show="loading" v-loading="loading" style="height: calc(100% - 114px);" element-loading-text="加载中"></div>
+  <div v-show="!loading">
+    <div v-if="data.records.length > 0" class="fav-container">
+      <el-card v-for="(r, idx) in data.records">
+        <template #header>
+          <div class="header">
+            <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
+                }}</span></span>
+            <span>反馈时间：{{ cmjs.fmt.tsStandard(r.feedbackTime) }}</span>
+            <div>
+              <el-button v-blur @click="pass(idx)" type="success">通过</el-button>
+              <el-button v-blur @click="deny(idx)" type="danger">驳回</el-button>
+            </div>
           </div>
+        </template>
+
+        <div class="body">
+          <FeedbackDescriptions :data="r.feedbackInfo" title="申诉信息"></FeedbackDescriptions>
+
+          <VideoDescriptions style="margin-top: 20px;" :data="r.videoInfo" title="视频信息"></VideoDescriptions>
         </div>
-      </template>
+      </el-card>
 
-      <div class="body">
-        <FeedbackDescriptions :data="r.feedbackInfo" title="申诉信息"></FeedbackDescriptions>
-
-        <VideoDescriptions style="margin-top: 20px;" :data="r.videoInfo" title="视频信息"></VideoDescriptions>
-      </div>
-    </el-card>
-
-    <el-pagination :total="data.total" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
-      hide-on-single-page background layout="prev, pager, next" />
+      <el-pagination :total="data.total" v-model:current-page="curPage" :default-page-size="5" class="flex-center"
+        hide-on-single-page background layout="prev, pager, next" />
+    </div>
+    <el-empty v-else description="暂无待处理的视频申诉"></el-empty>
   </div>
-  <el-empty v-else description="暂无待处理的视频申诉"></el-empty>
 </template>
 
 <script setup lang="ts">
-import Data from "@/mock/manage/feedback/appeal/video.json"
 import cmjs from '@/cmjs'
 import FeedbackDescriptions from "@/components/util/FeedbackDescriptions.vue"
 import VideoDescriptions from "@/components/util/VideoDescriptions.vue"
 import { ElMessageBox } from 'element-plus'
 import { useStore } from "@/store"
+import * as API from '@/api/manage'
 
 type Video = {
-  videoUrl: string,
-  coverUrl: string,
-  title: string,
-  region: string,
-  tags: string[],
-  intro: string,
+  videoUrl: string
+  coverUrl: string
+  title: string
+  regionName: string
+  regionSlug: string
+  tags: string[]
+  intro: string
   empower: boolean
 }
 
 type Record = {
-  id: number,
-  uid: number,
-  nickname: string,
-  feedbackTime: number,
+  id: number
+  uid: number
+  nickname: string
+  feedbackTime: number
   feedbackInfo: {
-    content: string,
-    imgs: string[],
+    content: string
+    imgs: string[]
   },
   videoInfo: Video
 }
 
 type Data = {
-  total: number,
+  total: number
   records: Record[]
 }
+
+let timestamp = cmjs.util.getCurBETimestamp()
+let loading = ref(false)
+let passing = ref<number[]>([])
+let denying = ref<number[]>([])
 
 const store = useStore()
 store.setManegeItemIndex(2, location.pathname)
 store.setManegeFeedbackItemIndex(0, location.pathname)
 
 let curPage = ref(1)
-let data = ref<Data>(getData())
+let data = ref<Data>({ total: 0, records: [] })
+setData()
 
 watch(curPage, newVal => {
-  data.value = getData()
+  setData()
 })
 
-function getData(): Data {
-  // TODO api
-  console.log("获取第" + curPage.value + "页的数据")
+function setData() {
+  loading.value = true
+  API.getAppealVideos(timestamp, curPage.value)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
 
-  return Data
+      data.value = res.data
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function pass(formIdx: number) {
-  //TODO 需请求后端
-  console.log(data.value.records[formIdx].id)
+  ElMessageBox.confirm('你确认要通过该视频吗？', '确认提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    showClose: false,
+    type: 'warning',
+    autofocus: false,
+  })
+    .then(() => {
+      const id = data.value.records[formIdx].id
+      passing.value.push(id)
+      API.operAppealVideo(id, "pass")
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
 
-  data.value.records.splice(formIdx, 1)
-  data.value.total--
-  cmjs.prompt.success("已通过")
+          data.value.records.splice(formIdx, 1)
+          data.value.total--
+          cmjs.prompt.success("已通过")
+        })
+        .catch((err) => {
+          cmjs.prompt.error(err)
+        })
+        .finally(() => {
+          const idx = passing.value.indexOf(id)
+          passing.value.splice(idx, 1)
+        })
+    })
 }
 
 function deny(formIdx: number) {
@@ -97,13 +144,26 @@ function deny(formIdx: number) {
     showClose: false,
   })
     .then(({ value }) => {
-      //TODO 需请求后端
-      console.log(data.value.records[formIdx].id)
-      console.log("理由：" + value)
+      const id = data.value.records[formIdx].id
+      denying.value.push(id)
+      API.operAppealVideo(id, "deny", value)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
 
-      data.value.records.splice(formIdx, 1)
-      data.value.total--
-      cmjs.prompt.success("已驳回")
+          data.value.records.splice(formIdx, 1)
+          data.value.total--
+          cmjs.prompt.success("已驳回")
+        })
+        .catch((err) => {
+          cmjs.prompt.error(err)
+        })
+        .finally(() => {
+          const idx = denying.value.indexOf(id)
+          denying.value.splice(idx, 1)
+        })
     })
     .catch(() => { })
 }

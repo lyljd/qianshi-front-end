@@ -36,6 +36,7 @@ import CaptchaWindow from "@/components/window/CaptchaWindow.vue"
 import EmailVerifyWindow from "@/components/window/EmailVerifyWindow.vue"
 import { useStore } from "@/store"
 import cmjs from '@/cmjs'
+import { UploadUserFile } from 'element-plus'
 
 const store = useStore()
 
@@ -43,7 +44,7 @@ function inSiteMessage() {
   store.openFSWindow({
     title: "站内留言",
     placeholder: "有什么问题都可以直接留言，管理员会尽快回复的！",
-    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+    submitHandler: (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => {
       // TODO api
       console.log({
         "msg": msg,

@@ -39,6 +39,8 @@ const routes: Array<RouteRecordRaw> = [
       { path: "/u/:uid/collection", component: () => import("@/views/User/Collection.vue") },
       { path: "/u/:uid/favlist", component: () => import("@/views/User/Favlist.vue") },
       { path: "/u/:uid/setting", component: () => import("@/views/User/Setting.vue") },
+      { path: "/u/:uid/follow", component: () => import("@/views/User/Follow.vue") },
+      { path: "/u/:uid/fan", component: () => import("@/views/User/Fan.vue") },
     ]
   },
 

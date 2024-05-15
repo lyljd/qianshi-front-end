@@ -1,13 +1,9 @@
 <template>
-  <div class="v-container">
+  <div class="v-container" v-loading="pageLoading">
     <el-tabs @tab-change="tabChange" v-model="viewItem">
-      <div style="margin-bottom: 15px;">
-        <el-input @keyup.enter.native="search" v-model="searchKey" show-word-limit :maxlength="50" :prefix-icon="Search"
-          clearable placeholder="搜索视频" />
-      </div>
-
       <el-tab-pane :label="`已通过 ${listNum.pubedNum}`" name="pubed">
-        <el-table @cell-click="pubedCellClick" :cell-style="pubedCellStyle" border :data="pubed.list" class="pubed">
+        <el-table v-loading="pubedLoading && !pageLoading" @cell-click="pubedCellClick" :cell-style="pubedCellStyle"
+          border :data="pubed.list" class="pubed" empty-text="暂无已通过的视频">
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
               <Image :url="pubed.list[scope.$index].coverUrl" :w="210" :h="118.13" round errorText="封面加载失败"
@@ -27,13 +23,19 @@
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div class="oper">
-                <el-button v-blur v-if="!pubed.list[scope.$index].isPublish" @click="publish(scope.$index)" size="small"
-                  type="success"><span class="iconfont el-icon-fabu"></span>发布</el-button>
-                <el-button v-blur v-else @click="cancelPublish(scope.$index)" size="small" type="warning"><span
-                    class="iconfont el-icon-xiajia"></span>下架</el-button>
-                <el-button v-blur @click="edit(scope.$index)" size="small"><span
-                    class="iconfont el-icon-edit"></span>编辑</el-button>
-                <el-button v-blur @click="deleteItem(scope.$index)" size="small" type="danger"><span
+                <el-button v-blur v-loading="pbing.includes(pubed.list[scope.$index].id)"
+                  :disabled="pbing.includes(pubed.list[scope.$index].id)" v-if="!pubed.list[scope.$index].isPublish"
+                  @click="publish(scope.$index)" size="small" type="success"><span
+                    class="iconfont el-icon-fabu"></span>发布</el-button>
+                <el-button v-blur v-loading="pbing.includes(pubed.list[scope.$index].id)"
+                  :disabled="pbing.includes(pubed.list[scope.$index].id)" v-else @click="cancelPublish(scope.$index)"
+                  size="small" type="warning"><span class="iconfont el-icon-xiajia"></span>下架</el-button>
+                <el-button v-blur v-loading="getting.includes(scope.$index) && viewItem === 'pubed'"
+                  :disabled="getting.includes(scope.$index) && viewItem === 'pubed'" @click="edit(scope.$index)"
+                  size="small"><span class="iconfont el-icon-edit"></span>编辑</el-button>
+                <el-button v-loading="deleting.includes(pubed.list[scope.$index].id)"
+                  :disabled="deleting.includes(pubed.list[scope.$index].id)" v-blur
+                  @click="deleteItem(scope.$index, 'del')" size="small" type="danger"><span
                     class="iconfont el-icon-ashbin"></span>删除</el-button>
               </div>
             </template>
@@ -47,8 +49,8 @@
       </el-tab-pane>
 
       <el-tab-pane :label="`进行中 ${listNum.isPubingNum}`" name="isPubing">
-        <el-table @cell-click="isPubingCellClick" :cell-style="isPubingCellStyle" :data="isPubing.list"
-          class="is-pubing">
+        <el-table v-loading="isPubingLoading && !pageLoading" @cell-click="isPubingCellClick"
+          :cell-style="isPubingCellStyle" :data="isPubing.list" class="is-pubing" empty-text="暂无进行中的视频">
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
               <Image :url="isPubing.list[scope.$index].coverUrl" :w="210" :h="118.13" round errorText="封面加载失败"
@@ -63,12 +65,17 @@
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div class="oper">
-                <el-button v-blur @click="edit(scope.$index)" size="small"><span
-                    class="iconfont el-icon-edit"></span>编辑</el-button>
-                <el-button v-blur v-if="!isPubing.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
-                  type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
-                <el-button v-blur v-if="isPubing.list[scope.$index].vid" @click="cancelModify(scope.$index)"
-                  size="small" type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
+                <el-button v-blur v-loading="getting.includes(scope.$index) && viewItem === 'isPubing'"
+                  :disabled="getting.includes(scope.$index) && viewItem === 'isPubing'" @click="edit(scope.$index)"
+                  size="small"><span class="iconfont el-icon-edit"></span>编辑</el-button>
+                <el-button v-blur v-loading="deleting.includes(isPubing.list[scope.$index].id)"
+                  :disabled="deleting.includes(isPubing.list[scope.$index].id)" v-if="!isPubing.list[scope.$index].vid"
+                  @click="deleteItem(scope.$index, 'del')" size="small" type="danger"><span
+                    class="iconfont el-icon-ashbin"></span>删除</el-button>
+                <el-button v-blur v-loading="deleting.includes(isPubing.list[scope.$index].id)"
+                  :disabled="deleting.includes(isPubing.list[scope.$index].id)" v-if="isPubing.list[scope.$index].vid"
+                  @click="deleteItem(scope.$index, 'cancel-modify')" size="small" type="warning"><span
+                    class="iconfont el-icon-cancel"></span>取消修改</el-button>
               </div>
             </template>
           </el-table-column>
@@ -82,10 +89,10 @@
 
       <el-tab-pane :label="`未通过 ${listNum.notPubedNum}`" name="notPubed">
         <div class="tip">
-          <span style="margin-top: 0; margin-bottom: 3px; color:red">在超过处理时间1天后，未通过的视频和封面资源将被删除。</span>
+          <span style="margin-top: 0; margin-bottom: 3px; color:red">在超过处理时间1天后，未通过且未处于申诉中的视频的视频资源和封面资源将被删除。</span>
         </div>
-        <el-table @cell-click="notPubedCellClick" :cell-style="notPubedCellStyle" border :data="notPubed.list"
-          class="not-pubed">
+        <el-table v-loading="notPubedLoading && !pageLoading" @cell-click="notPubedCellClick"
+          :cell-style="notPubedCellStyle" border :data="notPubed.list" class="not-pubed" empty-text="暂无未通过的视频">
           <el-table-column align="center" :width="235" label="封面">
             <template #default="scope">
               <Image :url="notPubed.list[scope.$index].coverUrl" :w="210" :h="118.13" round errorText="封面加载失败"
@@ -108,16 +115,23 @@
           <el-table-column align="center" :width="89" label="操作">
             <template #default="scope">
               <div class="oper">
-                <el-button v-blur @click="edit(scope.$index)" size="small"><span
-                    class="iconfont el-icon-edit"></span>编辑</el-button>
-                <el-button v-blur v-if="!notPubed.list[scope.$index].vid" @click="deleteItem(scope.$index)" size="small"
-                  type="danger"><span class="iconfont el-icon-ashbin"></span>删除</el-button>
-                <el-button v-blur v-if="notPubed.list[scope.$index].vid" @click="cancelModify(scope.$index)"
-                  size="small" type="warning"><span class="iconfont el-icon-cancel"></span>取消修改</el-button>
-                <el-button v-blur :class="{ appealBtnT: notPubed.list[scope.$index].appealStatus }"
-                  @click="appealIdx = scope.$index; appeal()" size="small" type="info"><span
-                    class="iconfont el-icon-appeal"></span>{{
-      notPubed.list[scope.$index].appealStatus ? "已申诉" : "申诉" }}</el-button>
+                <el-button v-blur v-if="!notPubed.list[scope.$index].appealId"
+                  v-loading="getting.includes(scope.$index) && viewItem === 'notPubed'"
+                  :disabled="getting.includes(scope.$index) && viewItem === 'notPubed'" @click="edit(scope.$index)"
+                  size="small"><span class="iconfont el-icon-edit"></span>编辑</el-button>
+                <el-button v-blur v-loading="deleting.includes(notPubed.list[scope.$index].id)"
+                  :disabled="deleting.includes(notPubed.list[scope.$index].id)" v-if="!notPubed.list[scope.$index].vid"
+                  @click="deleteItem(scope.$index, 'del')" size="small" type="danger"><span
+                    class="iconfont el-icon-ashbin"></span>删除</el-button>
+                <el-button v-blur v-loading="deleting.includes(notPubed.list[scope.$index].id)"
+                  :disabled="deleting.includes(notPubed.list[scope.$index].id)" v-if="notPubed.list[scope.$index].vid"
+                  @click="deleteItem(scope.$index, 'cancel-modify')" size="small" type="warning"><span
+                    class="iconfont el-icon-cancel"></span>取消修改</el-button>
+                <el-button v-blur v-loading="viewing.includes(scope.$index)" :disabled="viewing.includes(scope.$index)"
+                  @click="!notPubed.list[scope.$index].appealId ? appeal(scope.$index) : showAppealDetails(scope.$index)"
+                  size="small" type="info"><span class="iconfont el-icon-appeal"></span>{{
+    notPubed.list[scope.$index].appealId ?
+      "查看申诉" : "申诉" }}</el-button>
               </div>
             </template>
           </el-table-column>
@@ -131,20 +145,20 @@
     </el-tabs>
   </div>
 
-  <el-dialog width="75%" @open="store.regions.length === 0 ? store.getRegions() : null" v-model="editWindowVisible"
-    class="edit-dialog" :before-close="beforeEditWindowClose" title="视频编辑" align-center>
+  <el-dialog width="75%" v-model="editWindowVisible" class="edit-dialog" :before-close="beforeEditWindowClose"
+    title="视频编辑" align-center>
     <div class="v-container">
       <div class="upload-form">
         <div class="row">
           <span class="notice"><span class="require">*</span>视频：</span>
-          <VideoUpload style="width: 100%;" @setVideoUrl="(f: Function) => { setVideoUrl = f }"
-            :initVideoUrl="video.videoUrl" :uploadHandler="videoUploadHandler">
+          <VideoUpload style="width: 100%;" :init-video-url="video.videoUrl"
+            @setVideoUrl="(f: Function) => { setVideoUrl = f }" :uploadHandler="videoUploadHandler">
           </VideoUpload>
         </div>
 
         <div class="row">
           <span class="notice"><span class="require">*</span>封面：</span>
-          <ImageUpload @setImgUrl="(f: Function) => { setCoverUrl = f }" :initImgUrl="video.coverUrl" :w="270"
+          <ImageUpload :init-img-url="video.coverUrl" @setImgUrl="(f: Function) => { setCoverUrl = f }" :w="270"
             :h="151.88" proportion="16:9" :uploadHandler="coverUploadHandler">
           </ImageUpload>
         </div>
@@ -171,7 +185,7 @@
 
         <div class="row">
           <span class="notice">简介：</span>
-          <el-input v-model="video.intro" maxlength="250" rows="3" placeholder="请输入简介" type="textarea"
+          <el-input v-model="video.intro" maxlength="1000" rows="3" placeholder="请输入简介" type="textarea"
             show-word-limit />
         </div>
 
@@ -181,7 +195,7 @@
             <el-checkbox :disabled="editEmpowerDisabled" v-model="video.empower" label="未经作者授权，禁止转载" />
             <div class="tip">
               <span>勾选后该文案会显示在视频播放页中</span>
-              <span style="color: #FF6699;">若在修改时取消勾选该项，后续在编辑时将不能恢复勾选。</span>
+              <span style="color: #FF6699;">若在编辑时取消勾选该项，后续再编辑时将不能恢复勾选。</span>
             </div>
           </div>
         </div>
@@ -197,26 +211,55 @@
         </div>
 
         <div class="row" style="justify-content: center;">
-          <el-button v-blur :disabled="!hasEdit || videoUploading || coverUploading" @click="submit" type="primary"
+          <el-button v-blur v-loading="submitting"
+            :disabled="!hasEdit || videoUploading || coverUploading || submitting" @click="submit" type="primary"
             size="large">修改</el-button>
         </div>
       </div>
     </div>
   </el-dialog>
+
+  <el-dialog width="75%" v-model="appealDetailsWindowVisible" title="申诉详情" align-center>
+    <div class="appeal-detail-container">
+      <el-descriptions :column="1" border style="margin-bottom: 20px;">
+        <el-descriptions-item label="申诉理由" align="center">
+          {{ appealVideoDetail.content }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="申请～处理 时间" align="center">
+          <div>{{ cmjs.fmt.tsStandard(appealVideoDetail.applyAt) }}</div>
+          <div>～</div>
+          <div>{{ appealVideoDetail.processAt ? cmjs.fmt.tsStandard(appealVideoDetail.processAt) : '待处理' }}</div>
+        </el-descriptions-item>
+
+        <el-descriptions-item label="附件" align="center">
+          <div v-if="appealVideoDetail.imgs.length > 0" style="display: flex; gap: 8px; justify-content: center;">
+            <Image :w="135" :h="135" v-for="url in appealVideoDetail.imgs" :url="url" preview contain border round>
+            </Image>
+          </div>
+          <div v-else>无</div>
+        </el-descriptions-item>
+
+        <el-descriptions-item v-if="appealVideoDetail.processAt" label="驳回原因" align="center">
+          {{ appealVideoDetail.reason || "无" }}
+        </el-descriptions-item>
+      </el-descriptions>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import mockNum from "@/mock/platform/article/num.json"
-import mockPubed from "@/mock/platform/article/video/pubed.json"
-import mockIsPubing from "@/mock/platform/article/video/is_pubing.json"
-import mockNotPubed from "@/mock/platform/article/video/not_pubed.json"
 import cmjs from '@/cmjs'
-import { Search } from '@element-plus/icons-vue'
-import { ElMessageBox, ElSelect, ElInput } from 'element-plus'
+import { ElMessageBox, ElSelect, ElInput, UploadUserFile } from 'element-plus'
 import { useStore } from "@/store"
 import ImageUpload from "@/components/common/ImageUpload.vue"
 import VideoUpload from "@/components/common/VideoUpload.vue"
 import TagInput from '@/components/common/TagInput.vue'
+import * as VideoAPI from '@/api/video'
+import * as AuthAPI from '@/api/auth'
+import * as UploadAPI from '@/api/upload'
+import _ from 'lodash'
+import { AxiosProgressEvent } from "axios"
 
 type Num = {
   pubedNum: number,
@@ -255,77 +298,124 @@ type NotPubed = {
     applyTime: number,
     processTime: number,
     reason: string,
-    appealStatus: boolean,
+    appealId?: number,
     vid?: number,
   }[]
 }
 
-type Video = {
-  videoUrl: string,
-  coverUrl: string,
-  title: string,
-  region: string,
-  tags: string[],
-  intro: string,
-  empower: boolean,
-  autoPublish?: boolean
+type EditVideo = {
+  videoUrl: string
+  videoName: string
+  coverUrl: string
+  coverName: string
+  title: string
+  region: string
+  tags: string[]
+  intro: string
+  empower: boolean
+  id: number
+  typ: "video" | "video-is-pubing" | "video-not-pubed"
+  autoPublish: boolean
 }
+
+type UploadPara = {
+  url: string
+  filename: string
+  contentType: string
+  xOssCallback: string
+}
+
+type AppealVideoDetail = {
+  content: string
+  imgs: string[]
+  applyAt: number
+  processAt?: number
+  reason?: string
+}
+
+let pageLoading = ref(false)
+let pubedLoading = ref(false)
+let isPubingLoading = ref(false)
+let notPubedLoading = ref(false)
+let pbing = ref<number[]>([])
+let deleting = ref<number[]>([])
+let getting = ref<number[]>([]) // 编辑
+let viewing = ref<number[]>([]) // 查看申诉
+let submitting = ref(false)
 
 const store = useStore()
 store.setPlatformItemIndex(2, location.pathname)
 
 const titleInputRef = ref<InstanceType<typeof ElInput>>()
 
+let timestamp = cmjs.util.getCurBETimestamp()
+
 let pubedCurPage = ref(1)
 let isPubingCurPage = ref(1)
 let notPubedCurPage = ref(1)
 
-let listNum: Num = reactive(getNum())
-let pubed: Pubed = reactive({
+let listNum = ref<Num>({
+  pubedNum: 0,
+  isPubingNum: 0,
+  notPubedNum: 0
+})
+setNum()
+let pubed = ref<Pubed>({
   total: 0,
   list: []
 })
-let isPubing: IsPubing = reactive({
+let isPubing = ref<IsPubing>({
   total: 0,
   list: []
 })
-let notPubed: NotPubed = reactive({
+let notPubed = ref<NotPubed>({
   total: 0,
   list: []
 })
 let viewItem = ref(handleUrlQueryTab())
-let searchKey = ref("")
-let appealIdx = ref(-1)
 
-let video: Video = reactive({
+let video: EditVideo = reactive({
+  videoName: "",
   videoUrl: "",
+  coverName: "",
   coverUrl: "",
   title: "",
   region: "",
   tags: [],
   intro: "",
-  empower: false
+  empower: true,
+  id: 0,
+  typ: "video",
+  autoPublish: true,
 })
-let videoCopy: Video = reactive({
+let videoCopy = ref<EditVideo>({
+  videoName: "",
   videoUrl: "",
+  coverName: "",
   coverUrl: "",
   title: "",
   region: "",
   tags: [],
   intro: "",
-  empower: false
+  empower: true,
+  id: 0,
+  typ: "video",
+  autoPublish: true,
 })
+let appealVideoDetail = ref<AppealVideoDetail>({ content: "", imgs: [], applyAt: 0 })
 
 let editWindowVisible = ref(false)
+let appealDetailsWindowVisible = ref(false)
 let editEmpowerDisabled = ref(false)
 let hasEdit = ref(false)
 let coverUploading = ref(false)
 let videoUploading = ref(false)
 let setCoverUrl: Function
 let setVideoUrl: Function
+let getSuccess = ref(false)
 
 watch(video, (newV) => {
-  if (newV.videoUrl !== videoCopy.videoUrl || newV.coverUrl !== videoCopy.coverUrl || newV.title !== videoCopy.title || newV.region !== videoCopy.region || JSON.stringify(newV.tags) !== JSON.stringify(videoCopy.tags) || newV.intro !== videoCopy.intro || newV.empower !== videoCopy.empower) {
+  if (!_.isEqual(newV, videoCopy.value)) {
     hasEdit.value = true
     store.switchAsk = true
   } else {
@@ -334,40 +424,34 @@ watch(video, (newV) => {
   }
 })
 watch(pubedCurPage, (newV) => {
-  pubed = reactive(getPubed())
+  setPubed()
 })
 watch(isPubingCurPage, (newV) => {
-  isPubing = reactive(getIsPubing())
+  setIsPubing()
 })
 watch(notPubedCurPage, (newV) => {
-  notPubed = reactive(getNotPubed())
+  setNotPubed()
 })
 
 function tabChange() {
   switch (viewItem.value) {
     case "pubed": {
-      if (pubedCurPage.value === 1) {
-        pubed = reactive(getPubed())
-      } else {
-        pubedCurPage.value = 1
+      if (pubed.value.list.length === 0) {
+        setPubed()
       }
       cmjs.util.addUrlQuery('tab', 'pubed')
       break
     }
     case "isPubing": {
-      if (isPubingCurPage.value === 1) {
-        isPubing = reactive(getIsPubing())
-      } else {
-        isPubingCurPage.value = 1
+      if (isPubing.value.list.length === 0) {
+        setIsPubing()
       }
       cmjs.util.addUrlQuery('tab', 'isPubing')
       break
     }
     case "notPubed": {
-      if (notPubedCurPage.value === 1) {
-        notPubed = reactive(getNotPubed())
-      } else {
-        notPubedCurPage.value = 1
+      if (notPubed.value.list.length === 0) {
+        setNotPubed()
       }
       cmjs.util.addUrlQuery('tab', 'notPubed')
       break
@@ -375,42 +459,88 @@ function tabChange() {
   }
 }
 
-function getNum(): Num {
-  // TODO api
-  return mockNum
+function setNum() {
+  pageLoading.value = true
+  VideoAPI.getMyArticleVideoNum(timestamp)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      listNum.value = res.data
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      pageLoading.value = false
+    })
 }
 
-function getPubed(): Pubed {
-  // TODO api
-  // listNum.pubedNum = pubed.total
-  listNum.pubedNum = mockPubed.total
-  console.log(`获取【视频-已通过】第${pubedCurPage.value}页数据`)
-  return mockPubed
+function setPubed() {
+  pubedLoading.value = true
+  VideoAPI.getMyPubedVideo(timestamp, pubedCurPage.value)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      pubed.value = res.data
+      listNum.value.pubedNum = pubed.value.total
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      pubedLoading.value = false
+    })
 }
 
-function getIsPubing(): IsPubing {
-  // TODO api
-  // listNum.isPubingNum = isPubing.total
-  listNum.isPubingNum = mockIsPubing.total
-  console.log(`获取【视频-进行中】第${isPubingCurPage.value}页数据`)
-  return mockIsPubing
+function setIsPubing() {
+  isPubingLoading.value = true
+  VideoAPI.getMyIsPubingVideo(timestamp, isPubingCurPage.value)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      isPubing.value = res.data
+      listNum.value.isPubingNum = isPubing.value.total
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      isPubingLoading.value = false
+    })
 }
 
-function getNotPubed(): NotPubed {
-  // TODO api
-  // listNum.notPubedNum = notPubed.total
-  listNum.notPubedNum = mockNotPubed.total
-  console.log(`获取【视频-未发布】第${notPubedCurPage.value}页数据`)
-  return mockNotPubed
+function setNotPubed() {
+  notPubedLoading.value = true
+  VideoAPI.getMyNotPubedVideo(timestamp, notPubedCurPage.value)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      notPubed.value = res.data
+      listNum.value.notPubedNum = notPubed.value.total
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      notPubedLoading.value = false
+    })
 }
 
-function search() {
-  // TODO api
-  cmjs.prompt.info(`type: ${viewItem.value}; searchKey: ${searchKey.value}`)
-}
-
-function deleteItem(idx: number) {
-  ElMessageBox.confirm('你确认要删除该视频吗？', '确认提示', {
+function deleteItem(idx: number, kind: "del" | "cancel-modify") {
+  const kindText = kind === 'del' ? '删除' : '取消修改'
+  ElMessageBox.confirm(`你确认要${kindText}该视频吗？`, '确认提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     closeOnClickModal: false,
@@ -420,105 +550,227 @@ function deleteItem(idx: number) {
     autofocus: false,
   })
     .then(() => {
-      //TODO api
+      let id: number = 0
+      let typ: "video" | "video-is-pubing" | "video-not-pubed" = "video"
+
       switch (viewItem.value) {
         case "pubed": {
-          pubed.list.splice(idx, 1)
-          pubed.total--
-          listNum.pubedNum--
+          id = pubed.value.list[idx].id
+          typ = "video"
           break
         }
         case "isPubing": {
-          isPubing.list.splice(idx, 1)
-          isPubing.total--
-          listNum.isPubingNum--
+          id = isPubing.value.list[idx].id
+          typ = "video-is-pubing"
           break
         }
         case "notPubed": {
-          notPubed.total--
-          notPubed.list.splice(idx, 1)
-          listNum.notPubedNum--
+          id = notPubed.value.list[idx].id
+          typ = "video-not-pubed"
           break
         }
       }
-      cmjs.prompt.success('删除成功')
+
+      deleting.value.push(id)
+      VideoAPI.deleteVideo(id, typ)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
+
+          // 移除记录
+          switch (viewItem.value) {
+            case "pubed": {
+              pubed.value.list.splice(idx, 1)
+              pubed.value.total--
+              listNum.value.pubedNum--
+              if (pubed.value.list.length === 0) {
+                pubedCurPage.value-- // 删除了当前页的最后一条记录后需要跳转到上一页，以下同理
+              }
+              break
+            }
+            case "isPubing": {
+              isPubing.value.list.splice(idx, 1)
+              isPubing.value.total--
+              listNum.value.isPubingNum--
+              if (isPubing.value.list.length === 0) {
+                isPubingCurPage.value--
+              }
+              break
+            }
+            case "notPubed": {
+              notPubed.value.total--
+              notPubed.value.list.splice(idx, 1)
+              listNum.value.notPubedNum--
+              if (notPubed.value.list.length === 0) {
+                notPubedCurPage.value--
+              }
+              break
+            }
+          }
+          cmjs.prompt.success(`${kindText}成功`)
+        })
+        .catch((err) => {
+          cmjs.prompt.error(err)
+        })
+        .finally(() => {
+          const idx = deleting.value.indexOf(id)
+          deleting.value.splice(idx, 1)
+        })
     })
 }
 
-function appeal() {
-  if (notPubed.list[appealIdx.value].appealStatus) {
-    cmjs.prompt.info("请耐心等待，并留意系统消息")
-    return
-  }
+function appeal(idx: number) {
+  let ups = ref<UploadPara[]>([])
+  let timer: number
 
   store.openFSWindow({
     title: "申诉",
+    tip: "每个视频只有一次申诉机会，且一旦提交申诉，该视频将不能再编辑。",
     placeholder: "请输入申诉理由",
-    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
-      // TODO api
-      console.log({
-        "msg": msg,
-        "fileList": fileList,
-        "data": {
-          id: notPubed.list[appealIdx.value].id,
-        },
-      })
-      cmjs.prompt.success("提交成功！请留意系统消息")
-      notPubed.list[appealIdx.value].appealStatus = true
-      closeWindow()
+    submitHandler: async (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => {
+      submitting.value = true
+      let errorOccur = false
+
+      if (fileList.length !== ups.value.length) {
+        clearTimeout(timer)
+        ups.value = []
+        timer = setTimeout(() => {
+          ups.value = []
+        }, 300000) // 上传url是有时限的，目前后端定的是5分钟，超时后需重新获取url
+
+        // 循环获取上传所需参数
+        for (let i = 0; i < fileList.length; i++) {
+          if (errorOccur) {
+            break
+          }
+
+          const f = fileList[i]
+          await AuthAPI.getUploadUrl("attachment", cmjs.util.getFileSuffix(f.name))
+            .then((res) => {
+              if (res.code !== 0) {
+                errorOccur = true
+                cmjs.prompt.error(res.msg)
+                return
+              }
+
+              const up: UploadPara = res.data
+              ups.value.push(up)
+            })
+            .catch((err) => {
+              errorOccur = true
+              cmjs.prompt.error(err)
+            })
+        }
+
+        if (errorOccur) {
+          submitting.value = false
+          return
+        }
+      }
+
+      const imgs: string[] = []
+      // 依次上传文件
+      for (let i = 0; i < ups.value.length; i++) {
+        if (errorOccur) {
+          break
+        }
+
+        const up = ups.value[i]
+        await UploadAPI.upload({
+          uploadUrl: up.url,
+          file: fileList[i].raw!,
+          contentType: up.contentType,
+          xOssCallback: up.xOssCallback,
+          onUploadProgress: () => { },
+        })
+          .then((res) => {
+            if (res.code !== 0) {
+              errorOccur = true
+              cmjs.prompt.error(res.msg)
+              return
+            }
+
+            imgs.push(up.filename)
+          })
+          .catch((err) => {
+            errorOccur = true
+            cmjs.prompt.error(err)
+          })
+
+      }
+
+      if (errorOccur) {
+        submitting.value = false
+        return
+      }
+
+      VideoAPI.appealVideo(notPubed.value.list[idx].id, msg, imgs)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
+
+          cmjs.prompt.success("提交成功！请留意系统消息")
+          notPubed.value.list[idx].appealId = res.data.id
+          closeWindow()
+        })
+        .catch((err) => {
+          cmjs.prompt.error(err)
+        })
+        .finally(() => {
+          submitting.value = false
+        })
     },
   })
 }
 
-function getVideo(id: number): Video {
-  //TODO api（通过id和viewItem去请求后端获取数据）
-  console.log(id, viewItem.value)
+async function getVideo(id: number) {
+  getSuccess.value = false
+  const typ = viewItem.value === 'pubed' ? 'video' : viewItem.value === 'isPubing' ? 'video-is-pubing' : 'video-not-pubed'
 
-  const v: Video = {
-    "videoUrl": "/resource/video/8.mp4",
-    "coverUrl": "/resource/cover/8.jpeg",
-    "title": "许嵩-雅俗共赏",
-    "region": "music",
-    "tags": [
-      "许嵩",
-      "vae",
-      "青年晚报",
-      "雅俗共赏",
-      "音乐"
-    ],
-    "intro": "满纸荒唐中窥见满脸沧桑，触到神经就要懂得鼓掌。",
-    "empower": true
-  }
-  if (viewItem.value !== "pubed") {
-    v.autoPublish = false
-  }
+  await VideoAPI.getEditVideo(id, typ)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
 
-  return v
-}
+      getSuccess.value = true
 
-function setVideo(v: Video) {
-  video.videoUrl = v.videoUrl
-  video.coverUrl = v.coverUrl
-  video.title = v.title
-  video.region = v.region
-  video.tags = v.tags
-  video.intro = v.intro
-  video.empower = v.empower
-  video.autoPublish = v.autoPublish !== undefined ? v.autoPublish : true
+      video.videoUrl = res.data.videoUrl
+      video.videoName = res.data.videoName
+      video.coverUrl = res.data.coverUrl
+      video.coverName = res.data.coverName
+      video.title = res.data.title
+      video.region = res.data.region
+      video.intro = res.data.intro
+      video.tags = res.data.tags ? res.data.tags : []
+      video.empower = res.data.empower
+      video.autoPublish = res.data.autoPublish
+      video.id = id
+      video.typ = typ
 
-  videoCopy.videoUrl = v.videoUrl
-  videoCopy.coverUrl = v.coverUrl
-  videoCopy.title = v.title
-  videoCopy.region = v.region
-  videoCopy.tags = [...v.tags] //深拷贝
-  videoCopy.intro = v.intro
-  videoCopy.empower = v.empower
-  video.autoPublish = v.autoPublish !== undefined ? v.autoPublish : true
+      if (setVideoUrl) { // 第一次是在没打开窗口前，那时函数还不存在，只能先通过init-xxx-url设置
+        setVideoUrl(video.videoUrl)
+      }
+      if (setCoverUrl) { // 同上
+        setCoverUrl(video.coverUrl)
+      }
+      editEmpowerDisabled.value = !video.empower
 
-  editEmpowerDisabled.value = !video.empower
+      videoCopy.value = _.cloneDeep(video)
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
 }
 
 function publish(idx: number) {
+  const id = pubed.value.list[idx].id
+
   ElMessageBox.confirm('你确认要发布该视频吗？', '确认提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -529,14 +781,30 @@ function publish(idx: number) {
     autofocus: false,
   })
     .then(() => {
-      //TODO api
+      pbing.value.push(id)
+      VideoAPI.pbOrNopbVideo(id, true)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
 
-      pubed.list[idx].isPublish = true
-      cmjs.prompt.success('发布成功')
+          pubed.value.list[idx].isPublish = true
+          cmjs.prompt.success('发布成功')
+        })
+        .catch((err) => {
+          cmjs.prompt.error(err)
+        })
+        .finally(() => {
+          const idx = pbing.value.indexOf(id)
+          pbing.value.splice(idx, 1)
+        })
     })
 }
 
 function cancelPublish(idx: number) {
+  const id = pubed.value.list[idx].id
+
   ElMessageBox.confirm('你确认要下架该视频吗？下架后其他人将无法观看该视频，且正在观看的人将立刻被终止观看！注意：视频的相关数据<span style="color: red;">不会受到影响</span>。', '确认提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -548,30 +816,57 @@ function cancelPublish(idx: number) {
     dangerouslyUseHTMLString: true,
   })
     .then(() => {
-      //TODO api
+      pbing.value.push(id)
+      VideoAPI.pbOrNopbVideo(id, false)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
+          }
 
-      pubed.list[idx].isPublish = false
-      cmjs.prompt.success('下架成功')
+          pubed.value.list[idx].isPublish = false
+          cmjs.prompt.success('已下架')
+        })
+        .catch((err) => {
+          cmjs.prompt.error(err)
+        })
+        .finally(() => {
+          const idx = pbing.value.indexOf(id)
+          pbing.value.splice(idx, 1)
+        })
     })
 }
 
-function edit(idx: number) {
+async function edit(idx: number) {
+  getting.value.push(idx)
+
+  if (store.regions.length === 0) {
+    await store.getRegions()
+  }
+
   switch (viewItem.value) {
     case "pubed": {
-      setVideo(getVideo(pubed.list[idx].id))
+      await getVideo(pubed.value.list[idx].id)
       break
     }
     case "isPubing": {
-      setVideo(getVideo(isPubing.list[idx].id))
+      await getVideo(isPubing.value.list[idx].id)
       break
     }
     case "notPubed": {
-      setVideo(getVideo(notPubed.list[idx].id))
+      await getVideo(notPubed.value.list[idx].id)
       break
+    }
+    default: {
+      cmjs.prompt.error("不能编辑不支持的类型")
     }
   }
 
-  editWindowVisible.value = true
+  if (getSuccess.value) {
+    editWindowVisible.value = true
+  }
+  const iidx = getting.value.indexOf(idx)
+  getting.value.splice(iidx, 1)
 }
 
 function beforeEditWindowClose(done: Function) {
@@ -595,48 +890,102 @@ function beforeEditWindowClose(done: Function) {
   }
 }
 
-function coverUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+async function coverUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  let up: UploadPara = { url: "", filename: "", contentType: "", xOssCallback: "" }
+
+  await AuthAPI.getUploadUrl("cover", cmjs.util.getFileSuffix(file.name))
+    .then((res) => {
+      if (res.code !== 0) {
+        fail(res.msg)
+        return
+      }
+
+      up = res.data
+    })
+    .catch((err) => {
+      fail(err)
+    })
+
+  if (up === undefined) {
+    return
+  }
+
   coverUploading.value = true
+  let fileBinStr = URL.createObjectURL(file)
+  setCoverUrl(fileBinStr)
 
-  // TODO api
+  UploadAPI.upload({
+    uploadUrl: up.url,
+    file: file,
+    contentType: up.contentType,
+    xOssCallback: up.xOssCallback,
+    onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+      percent.value = Math.round((progressEvent.loaded / (progressEvent.total as number)) * 100)
+    },
+  })
+    .then((res) => {
+      if (res.code !== 0) {
+        fail(res.msg)
+      }
 
-  const url = URL.createObjectURL(file)
-  setCoverUrl(url)
-  const timer = setInterval(() => {
-    const randPercent = Math.floor(Math.random() * 26) + 25 // [25,50]，整数
-    if (percent.value + randPercent < 100) {
-      percent.value += randPercent
-    } else {
-      percent.value = 100
-      clearInterval(timer)
-      coverUploading.value = false
-      video.coverUrl = url // fail时不能设置！！
+      video.coverName = up.filename
       succ()
-      // fail()
-    }
-  }, 1000)
+    })
+    .catch((err) => {
+      fail(err)
+    })
+    .finally(() => {
+      coverUploading.value = false
+    })
 }
 
-function videoUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+async function videoUploadHandler(file: File, percent: Ref<number>, succ: Function, fail: Function) {
+  let up: UploadPara = { url: "", filename: "", contentType: "", xOssCallback: "" }
+
+  await AuthAPI.getUploadUrl("video", cmjs.util.getFileSuffix(file.name))
+    .then((res) => {
+      if (res.code !== 0) {
+        fail(res.msg)
+        return
+      }
+
+      up = res.data
+    })
+    .catch((err) => {
+      fail(err)
+    })
+
+  if (up === undefined) {
+    return
+  }
+
   videoUploading.value = true
+  let fileBinStr = URL.createObjectURL(file)
+  setVideoUrl(fileBinStr)
 
-  // TODO api
+  UploadAPI.upload({
+    uploadUrl: up.url,
+    file: file,
+    contentType: up.contentType,
+    xOssCallback: up.xOssCallback,
+    onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+      percent.value = Math.round((progressEvent.loaded / (progressEvent.total as number)) * 100)
+    },
+  })
+    .then((res) => {
+      if (res.code !== 0) {
+        fail(res.msg)
+      }
 
-  const url = URL.createObjectURL(file)
-  setVideoUrl(url)
-  const timer = setInterval(() => {
-    const randPercent = Math.floor(Math.random() * 11) + 10 // [10,20]，整数
-    if (percent.value + randPercent < 100) {
-      percent.value += randPercent
-    } else {
-      percent.value = 100
-      clearInterval(timer)
-      videoUploading.value = false
-      video.videoUrl = url // fail时不能设置！！
+      video.videoName = up.filename
       succ()
-      // fail()
-    }
-  }, 1000)
+    })
+    .catch((err) => {
+      fail(err)
+    })
+    .finally(() => {
+      videoUploading.value = false
+    })
 }
 
 function submit() {
@@ -649,39 +998,38 @@ function submit() {
     return
   }
 
-  // TODO api
-  // TODO 若在pubed页则需跳转到isPubing
-  console.log(video)
-
-  editWindowVisible.value = false
-  store.switchAsk = false
-  cmjs.prompt.success("修改成功")
-}
-
-function cancelModify(idx: number) {
-  ElMessageBox.confirm('你确认要取消修改该视频吗？', '确认提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    showClose: false,
-    type: 'warning',
-    autofocus: false,
-  })
-    .then(() => {
-      //TODO api
-
-      if (viewItem.value === "isPubing") {
-        isPubing.list.splice(idx, 1)
-        isPubing.total--
-        listNum.isPubingNum--
-      } else if (viewItem.value === "notPubed") {
-        notPubed.list.splice(idx, 1)
-        notPubed.total--
-        listNum.notPubedNum--
+  submitting.value = true
+  VideoAPI.uploadEditVideo(video)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
       }
 
-      cmjs.prompt.success('操作成功')
+      editWindowVisible.value = false
+      store.switchAsk = false
+      cmjs.prompt.success("修改成功")
+      video.videoName = "" // 防止在跳转前的1秒内再次点击
+      setTimeout(() => {
+        timestamp = cmjs.util.getCurBETimestamp()
+        if (viewItem.value !== "isPubing") {
+          viewItem.value = "isPubing"
+          cmjs.util.clearUrlQuery()
+          cmjs.util.addUrlQuery("tab", "isPubing")
+        }
+        if (isPubingCurPage.value !== 1) {
+          isPubingCurPage.value = 1 // isPubingCurPage值变更后自动会setIsPubing()
+        } else {
+          setIsPubing()
+        }
+      }, 1000) // 跳转过快会无法加载最新的数据（应该是后端数据库还没来得及）
+
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      submitting.value = false
     })
 }
 
@@ -711,7 +1059,7 @@ function isPubingCellClick(row: any, column: any) {
 }
 
 function isPubingCellStyle(cell: any) {
-  if (isPubing.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
+  if (isPubing.value.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
     return { cursor: "pointer" }
   }
 
@@ -726,7 +1074,7 @@ function notPubedCellClick(row: any, column: any) {
 }
 
 function notPubedCellStyle(cell: any) {
-  if (notPubed.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
+  if (notPubed.value.list[cell.rowIndex].vid !== undefined && (cell.columnIndex === 0 || cell.columnIndex === 1)) {
     return { cursor: "pointer" }
   }
   return {}
@@ -735,30 +1083,52 @@ function notPubedCellStyle(cell: any) {
 function handleUrlQueryTab(): string {
   const tab = cmjs.util.getUrlQuery('tab')
   if (!tab) {
-    pubed = reactive(getPubed())
+    setPubed()
     return "pubed"
   }
 
   switch (tab) {
     case 'pubed': {
-      pubed = reactive(getPubed())
+      setPubed()
       return "pubed"
     }
     case 'isPubing': {
-      isPubing = reactive(getIsPubing())
+      setIsPubing()
       return "isPubing"
     }
     case 'notPubed': {
-      notPubed = reactive(getNotPubed())
+      setNotPubed()
       return "notPubed"
     }
     default: {
       cmjs.prompt.error('不存在的页面')
       cmjs.util.addUrlQuery('tab', 'pubed')
-      pubed = reactive(getPubed())
+      setPubed()
       return "pubed"
     }
   }
+}
+
+function showAppealDetails(idx: number) {
+  viewing.value.push(idx)
+  VideoAPI.getAppealVideo(notPubed.value.list[idx].appealId!)
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      res.data.imgs = res.data.imgs ? res.data.imgs : []
+      appealVideoDetail.value = res.data
+      appealDetailsWindowVisible.value = true
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+    .finally(() => {
+      const iidx = viewing.value.indexOf(idx)
+      viewing.value.splice(iidx, 1)
+    })
 }
 </script>
 
@@ -774,12 +1144,6 @@ function handleUrlQueryTab(): string {
       margin-left: 0;
       margin-top: 10px;
     }
-  }
-
-  .appealBtnT {
-    cursor: not-allowed;
-    background-color: #c8c9cc;
-    border-color: #c8c9cc;
   }
 
   .page-container {
@@ -906,5 +1270,9 @@ function handleUrlQueryTab(): string {
   td:not(:last-child) {
     border-right: 1px solid #ebeef5 !important;
   }
+}
+
+.appeal-detail-container .el-descriptions__cell.el-descriptions__label.is-bordered-label {
+  width: 135px !important;
 }
 </style>

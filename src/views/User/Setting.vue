@@ -15,6 +15,10 @@
       </div>
       <div class="option">
         <span>公开我的关注列表</span>
+        <el-switch v-model="userSetting.openFollow" />
+      </div>
+      <div class="option">
+        <span>公开我的粉丝列表</span>
         <el-switch v-model="userSetting.openFan" />
       </div>
     </div>
@@ -32,6 +36,7 @@ type UserSetting = {
   openStar: boolean,
   openCoin: boolean,
   openLike: boolean,
+  openFollow: boolean,
   openFan: boolean,
 }
 
@@ -54,7 +59,7 @@ function getUserSetting(): UserSetting {
     //TODO api
     return mockUserSetting
   }
-  return { openStar: false, openCoin: false, openLike: false, openFan: false }
+  return { openStar: false, openCoin: false, openLike: false, openFollow: false, openFan: false }
 }
 </script>
 

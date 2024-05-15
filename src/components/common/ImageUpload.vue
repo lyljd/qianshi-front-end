@@ -97,8 +97,8 @@ function succ() {
   endUpload()
 }
 
-function fail() {
-  cmjs.prompt.error("上传失败")
+function fail(msg?: string) {
+  cmjs.prompt.error(msg ? msg : "上传失败")
   imgUrl.value = preImgUrl
   imgHash = preImgHash
   endUpload()

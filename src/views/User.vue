@@ -1,5 +1,8 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading.fullscreen.lock="pageLoading" element-loading-text="加载中"
+    element-loading-background="rgba(0, 0, 0, 0.7)">
+    <el-alert v-if="user.isBan" title="账号封禁中" type="error" :closable="false" center />
+
     <div class="head">
       <Image :url="topImgUrl" :w="1140" :h="180" errorText="头图加载失败" :errorTextFontSize="20"></Image>
 
@@ -17,12 +20,13 @@
 
         <template #footer>
           <el-button v-blur @click="cancelTopImg">取消</el-button>
-          <el-button v-blur @click="saveTopImg">保存</el-button>
+          <el-button v-blur v-loading="replaceing" :disabled="replaceing" @click="saveTopImg">保存</el-button>
         </template>
       </el-drawer>
 
       <div class="info">
-        <Avatar v-model="user.avatarUrl" size="large" :upload="isMe ? { handler: avatarUploadHandler } : undefined">
+        <Avatar v-model="user.avatarUrl" :text="user.isReview ? '审核中' : ''" size="large"
+          :upload="isMe ? { handler: avatarUploadHandler } : undefined">
         </Avatar>
 
         <div class="right">
@@ -40,25 +44,18 @@
               <span class="iconfont el-icon-ip"></span>
               {{ user.ipLocation }}
             </span>
-
-            <el-tooltip v-if="user.isReview" content="在此期间你可以重新上传头像" placement="top">
-              <span class="iconfont el-icon-info tool-tip">头像审核中</span>
-            </el-tooltip>
-
-            <el-tooltip v-if="user.isBan" content="" placement="top">
-              <span class="iconfont el-icon-info tool-tip">账号封禁中</span>
-            </el-tooltip>
           </div>
 
           <input ref="signatureInput" @blur="saveSignature" :readonly="isMe ? false : true"
             :class="{ 'signature-row-me': isMe, 'signature-row': !isMe }" :placeholder="isMe ? '编辑个性签名' : ''"
-            v-model="signature" @keyup.enter.native="signatureInput?.blur()" />
+            v-model="signature" @keyup.enter.native="signatureInput?.blur()" :maxlength="50" />
         </div>
       </div>
 
       <div v-show="!isMe" class="oper">
-        <el-button v-blur @click="focu" :class="!user.isFocu ? 'not-focu' : ''">{{ !user.isFocu ? "关注" : "已关注"
-          }}</el-button>
+        <div style="position:relative;margin-right:12px;"><el-button v-blur v-loading="focuing" :disabled="focuing"
+            @click="focu" :class="!user.isFocu ? 'not-focu' : ''">{{ !user.isFocu ?
+    "关注" : "已关注" }}</el-button></div>
 
         <el-button v-blur @click="sendMessage">发消息</el-button>
 
@@ -105,15 +102,17 @@
         <div class="flex-grow" />
 
         <div class="num-container">
-          <div class="num-box">
+          <div class="num-box follow-num-box" :class="lastPath === 'follow' ? 'highlight' : ''"
+            @click="cmjs.jump.follow(uid, true)">
             <div class="num-span">关注数</div>
-            <div :title="(user.followNum).toString()" @click="cmjs.jump.follow(uid)" class="num focu-num">{{
-        cmjs.fmt.numWE(user.followNum) }}</div>
+            <div :title="(user.followNum).toString()" class="num">{{
+    cmjs.fmt.numWE(user.followNum) }}</div>
           </div>
-          <div class="num-box">
+          <div class="num-box fan-num-box" :class="lastPath === 'fan' ? 'highlight' : ''"
+            @click="cmjs.jump.fan(uid, true)">
             <div class="num-span">粉丝数</div>
-            <div :title="(user.fanNum).toString()" @click="cmjs.jump.fan(uid)" class="num fan-num">{{
-        cmjs.fmt.numWE(user.fanNum) }}</div>
+            <div :title="(user.fanNum).toString()" class="num">{{
+    cmjs.fmt.numWE(user.fanNum) }}</div>
           </div>
           <div class="num-box">
             <div class="num-span">获赞数</div>
@@ -147,8 +146,9 @@ import cmjs from '@/cmjs'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 import { useRoute } from "vue-router"
-import { ElMessageBox } from "element-plus"
+import { ElMessageBox, UploadUserFile } from "element-plus"
 import * as API from '@/api/user'
+import { useRouter } from "vue-router"
 
 type User = {
   uid: number
@@ -175,8 +175,11 @@ type User = {
 }
 
 const route = useRoute()
+const router = useRouter()
 
 const extraPop = ref()
+
+let pageLoading = ref(false)
 
 const uid = parseInt(route.params.uid as string)
 let user = ref<User>({ uid: uid, nickname: "", signature: "", avatarUrl: "", gender: "保密", level: 1, isVip: false, ipLocation: "", topImgNo: 0, isFocu: false, isBlock: false, postNum: 0, collectionNum: 0, favlistNum: 0, followNum: 0, fanNum: 0, likeNum: 0, playNum: 0, readNum: 0 })
@@ -192,6 +195,10 @@ watch(() => store.isLogin, (newVal: boolean) => {
     isMe.value = false
     getUser()
   }
+})
+
+router.afterEach((to, from) => {
+  setLastPath(to.path)
 })
 
 store.setUserMenuPostNum = setMenuPostNum
@@ -219,8 +226,14 @@ let searchKey = ref("")
 let oldTopImgUrl = ref("")
 let oldTopImgNo = ref(-1)
 let replaceTopImgDrawerShow = ref(false)
+let focuing = ref(false)
+let lastPath = ref("")
+let replaceing = ref(false) // 是否正在更换头图的api请求过程中
+
+setLastPath(route.path)
 
 function getUser() {
+  pageLoading.value = true
   API.userInfo(uid)
     .then((res) => {
       if (res.code !== 0) {
@@ -234,6 +247,9 @@ function getUser() {
     })
     .catch((err) => {
       cmjs.jump.error(err.response.status, err.response.statusText)
+    })
+    .finally(() => {
+      pageLoading.value = false
     })
 }
 
@@ -289,6 +305,7 @@ function cancelTopImg() {
 }
 
 function saveTopImg() {
+  replaceing.value = true
   API.MeTopImgNo(user.value.topImgNo)
     .then((res) => {
       if (res.code !== 0) {
@@ -298,9 +315,13 @@ function saveTopImg() {
 
       replaceTopImgDrawerShow.value = false
       cmjs.prompt.success("更换成功")
+      setTimeout(() => {
+        replaceing.value = false // 关闭窗口时有个延迟动画，需要等一下再解除更换状态，避免连点
+      }, 500)
     })
     .catch((err) => {
       cmjs.prompt.error(err)
+      replaceing.value = false
     })
 }
 
@@ -314,9 +335,47 @@ function focu() {
     return
   }
 
-  // TODO api
-  user.value.isFocu = !user.value.isFocu
-  cmjs.prompt.success(`${user.value.isFocu ? '关注' : '取关'}成功`)
+  focuing.value = true
+  if (!user.value.isFocu) {
+    // 关注
+    API.Follow(user.value.uid)
+      .then((res) => {
+        if (res.code !== 0) {
+          cmjs.prompt.error(res.msg)
+          return
+        }
+
+        user.value.isFocu = true
+        user.value.fanNum++
+        cmjs.prompt.success("关注成功")
+      })
+      .catch((err) => {
+        cmjs.prompt.error(err)
+      })
+      .finally(() => {
+        focuing.value = false
+      })
+
+  } else {
+    // 取关
+    API.CancelFollow(user.value.uid)
+      .then((res) => {
+        if (res.code !== 0) {
+          cmjs.prompt.error(res.msg)
+          return
+        }
+
+        user.value.isFocu = false
+        user.value.fanNum--
+        cmjs.prompt.success("已取关")
+      })
+      .catch((err) => {
+        cmjs.prompt.error(err)
+      })
+      .finally(() => {
+        focuing.value = false
+      })
+  }
 }
 
 function sendMessage() {
@@ -390,7 +449,7 @@ function reportUser() {
   store.openFSWindow({
     title: "用户举报",
     placeholder: "请输入举报理由",
-    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+    submitHandler: (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => {
       // TODO api
       console.log({
         "msg": msg,
@@ -420,6 +479,11 @@ function setMenuFavlistNum(newNum: number) {
 function toSearch() {
   cmjs.prompt.info(`searchKey: ${searchKey.value}`)
 }
+
+function setLastPath(path: string) {
+  let lastIdx = path.lastIndexOf('/')
+  lastPath.value = route.path.substring(lastIdx + 1)
+}
 </script>
 
 <style lang="less" scoped>
@@ -431,6 +495,7 @@ function toSearch() {
     width: 1140px;
     height: 180px;
     position: relative;
+    margin-top: 10px;
 
     .replace-top-img {
       position: absolute;
@@ -611,11 +676,16 @@ function toSearch() {
             text-align: center;
             margin-top: 5px;
           }
+        }
 
-          .focu-num:hover,
-          .fan-num:hover {
+        .follow-num-box:hover,
+        .fan-num-box:hover,
+        .highlight {
+          color: #409EFF;
+          cursor: pointer;
+
+          .num-span {
             color: #409EFF;
-            cursor: pointer;
           }
         }
       }

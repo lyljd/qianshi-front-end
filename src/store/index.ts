@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { UploadUserFile } from 'element-plus'
 
 interface StoreState {
   isLogin: boolean
@@ -16,13 +17,14 @@ type Region = {
 }
 
 type FSOpt = {
-  title: string,
-  placeholder?: string,
-  msgMaxlength?: number,
-  fileSize?: number,
-  fileNum?: number,
-  submitHandler: (msg: string, fileList: File[], closeWindow: Function) => void,
-  cancelHandler?: Function,
+  title: string
+  tip?: string
+  placeholder?: string
+  msgMaxlength?: number
+  fileSize?: number
+  fileNum?: number
+  submitHandler: (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => void
+  cancelHandler?: Function
 }
 
 type Receiver = {
@@ -59,6 +61,6 @@ export const useStore = defineStore("qianshi", {
     setUserMenuFavlistNum: (newNum: number) => { },
     setNewMessageNum: (num: number) => { },
     setNewDynamicNum: (num: number) => { },
-    getRegions: () => { },
+    getRegions: async () => { },
   }
 })

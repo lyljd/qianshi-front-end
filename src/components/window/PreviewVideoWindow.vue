@@ -28,12 +28,12 @@ function beforePVWindowClose(done: Function) {
 <style>
 .preview-video {
   border-radius: 10px !important;
+  width: auto;
 }
 
 .preview-video video {
-  width: 100%;
+  height: 75vh;
   border-radius: 10px;
-  vertical-align: top;
 }
 
 .preview-video .el-dialog__header {

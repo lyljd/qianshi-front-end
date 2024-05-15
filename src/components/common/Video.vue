@@ -263,8 +263,8 @@
         </ul>
       </div>
 
-      <el-dialog v-model="shortcutKeyDescriptionWindowVisible" title="快捷键说明" :center="true" :align-center="true"
-        :width="300">
+      <el-dialog :modal="fullScreenStatus" v-model="shortcutKeyDescriptionWindowVisible" title="快捷键说明" :center="true"
+        :align-center="true" :width="300">
         <el-table :data="shortcutKeyDesc" :show-header="false">
           <el-table-column prop="key" label="快捷键" :align="'center'" />
           <el-table-column prop="desc" label="说明" :align="'center'" />
@@ -348,7 +348,7 @@ import VipPriIco from '@/components/common/VipPriIco.vue'
 import cmjs from '@/cmjs'
 import { useStore } from '@/store'
 import { storeToRefs } from 'pinia'
-import { InputInstance, ElMessageBox } from 'element-plus'
+import { InputInstance, ElMessageBox, UploadUserFile } from 'element-plus'
 
 type VideoQuality = {
   label: string,
@@ -401,7 +401,7 @@ const props = defineProps<{
 }>()
 
 const vidRef = toRef(props, 'vid')
-watch(vidRef, () => {
+watch(vidRef, (newVal, oldVal) => {
   firstPlay.value = true
   playSpeed.value = 1
   calcVideoUrlAndQuality()
@@ -411,7 +411,9 @@ watch(vidRef, () => {
   runningDanmus.value = []
 
   nextTick(() => {
-    videoEle.play()
+    if (oldVal !== 0) {
+      videoEle.play()
+    }
   })
   initDanmuMap()
   calcActiveItemPos()
@@ -579,7 +581,7 @@ onMounted(() => {
 
   videoEle.addEventListener('contextmenu', function (event: any) {
     event.preventDefault()
-    showContext(event.pageX, event.pageY)
+    showContext(event.offsetX, event.offsetY + (fullScreenStatus.value ? 0 : 77))
   })
 
   window.addEventListener('click', function () {
@@ -914,7 +916,7 @@ function hoverDanmu(d: Danmu, event: MouseEvent) {
       dmHover.dm = d
       const dmEle = document.getElementById(`dm-${d.id}`) as HTMLElement
 
-      dmHover.x = event.clientX - screenEle.offsetLeft - hoverMenuEle.clientWidth / 2 + window.scrollX + (dmHover.dm.isUp ? 15 : 0)
+      dmHover.x = event.clientX - screenEle.getBoundingClientRect().left - hoverMenuEle.clientWidth / 2 + window.scrollX + (dmHover.dm.isUp ? 15 : 0)
       hmbLeft.value = "50%"
       hmbTF.value = "translateX(-50%)"
       if (dmHover.x < 0) {
@@ -922,9 +924,10 @@ function hoverDanmu(d: Danmu, event: MouseEvent) {
         dmHover.x = 0
         hmbLeft.value = ""
         hmbTF.value = ""
-      } else if (dmHover.x > screenEle.clientWidth - hoverMenuEle.clientWidth) {
+      } else if (dmHover.x > screenEle.clientWidth + 30 - hoverMenuEle.clientWidth) {
         // 菜单显示位置超出右边界
-        dmHover.x = screenEle.clientWidth - hoverMenuEle.clientWidth
+        // 不知何原因正好差了30，在第49次提交时作为修bug使用
+        dmHover.x = screenEle.clientWidth + 30 - hoverMenuEle.clientWidth
         hmbLeft.value = "calc(100% - 7.5px)"
         hmbTF.value = "translateX(-100%)"
       }
@@ -1051,7 +1054,7 @@ function reportDanmu(did: number) {
   store.openFSWindow({
     title: "弹幕举报",
     placeholder: "请输入举报理由",
-    submitHandler: (msg: string, fileList: File[], closeWindow: Function) => {
+    submitHandler: (msg: string, fileList: UploadUserFile[], submitting: globalThis.Ref<boolean>, closeWindow: Function) => {
       // TODO api
       console.log({
         "msg": msg,
@@ -1286,6 +1289,7 @@ function handleFullscreenChange() {
     thProportion.value = 1
     dsProportion.value = 1
   }
+  contextMenuEle.style.display = 'none'
   trackReduce.value = calcTrackReduce()
   showCtlBar()
 }
@@ -1342,9 +1346,17 @@ function handleVideoError() {
 }
 
 function showContext(left: number, top: number) {
+  const maxLeft = videoEle.clientWidth - 188
+  const maxTop = videoEle.clientHeight - 149.38 + (fullScreenStatus.value ? 0 : 77)
+  if (left > maxLeft) {
+    left = maxLeft
+  }
+  if (top > maxTop) {
+    top = maxTop
+  }
   contextMenuEle.style.display = 'block'
-  contextMenuEle.style.left = left + 'px'
-  contextMenuEle.style.top = top + 'px'
+  contextMenuEle.style.left = `${left}px`
+  contextMenuEle.style.top = `${top}px`
   contextStatus.value = true
 }
 
