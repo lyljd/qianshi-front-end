@@ -1,7 +1,7 @@
 <template>
   <div style="position: relative;" @click="onClick">
     <img
-      @error="url = 'https://cdn.qianshi.fun/default-avatar.png?auth_key=1741881639-0-0-8c52d45ef270f436878becd527a8c744'"
+      @error="url = 'https://cdn.qianshi.fun/default-avatar.png'"
       :src="url" :class="'avatar-' + data.size"
       :style="{ cursor: data.upload || data.home ? uploading ? 'not-allowed' : 'pointer' : 'default', opacity: uploading ? 0.5 : text ? 0.25 : 1 }" />
 

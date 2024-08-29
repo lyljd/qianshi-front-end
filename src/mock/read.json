@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "publishAt": 1713498740,
+    "uid": 2,
+    "nickname": "Bonnenult",
+    "title": "什么是闭包？",
+    "content": "闭包就是能够读取其他函数内部变量的函数。我们想想，一个函数被调用完之后，其内部的变量会被自动回收掉，下一次调用的时候又会被重新初始化。但是闭包可以使其不被回收，而且下...",
+    "cover": "https://cdn.qianshi.fun/temp/壁纸/b站22娘.png",
+    "tags": [
+      "闭包",
+      "Go",
+      "技术分析"
+    ],
+    "readNum": 23,
+    "likeNum": 5
+  },
+  {
+    "id": 2,
+    "publishAt": 1716508246,
+    "uid": 2,
+    "nickname": "Bonnenult",
+    "title": "单元测试",
+    "content": "在写代码的时候，有时候完成了一个函数，肯定要测试一下写的到底对不对，在没学单元测试前肯定是把新写的函数放到main函数里面去，然后可能会把不相关的代码给注释掉，在项目...",
+    "tags": [
+      "测试",
+      "Go"
+    ],
+    "readNum": 0,
+    "likeNum": 0
+  },
+  {
+    "id": 3,
+    "publishAt": 1714498740,
+    "uid": 1,
+    "nickname": "浅时",
+    "title": "好消息",
+    "content": "网站终于上线啦！",
+    "tags": [],
+    "readNum": 7,
+    "likeNum": 1
+  }
+]

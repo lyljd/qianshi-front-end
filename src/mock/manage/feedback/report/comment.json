@@ -5,11 +5,11 @@
       "id": 1,
       "uid": 1,
       "nickname": "Bonnenult",
-      "reportTime": 1698889800000,
+      "reportTime": 1698889800,
       "reportInfo": {
         "content": "测试下评论举报",
         "imgs": [
-          "/resource/壁纸/锁屏1.jpg"
+          "https://cdn.qianshi.fun/temp/壁纸/锁屏1.jpg"
         ]
       },
       "commentInfo": {
@@ -17,7 +17,7 @@
         "vid": 1,
         "uid": 1,
         "nickname": "Bonnenult",
-        "time":1698076800000,
+        "time":1698076800,
         "content": "欢迎大家多多评论噢！"
       }
     }

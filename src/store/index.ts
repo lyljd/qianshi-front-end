@@ -8,7 +8,10 @@ interface StoreState {
   power: number
   errCode: number
   errMsg: string
-  regions: Region[]
+  videoRegions: Region[]
+  readRegions: Region[]
+  richTextEditorHasRegist: boolean
+  richTextEditorPreview: boolean
 }
 
 type Region = {
@@ -40,7 +43,10 @@ export const useStore = defineStore("qianshi", {
     power: -1,
     errCode: 404,
     errMsg: "未找到页面",
-    regions: [],
+    videoRegions: [],
+    readRegions: [],
+    richTextEditorHasRegist: false,
+    richTextEditorPreview: false,
   }),
 
   actions: {
@@ -60,7 +66,8 @@ export const useStore = defineStore("qianshi", {
     setUserMenuCollectionNum: (newNum: number) => { },
     setUserMenuFavlistNum: (newNum: number) => { },
     setNewMessageNum: (num: number) => { },
-    setNewDynamicNum: (num: number) => { },
-    getRegions: async () => { },
+    getVideoRegions: async () => { },
+    getReadRegions: async () => { },
+    setReadSlug: (slug: string) => { },
   }
 })

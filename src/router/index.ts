@@ -34,13 +34,14 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/User.vue"),
     children: [
       { path: "/u/:uid", component: () => import("@/views/User/Home.vue") },
-      { path: "/u/:uid/dynamic", component: () => import("@/views/User/Dynamic.vue") },
       { path: "/u/:uid/post", component: () => import("@/views/User/Post.vue") },
       { path: "/u/:uid/collection", component: () => import("@/views/User/Collection.vue") },
       { path: "/u/:uid/favlist", component: () => import("@/views/User/Favlist.vue") },
       { path: "/u/:uid/setting", component: () => import("@/views/User/Setting.vue") },
       { path: "/u/:uid/follow", component: () => import("@/views/User/Follow.vue") },
       { path: "/u/:uid/fan", component: () => import("@/views/User/Fan.vue") },
+      { path: "/u/:uid/likeVideos", component: () => import("@/views/User/LikeVideos.vue") },
+      { path: "/u/:uid/coinVideos", component: () => import("@/views/User/CoinVideos.vue") },
     ]
   },
 
@@ -52,7 +53,6 @@ const routes: Array<RouteRecordRaw> = [
       { path: "/me/setting", component: () => import("@/views/Me/Setting.vue") },
       { path: "/me/security", component: () => import("@/views/Me/Security.vue") },
       { path: "/me/coin", component: () => import("@/views/Me/Coin.vue") },
-      { path: "/me/blacklist", component: () => import("@/views/Me/Blacklist.vue") },
     ],
     meta: {
       title: '个人中心',
@@ -153,14 +153,72 @@ const routes: Array<RouteRecordRaw> = [
           power: 3,
         }
       },
-
-      { path: "/manage/statistic", component: () => import("@/views/Manage/Statistic.vue"), meta: { power: 5 } },
     ],
     meta: {
       title: '后台管理',
       needLogin: true,
       power: 1,
     },
+  },
+
+  {
+    path: "/read",
+    component: () => import("@/views/Read.vue"),
+    redirect: "/read/recommended",
+    children: [
+      { path: "/read/:region", component: () => import("@/views/Read.vue") }
+    ],
+    meta: {
+      title: '专栏',
+    }
+  },
+
+  {
+    path: "/r/:rid",
+    component: () => import("@/views/Read/Details.vue")
+  },
+
+  {
+    path: "/vip",
+    component: () => import("@/views/Vip.vue"),
+    meta: {
+      title: "会员",
+    }
+  },
+
+  {
+    path: "/region/:slug",
+    component: () => import("@/views/Region.vue")
+  },
+
+  {
+    path: "/history",
+    component: () => import("@/views/History.vue"),
+    meta: {
+      title: "历史记录",
+    }
+  },
+
+  {
+    path: "/hot",
+    component: () => import("@/views/Hot.vue"),
+    meta: {
+      title: "热门",
+    }
+  },
+
+  {
+    path: "/search",
+    component: () => import("@/views/Search.vue")
+  },
+
+  {
+    path: "/message",
+    children: [
+      { path: "/message/reply", component: () => import("@/views/Message/Reply.vue") },
+      { path: "/message/system", component: () => import("@/views/Message/System.vue") },
+      { path: "/message/chat", component: () => import("@/views/Message/Chat.vue") },
+    ],
   },
 ]
 

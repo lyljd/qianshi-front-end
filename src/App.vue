@@ -1,6 +1,6 @@
 <template>
   <div v-if="!cmjs.util.isMobile()">
-    <el-backtop :right="50" :bottom="50" />
+    <el-backtop style="z-index: 2000;" :right="50" :bottom="50" />
 
     <TopMenuBar v-if="store.topPath !== 'manage'"></TopMenuBar>
 
@@ -9,7 +9,7 @@
     <div>
       <router-view></router-view>
 
-      <div v-if="store.topPath !== 'manage'" class="in-site-message-container">
+      <div v-if="store.topPath === '' || store.topPath === 'read'" class="in-site-message-container">
         <span @click="inSiteMessage" v-if="store.isLogin" class="in-site-message">站内留言</span>
       </div>
 

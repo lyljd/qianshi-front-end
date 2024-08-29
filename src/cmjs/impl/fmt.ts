@@ -1,5 +1,5 @@
 // fmt.ts 将数据格式化
-// 由于js的时间戳相较于绝大多数后端而言都要多3个0，所以在tsRich和tsTmpl处理时会将时间戳*1000
+// 由于js的时间戳相较于绝大多数后端而言都要多3个0，所以在tsRich、tsTmpl和处理时会将时间戳*1000
 
 import util from "./util"
 
@@ -61,7 +61,7 @@ export default {
   // *使用该函数时template不能含有"YYYY-"
   tsYTmpl(timestamp: number, template: string): string {
     const curYear = new Date(Date.now()).getFullYear()
-    const tsYear = new Date(timestamp).getFullYear()
+    const tsYear = new Date(timestamp * 1000).getFullYear()
     if (curYear === tsYear) {
       return this.tsTmpl(timestamp, template)
     }
@@ -74,7 +74,7 @@ export default {
   tsYRichTmpl(timestamp: number, template: string): string {
     const now = new Date()
     const today0ClockTimestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    if (timestamp >= today0ClockTimestamp.getTime()) {
+    if (timestamp * 1000 >= today0ClockTimestamp.getTime()) {
       return tsRich(timestamp)
     }
     return this.tsYTmpl(timestamp, template)

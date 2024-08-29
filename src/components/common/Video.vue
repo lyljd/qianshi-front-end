@@ -10,6 +10,13 @@
               style="margin-left: 15px;">{{ idx }}</span></div>
         </div>
 
+        <el-card v-show="props.vip && props.video[0].url === ''" class="vip-notice">
+          <div class="vn-row">
+            <span style="cursor: default;">本视频是会员专享内容</span>
+            <el-button @click="cmjs.jump.new('/vip')" type="success">开通会员</el-button>
+          </div>
+        </el-card>
+
         <div v-for="d in runningDanmus" :key="d.id" class="danmu"
           :class="{ danmuModalUp: d.isUp, danmuBorderNew: d.isNew && !d.isUp }" @animationend="doneDanmu(d)"
           :style="{ animationPlayState: d.id === dmHover.dm.id || !playStatus ? 'paused' : '', color: d.color, top: `${d.track! * trackHeight * thProportion + (trackHeight * thProportion - 20 * dmSize * dsProportion / 100) / 2 - (d.isUp ? 5 : 0)}px`, zIndex: dmShow ? 'auto' : '-1', opacity: dmOpacity / 100, fontSize: `${20 * dmSize * dsProportion / 100}px`, lineHeight: `${20 * dmSize * dsProportion / 100}px`, animationDuration: `${10 - dmSpeed + (d.aniDiff as number)}s` }"
@@ -58,8 +65,9 @@
         <transition :leaveActiveClass="!btProgerssShow ? 'animate__animated animate__fadeOut' : ''"
           enterActiveClass="animate__animated animate__fadeIn">
           <div class="ctl-bar-container" v-show="ctlBarShow">
-            <el-progress @click="handleProgressClick" @mousemove="handleProgressMove" @mouseleave="hidePreview"
-              class="progress" :percentage="videoTimePercentage" :show-text="false" />
+            <DoubleLayerProgress class="progress" :flp="videoLoadedPercentage" :slp="videoTimePercentage"
+              @click="handleProgressClick" @mousemove="handleProgressMove" @mouseleave="hidePreview">
+            </DoubleLayerProgress>
 
             <div id="ctl-bar" class="ctl-bar">
               <div class="left-bar">
@@ -248,15 +256,16 @@
         </transition>
 
         <transition enterActiveClass="animate__animated animate__fadeIn">
-          <el-progress class="bt-progress" v-show="!ctlBarShow && btProgerssShow" :percentage="videoTimePercentage"
-            :show-text="false" :stroke-width="fullScreenStatus ? 1 : 3"
-            :style="{ marginTop: fullScreenStatus ? -1 : -3 + 'px' }" />
+          <DoubleLayerProgress class="bt-progress" v-show="!ctlBarShow && btProgerssShow" :flp="videoLoadedPercentage"
+            :slp="videoTimePercentage" :h="fullScreenStatus ? 1 : 3"
+            :style="{ marginTop: fullScreenStatus ? -1 : -3 + 'px' }">
+          </DoubleLayerProgress>
         </transition>
       </div>
 
       <div class="context-menu">
         <ul>
-          <li>弹幕视频播放器 v021724</li>
+          <li>弹幕视频播放器 v061324</li>
           <li @click="copyVideoUrl">复制视频地址（精准空降）</li>
           <li @click="shortcutKeyDescriptionWindowVisible = true">快捷键说明</li>
           <li @click="cmjs.jump.developer()">关于作者</li>
@@ -273,7 +282,7 @@
     </div>
 
     <div class="danmu-bar">
-      <span class="statistic">{{ cmjs.fmt.numWE(0) }} 人正在看，已装填 {{ cmjs.fmt.numWE(props.danmus.length) }} 条弹幕</span>
+      <span class="statistic">已装填 {{ cmjs.fmt.numWE(props.danmus.length) }} 条弹幕</span>
 
       <el-tooltip :content="dmShow ? '关闭弹幕(d)' : '开启弹幕(d)'" placement="top" effect="light" :enterable="false">
         <span @click="setDanmuShow" class="iconfont icon dm-ico"
@@ -345,6 +354,7 @@
 <script setup lang="ts">
 import ColorPicker from '@/components/common/ColorPicker.vue'
 import VipPriIco from '@/components/common/VipPriIco.vue'
+import DoubleLayerProgress from '@/components/common/DoubleLayerProgress.vue'
 import cmjs from '@/cmjs'
 import { useStore } from '@/store'
 import { storeToRefs } from 'pinia'
@@ -358,7 +368,7 @@ type VideoQuality = {
 type Collection = {
   vid: number
   title: string
-  duration: number
+  url: string
   vip: boolean
 }
 
@@ -418,6 +428,21 @@ watch(vidRef, (newVal, oldVal) => {
   initDanmuMap()
   calcActiveItemPos()
 })
+
+// <-- 以下这部分是为了修复登录前后prpos.video变动了之后，videoEle的src没有变动的问题
+// 这段代码有可能导致一些bug？？？（目前是没有观测到）
+const propVideoRef = toRef(props, 'video')
+watch(propVideoRef, (newVal, oldVal) => {
+  videoEle.src = props.video[0].url
+  psvEle.src = props.video[0].url
+  videoTimePercentage.value = 0
+  if (newVal[0].url === '') {
+    videoDuration.value = "00:00"
+    showCtlBar(-1)
+    playStatus.value = false
+  }
+})
+// -->
 
 const store = useStore()
 
@@ -507,6 +532,7 @@ let playStatus = ref(false)
 let contextStatus = ref(false) // 菜单是否显示
 let errorStatus = ref(false) // 视频是否加载失败
 let shortcutKeyDescriptionWindowVisible = ref(false)
+let videoLoadedPercentage = ref(0)
 let videoTimePercentage = ref(0)
 let videoCurrent = ref("00:00")
 let videoDurationNumber = ref(0) // 该视频有多少秒
@@ -606,9 +632,14 @@ onMounted(() => {
     }
   })
 
-  videoEle.addEventListener('timeupdate', function () {
+  videoEle.addEventListener('timeupdate', function (e: Event) {
     videoTimePercentage.value = videoEle.currentTime / videoEle.duration * 100
     videoCurrent.value = cmjs.fmt.videoDuration(Math.floor(videoEle.currentTime))
+
+    if (videoEle.buffered.length > 0) {
+      const bufferedEnd = videoEle.buffered.end(videoEle.buffered.length - 1)
+      videoLoadedPercentage.value = bufferedEnd / videoEle.duration * 100
+    }
 
     const ct = Math.floor(videoEle.currentTime)
     if (danmuMap.has(ct) && !errorStatus.value) {
@@ -1342,7 +1373,9 @@ function handleVideoError() {
   if (pipStatus.value) {
     cancelPip()
   }
-  cmjs.prompt.error("视频加载失败")
+  if (!(props.vip && props.video[0].url === "")) {
+    cmjs.prompt.error("视频加载失败")
+  }
 }
 
 function showContext(left: number, top: number) {
@@ -1423,6 +1456,19 @@ function hidePreview() {
 
       .track:nth-child(even) {
         background-color: #FAFAFA;
+      }
+    }
+
+    .vip-notice {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      .vn-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
     }
 
@@ -1548,11 +1594,6 @@ function hidePreview() {
       .progress {
         cursor: pointer;
         margin-top: -56px;
-
-        :deep(.el-progress-bar__outer),
-        :deep(.el-progress-bar__inner) {
-          border-radius: unset;
-        }
       }
 
       .ctl-bar {

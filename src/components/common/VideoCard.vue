@@ -12,27 +12,36 @@
     </el-tooltip>
 
     <div style="position: relative;">
-      <Image v-show="!playStatus" :url="data.coverUrl" :w="cs.w" :h="cs.ch"
-        :errorText="!data.expire ? '封面加载失败' : '视频已失效'" :errorTextFontSize="cs.bfs" class="cover"
-        @click="!data.expire ? cmjs.jump.video(data.vid) : undefined" @mouseenter="coverMouseEnter"
-        @mouseleave="coverMouseLeave" :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
-      </Image>
+      <el-skeleton animated :loading="loading">
+        <template #template>
+          <el-skeleton-item variant="image" :style="{ width: `${cs.w}px`, height: `${cs.ch}px` }"
+            style="border-radius: 5px;" />
+        </template>
 
-      <VipPriIco v-if="data.vip && !data.expire" :fs="cs.ufs" class="vc-vpi" v-show="!playStatus"></VipPriIco>
+        <Image v-show="!playStatus" :url="data.coverUrl" :w="cs.w" :h="cs.ch"
+          :errorText="!data.expire ? '封面加载失败' : '视频已失效'" :errorTextFontSize="cs.bfs" class="cover"
+          @click="!data.expire ? cmjs.jump.video(data.vid) : undefined" @mouseenter="coverMouseEnter"
+          @mouseleave="coverMouseLeave" :style="{ cursor: !data.expire ? 'pointer' : 'not-allowed' }">
+        </Image>
+      </el-skeleton>
 
-      <div v-if="!data.expire" v-show="!playStatus && !hoverInfoStatus" class="inner-info"
+      <VipPriIco v-if="data.vip && !data.expire" :fs="cs.ufs" class="vc-vpi" v-show="!playStatus && !loading">
+      </VipPriIco>
+
+      <div v-if="!data.expire" v-show="!playStatus && !hoverInfoStatus && !loading" class="inner-info"
         :style="{ width: `${cs.w}px`, height: `${cs.ufs + 10}px`, lineHeight: `${cs.ufs + 10}px`, fontSize: `${cs.ufs}px`, justifyContent: innerInfoShow ? 'space-between' : 'right' }">
         <span v-if="innerInfoShow" style="margin-left: 5px;">
           <span>
             <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
     cmjs.fmt.numWE(data.playNum) }}
           </span>
-          <span style="margin-left: 5px;">
+          <!-- <span style="margin-left: 5px;">
             <span class="iconfont el-icon-danmushu" :style="{ fontSize: `${cs.ufs}px` }"></span>{{
     cmjs.fmt.numWE(data.danmuNum) }}
-          </span>
+          </span> -->
         </span>
-        <span v-show="!hoverInfoStatus" style="margin-right: 5px;">{{ cmjs.fmt.videoDuration(data.duration) }}</span>
+        <span v-if="!(data.vip && data.videoUrl === '')" v-show="!hoverInfoStatus" style="margin-right: 5px;">{{
+    cmjs.fmt.videoDuration(duration) }}</span>
       </div>
     </div>
 
@@ -46,47 +55,63 @@
       :style="{ width: `${cs.w}px`, height: `${cs.ch}px`, fontSize: `${cs.bfs}px` }">
       <div class="hover-style-info" :style="{ height: `${cs.ch - 20}px` }">
         <div>播放：{{ cmjs.fmt.numWE(data.playNum) }}</div>
-        <div>弹幕：{{ cmjs.fmt.numWE(data.danmuNum) }}</div>
+        <!-- <div>弹幕：{{ cmjs.fmt.numWE(data.danmuNum) }}</div> -->
         <div class="hover-style-info-up">UP主：{{ data.nickname }}</div>
         <div>投稿：{{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}</div>
       </div>
     </div>
 
     <div class="info" :style="{ height: `${cs.h - cs.ch}px` }">
-      <div class="title-row" :style="{ lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">
-        <span v-if="!data.expire" @click="cmjs.jump.video(data.vid)" :title="data.title" class="title"
-          :style="{ fontSize: `${cs.bfs}px` }">{{
+      <el-skeleton animated :loading="loading">
+        <template #template>
+          <el-skeleton-item variant="text"
+            :style="{ height: `${cs.bfs}px`, margin: `${(cs.h - cs.ch - cs.ufs - cs.bfs) / 2}px 0` }"
+            style="display: block;" />
+        </template>
+
+        <div class="title-row" :style="{ lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">
+          <span v-if="!data.expire" @click="cmjs.jump.video(data.vid)" :title="data.title" class="title"
+            :style="{ fontSize: `${cs.bfs}px` }">{{
     data.title
   }}</span>
-        <el-tooltip v-else content="因为该视频已被删除或隐藏" placement="top">
-          <div class="iconfont el-icon-info" style="cursor: default; display: inline-flex;"
-            :style="{ fontSize: `${cs.bfs}px`, lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">视频为什么会失效？</div>
-        </el-tooltip>
-      </div>
+          <el-tooltip v-else content="因为该视频已被删除或隐藏" placement="top">
+            <div class="iconfont el-icon-info" style="cursor: default; display: inline-flex;"
+              :style="{ fontSize: `${cs.bfs}px`, lineHeight: `${cs.h - cs.ch - cs.ufs}px` }">视频为什么会失效？</div>
+          </el-tooltip>
+        </div>
+      </el-skeleton>
 
       <div class="util-container" :style="{ fontSize: `${cs.ufs}px` }">
-        <div class="util-row">
-          <span v-if="data.starDate && data.expire" style="cursor: default; margin-right: 10px;">收藏于：{{ data.starDate ?
+        <el-skeleton animated :loading="loading">
+          <template #template>
+            <el-skeleton-item variant="text" :style="{ height: `${cs.ufs + 2}px` }" style="display: block; width: 50%" />
+          </template>
+
+          <div class="util-row">
+            <span v-if="data.starDate && data.expire" style="cursor: default; margin-right: 10px;">收藏于：{{ data.starDate
+    ?
     cmjs.fmt.tsYRichTmpl(data.starDate, "MM-DD") : '未知' }}</span>
-          <span v-if="props.type === 'big' || data.expire" @click="cmjs.jump.user(data.uid)"
-            :title="data.nickname + ' · ' + cmjs.fmt.tsYRichTmpl(data.date, 'MM-DD')" class="util util-hl">
-            <span class="iconfont el-icon-UPzhu" :style="{ fontSize: `${cs.ufs}px` }"></span>
-            {{ data.nickname }} · {{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}
-          </span>
+            <span v-if="props.type === 'big' || data.expire" @click="cmjs.jump.user(data.uid)"
+              :title="data.nickname + ' · ' + cmjs.fmt.tsYRichTmpl(data.date, 'MM-DD')" class="util util-hl">
+              <span class="iconfont el-icon-UPzhu" :style="{ fontSize: `${cs.ufs}px` }"></span>
+              {{ data.nickname }} · {{ cmjs.fmt.tsYRichTmpl(data.date, "MM-DD") }}
+            </span>
 
-          <div v-else>
-            <span v-if="props.type === 'small'" class="util">
-              <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>
-              {{ cmjs.fmt.numWE(data.playNum) }}<span style="margin-left: 10px;">{{ cmjs.fmt.tsYRichTmpl(data.date,
+            <div v-else>
+              <span v-if="props.type === 'small'" class="util">
+                <span class="iconfont el-icon-bofangshu" :style="{ fontSize: `${cs.ufs}px` }"></span>
+                {{ cmjs.fmt.numWE(data.playNum) }}<span style="margin-left: 10px;">{{ cmjs.fmt.tsYRichTmpl(data.date,
     "MM-DD")
-                }}</span>
-            </span>
+                  }}</span>
+              </span>
 
-            <span v-if="props.type === 'small-star'" class="util" style="cursor: default;">
-              收藏于：{{ data.starDate ? cmjs.fmt.tsYRichTmpl(data.starDate, "MM-DD") : '未知' }}
-            </span>
+              <span v-if="props.type === 'small-star'" class="util" :style="{ fontSize: `${cs.ufs}px` }"
+                style="cursor: default;">
+                收藏于：{{ data.starDate ? cmjs.fmt.tsYRichTmpl(data.starDate, "MM-DD") : '未知' }}
+              </span>
+            </div>
           </div>
-        </div>
+        </el-skeleton>
 
         <el-popover ref="extraPop" trigger="click" placement="bottom-end">
           <template #reference>
@@ -120,8 +145,7 @@ type VideoCardData = {
   videoUrl: string
   coverUrl: string
   playNum: number
-  danmuNum: number
-  duration: number
+  // danmuNum: number
   title: string
   uid: number
   nickname: string
@@ -137,6 +161,7 @@ const props = withDefaults(defineProps<{
   hoverStyle: "preview" | "info",
   innerInfo: boolean,
   watchLater: boolean,
+  loading: boolean, // 加载时显示骨架屏
   extra: {
     name: string,
     cb: Function, // callback
@@ -146,6 +171,11 @@ const props = withDefaults(defineProps<{
   innerInfo: undefined,
   watchLater: undefined,
   extra: undefined,
+  loading: false,
+})
+
+watch(props, () => {
+  cmjs.util.getVideoDuration(props.data.videoUrl, duration)
 })
 
 const videoEle = ref<HTMLVideoElement>()
@@ -161,6 +191,8 @@ let coverHoverStatus = ref(false)
 let videoHoverStatus = ref(false)
 let wliHoverStatus = ref(false) // watchLater ico
 let watchLaterStatus = ref(false)
+let duration = ref(0)
+cmjs.util.getVideoDuration(props.data.videoUrl, duration)
 
 initData()
 
@@ -208,20 +240,23 @@ function initData() {
 
 function coverMouseEnter() {
   coverHoverStatus.value = true
-  switch (hoverStyleSwitch.value) {
-    case "preview": {
-      setTimeout(() => {
-        videoHoverStatus.value = false
-        if (coverHoverStatus.value) {
-          playStatus.value = true
-          videoEle.value?.play()
-        }
-      }, 1000)
-      break
-    }
-    case "info": {
-      hoverInfoStatus.value = true
-      break
+
+  if (!(props.data.vip && props.data.videoUrl === '')) {
+    switch (hoverStyleSwitch.value) {
+      case "preview": {
+        setTimeout(() => {
+          videoHoverStatus.value = false
+          if (coverHoverStatus.value) {
+            playStatus.value = true
+            videoEle.value?.play()
+          }
+        }, 1000)
+        break
+      }
+      case "info": {
+        hoverInfoStatus.value = true
+        break
+      }
     }
   }
 }

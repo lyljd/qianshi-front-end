@@ -14,8 +14,8 @@
             </div>
             <div class="row">
               <span class="tag">密码</span>
-              <el-input :autocomplete="autocomplete" @keyup.enter.native="login" class="input" maxlength="20" type="password" show-password
-                v-model="password" placeholder="请输入密码" />
+              <el-input :autocomplete="autocomplete" @keyup.enter.native="login" class="input" maxlength="20"
+                type="password" show-password v-model="password" placeholder="请输入密码" />
             </div>
           </div>
           <div class="tip" style="text-align: center;">
@@ -67,7 +67,6 @@ type LoginInfo = {
   token: string,
   refreshToken: string,
   newMessageNum: number,
-  newDynamicNum: number,
 }
 
 type disabledEleResp = {
@@ -270,8 +269,7 @@ function loginSuccDo(li: LoginInfo) {
   dialogVisible.value = false
   lbDis.endCountDown(false)
   store.isLogin = true
-  store.setNewMessageNum(li.newMessageNum)
-  store.setNewDynamicNum(li.newDynamicNum)
+  // store.setNewMessageNum(li.newMessageNum)
   setTimeout(() => {
     store.setTopMenuBarAvatar(li.avatarUrl)
   }, 0)

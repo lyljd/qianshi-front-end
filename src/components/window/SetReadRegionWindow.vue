@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="mainWindowVisible" width="33%" title="设置分区" class="srw" :close-on-click-modal="false"
+  <el-dialog v-model="mainWindowVisible" width="33%" title="设置专栏分区" class="srw" :close-on-click-modal="false"
     :close-on-press-escape="false" :show-close="false" align-center destroy-on-close>
 
     <div class="body">
@@ -9,11 +9,16 @@
           <el-input :readonly="saveLoading" @focus="activeIdx = idx" :id="`r-name-${r.name}`" v-model="r.name"
             placeholder="name" />
           <div class="divider"></div>
-          <el-input :readonly="saveLoading" @focus="activeIdx = idx" :id="`r-slug-${r.slug}`" v-model="r.slug"
-            placeholder="slug" />
+          <el-input :readonly="saveLoading || idx < dataCopy.length" @focus="activeIdx = idx" :id="`r-slug-${r.slug}`" v-model="r.slug"
+            placeholder="slug" :class="saveLoading || idx < dataCopy.length ? 'slug-ban-input' : ''" />
         </div>
         <div v-else class="flex-center" style="color: #909399;">暂无分区</div>
       </el-card>
+      <div class="tip">
+        <div>name不能为“综合”；slug不能为“recommended”</div>
+        <span>在保存后slug将<span style="color: red;">不能再修改</span></span>
+        <span>若某分区已有内容则<span style="color: red;">不能删除</span></span>
+      </div>
     </div>
 
     <template #footer>
@@ -38,6 +43,7 @@ import cmjs from '@/cmjs'
 import { useStore } from "@/store"
 import { ElMessageBox } from 'element-plus'
 import * as ManageAPI from '@/api/manage'
+import _ from 'lodash'
 
 type Data = {
   sort?: number
@@ -59,12 +65,12 @@ let activeIdx = ref(-1)
 let saveLoading = ref(false)
 
 async function setData() {
-  if (store.regions.length === 0) {
-    await store.getRegions()
+  if (store.readRegions.length === 0) {
+    await store.getReadRegions()
   }
 
-  data = reactive([...store.regions])
-  dataCopy = reactive([...store.regions])
+  data = store.readRegions
+  dataCopy = _.cloneDeep(data)
 }
 
 async function openMainWindow() {
@@ -96,6 +102,7 @@ function closeMainWindow() {
       store.switchAsk = false
       mainWindowVisible.value = false
       activeIdx.value = -1
+      store.readRegions = dataCopy
     }).catch(() => { })
   } else {
     mainWindowVisible.value = false
@@ -114,9 +121,21 @@ async function save() {
       return
     }
 
+    if (data[i].name === "综合") {
+      (document.getElementById(`r-name-${data[i].name}`) as HTMLElement).focus()
+      cmjs.prompt.error(`name不能为“综合”`)
+      return
+    }
+
     if (data[i].slug === "") {
       (document.getElementById(`r-slug-${data[i].slug}`) as HTMLElement).focus()
       cmjs.prompt.error(`slug不能为空`)
+      return
+    }
+
+    if (data[i].slug === "recommended") {
+      (document.getElementById(`r-slug-${data[i].slug}`) as HTMLElement).focus()
+      cmjs.prompt.error(`slug不能为“recommended”`)
       return
     }
 
@@ -144,14 +163,14 @@ async function save() {
     }
 
     saveLoading.value = true
-    await ManageAPI.setRegions(data)
+    await ManageAPI.setReadRegions(data)
       .then((res => {
         if (res.code !== 0) {
           cmjs.prompt.error(res.msg)
           return
         }
 
-        store.regions = []
+        store.readRegions = []
       }))
       .catch((err => {
         errOccur = true
@@ -207,6 +226,10 @@ function delItem() {
 
 .row:not(:last-child) {
   margin-bottom: 5px;
+}
+
+.slug-ban-input :deep(.el-input__inner) {
+  cursor: not-allowed;
 }
 </style>
 

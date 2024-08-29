@@ -52,6 +52,18 @@ const appealVideo = (id: number, content: string, imgs: string[]) => apiInstance
 
 const getAppealVideo = (id: number) => apiInstance.get(`/api/v1/video/appeal/${id}`).then(res => res.data)
 
+const getRecommendHomeVideo = () => apiInstance.get('/api/v1/video/recommend/home').then(res => res.data)
+
+const getRecommendVipVideo = () => apiInstance.get('/api/v1/video/recommend/vip').then(res => res.data)
+
+const getRecommendRegionsVideo = () => apiInstance.get('/api/v1/video/recommend/regions').then(res => res.data)
+
+const refreshRecommendRegionVideo = (slug: string) => apiInstance.get(`/api/v1/video/recommend/region/${slug}/refresh`).then(res => res.data)
+
+const getRegionRecommends = (slug: string, sort: 'popular' | 'play' | 'latest' | 'star', timestamp: number, page: number) => apiInstance.post(`/api/v1/video/region/${slug}/recommend`, { sort: sort, timestamp: timestamp, page: page }).then(res => res.data)
+
+const setVipVideo = (vid: number, set: boolean) => apiInstance.post('/api/v1/video/oper/vip', { id: vid, set: set }).then(res => res.data)
+
 export {
   getRegions,
   getMyArticleVideoNum,
@@ -66,4 +78,10 @@ export {
   uploadEditVideo,
   appealVideo,
   getAppealVideo,
+  getRecommendHomeVideo,
+  getRecommendVipVideo,
+  getRecommendRegionsVideo,
+  refreshRecommendRegionVideo,
+  getRegionRecommends,
+  setVipVideo,
 }

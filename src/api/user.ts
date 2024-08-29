@@ -52,6 +52,10 @@ const GetFollows = (uid: number, page: number, timestamp: number) => apiInstance
 
 const GetFans = (uid: number, page: number, timestamp: number) => apiInstance.post('/api/v1/user/fans', { id: uid, page: page, timestamp: timestamp }).then(res => res.data)
 
+const getMyVipInfo = () => apiInstance.get('/api/v1/user/vip').then(res => res.data)
+
+const PurchaseVip = (goodsId: number) => apiInstance.post('/api/v1/user/vip/purchase', { goodsId: goodsId }).then(res => res.data)
+
 export {
   emailLogin,
   passLogin,
@@ -75,4 +79,6 @@ export {
   CancelFollow,
   GetFollows,
   GetFans,
+  getMyVipInfo,
+  PurchaseVip
 }

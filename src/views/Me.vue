@@ -19,10 +19,6 @@
           <span class="iconfont el-icon-Bbi"></span>
           <span class="span">我的硬币</span>
         </el-menu-item>
-        <el-menu-item index="/me/blacklist">
-          <span class="iconfont el-icon-lahei"></span>
-          <span class="span">黑名单管理</span>
-        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>

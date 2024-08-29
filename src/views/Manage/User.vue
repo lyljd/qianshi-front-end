@@ -14,8 +14,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column :width="90" :formatter="tfFormatter" prop="isRestrict" label="交互限制" align="center" />
-
       <el-table-column :width="90" :formatter="tfFormatter" prop="isBan" label="账号封禁" align="center" />
 
       <el-table-column :width="90" prop="coinNum" label="硬币数" align="center" />
@@ -41,23 +39,13 @@
       <el-table-column :width="330" label="操作" align="center">
         <template #default="scope">
           <div class="flex-center" style="flex-wrap: wrap; gap: 5px;">
-            <el-popconfirm @confirm="() => { restrict(scope.$index) }"
-              :title="!scope.row.isRestrict ? '你确认要限制该用户吗？' : '你确认要取消限制该用户吗？'" confirm-button-text="确认"
-              cancel-button-text="取消">
-              <template #reference>
-                <el-button v-blur :type="!scope.row.isRestrict ? 'success' : 'danger'" size="small">{{
-                  !scope.row.isRestrict ?
-                  "限制交互" : "取消限制交互" }}</el-button>
-              </template>
-            </el-popconfirm>
-
             <el-popconfirm @confirm="() => { ban(scope.$index) }"
               :title="!scope.row.isBan ? '你确认要封禁该用户吗？' : '你确认要取消封禁该用户吗？'" confirm-button-text="确认"
               cancel-button-text="取消">
               <template #reference>
                 <el-button v-blur :type="!scope.row.isBan ? 'success' : 'danger'" size="small">{{ !scope.row.isBan ?
-                  "封禁账号" :
-                  "取消封禁账号" }}</el-button>
+        "封禁账号" :
+        "取消封禁账号" }}</el-button>
               </template>
             </el-popconfirm>
 
@@ -93,7 +81,6 @@ import UserInfoSysSetWindow from "@/components/window/UserInfoSysSetWindow.vue"
 type User = {
   id: number,
   nickname: string,
-  isRestrict: boolean,
   isBan: boolean,
   coinNum: number,
   exp: number,
@@ -163,14 +150,6 @@ function tfFormatter(_: any, __: any, v: boolean): string {
 
 function vipExpireDateFormatter(_: any, __: any, v: number): string {
   return v > 0 ? cmjs.fmt.tsTmpl(v, "YYYY-MM-DD") : "无会员"
-}
-
-function restrict(idx: number) {
-  // TODO api
-  console.log(result.value.data[idx].id)
-
-  result.value.data[idx].isRestrict = !result.value.data[idx].isRestrict
-  cmjs.prompt.success("操作成功")
 }
 
 function ban(idx: number) {

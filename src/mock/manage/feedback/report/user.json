@@ -5,7 +5,7 @@
       "id": 1,
       "uid": 1,
       "nickname": "Bonnenult",
-      "reportTime": 1689576232517,
+      "reportTime": 1689576232,
       "reportInfo": {
         "content": "随便试下用户举报",
         "imgs": []
@@ -19,11 +19,11 @@
       "id": 2,
       "uid": 1,
       "nickname": "Bonnenult",
-      "reportTime": 1689589232517,
+      "reportTime": 1689589232,
       "reportInfo": {
         "content": "看他不爽😕",
         "imgs": [
-          "/resource/壁纸/锁屏1.jpg"
+          "https://cdn.qianshi.fun/temp/壁纸/锁屏1.jpg"
         ]
       },
       "userInfo": {

@@ -20,10 +20,6 @@
     cmjs.fmt.numWE(video.starNum)
   }}</span></span>
 
-          <span :title="video.shareNum.toString()" class="iconfont el-icon-fenxiang icon"><span class="num">{{
-    cmjs.fmt.numWE(video.shareNum)
-  }}</span></span>
-
           <el-popover ref="extraPop" placement="bottom-end" @before-enter="beforeEnterExtraPop">
             <template #reference>
               <span style="font-size: 20px;" class="iconfont el-icon-diandiandianshu icon"></span>
@@ -33,11 +29,8 @@
                 <li @click="reportVideo"><span class="iconfont el-icon-jubao em-icon"></span>举报</li>
                 <li @click="cmjs.biz.watchLater(video.vid)"><span
                     class="iconfont el-icon-shaohouzaikan em-icon"></span>稍后再看</li>
-                <li v-if="store.power >= 4 && !video.vip" @click="setVipPri(video.vid)"><span
-                    class="iconfont el-icon-vip-pri em-icon"></span>设置会员专享
-                </li>
-                <li v-if="store.power >= 4 && video.vip" @click="cancelVipPri(video.vid)"><span
-                    class="iconfont el-icon-vip-pri em-icon"></span>取消会员专享
+                <li v-if="store.power >= 4 && !video.vip" @click="setVipPri(video.vid, !video.vip)"><span
+                    class="iconfont el-icon-vip-pri em-icon"></span>{{ video.vip ? '取消' : '设置' }}会员专享
                 </li>
               </ul>
             </div>
@@ -179,15 +172,11 @@
               @click="selectEpisode(item.vid)">
               <VipPriIco v-if="item.vip" :fs="13" style="margin-right: 10px;"></VipPriIco>
               <span :title="item.title" class="title">{{ item.title }}</span>
-              <span class="duration">{{ cmjs.fmt.videoDuration(item.duration) }}</span>
+              <span class="duration">{{ cmjs.fmt.videoDuration(item.duration!) }}</span>
             </li>
           </ul>
         </div>
       </el-card>
-
-      <div v-if="video.advertisement" class="advertisement">
-        <Advertisement :data="video.advertisement"></Advertisement>
-      </div>
 
       <div v-if="!video.collection && video.recommend" class="autoStreaming-row">
         <div>接下来播放</div>
@@ -205,7 +194,6 @@
 
 <script setup lang="ts">
 import VideoCard from '@/components/common/VideoCard.vue'
-import Advertisement from "@/components/common/Advertisement.vue"
 import CommentArea from "@/components/common/CommentArea.vue"
 import VideoTag from "@/components/common/VideoTag.vue"
 import Video from '@/components/common/Video.vue'
@@ -232,7 +220,6 @@ type Video = {
   likeNum: number
   coinNum: number
   starNum: number
-  shareNum: number
   isLike: boolean
   isCoin: boolean
   isStar: boolean
@@ -246,7 +233,6 @@ type Video = {
   }
   author: AuthorInfo
   danmu: Danmu[]
-  advertisement?: Advertisement
   collection?: Collection
   recommend?: Recommend[]
   vip: boolean
@@ -312,8 +298,9 @@ type Collection = {
   introduction: string
   videos: {
     vid: number
+    url: string
+    duration?: number
     title: string
-    duration: number
     vip: boolean
   }[]
 }
@@ -324,25 +311,11 @@ type Recommend = {
   coverUrl: string
   playNum: number
   danmuNum: number
-  duration: number
   title: string
   uid: number
   nickname: string
   date: number
   vip: boolean
-}
-
-type Advertisement = {
-  type: string,
-  content: string | Text,
-  linkUrl: string,
-}
-
-type Text = {
-  text: string,
-  fontSize: number,
-  fontColor: string,
-  bgColor: string,
 }
 
 type DanmuCtl = {
@@ -376,7 +349,7 @@ let dmCtlEle: HTMLDivElement
 let leftColumn: HTMLDivElement
 let rightColumn: HTMLDivElement
 
-let video = ref<Video>({ vid: 0, title: "-", regionSlug: "", regionName: "-", playNum: 0, date: 0, firstPublishAt: 0, empower: false, ipLocation: "", likeNum: 0, coinNum: 0, starNum: 0, shareNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "-", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
+let video = ref<Video>({ vid: 0, title: "-", regionSlug: "", regionName: "-", playNum: 0, date: 0, firstPublishAt: 0, empower: false, ipLocation: "", likeNum: 0, coinNum: 0, starNum: 0, isLike: false, isCoin: false, isStar: false, video: [], intro: "", tags: [], comments: { total: 0, totalTop: 0, data: [] }, author: { uid: 0, avatarUrl: "", nickname: "-", signature: "", fanNum: 0, isFocu: false }, danmu: [], vip: false })
 let init = ref(false) // 页面是否初始化完成；在onMounted执行完毕后则初始化完成
 let autoStreaming = ref(cmjs.cache.getLS("autoStreaming") !== "false" ? true : false) // 自动连播
 let nextVid = ref(-1)
@@ -471,6 +444,19 @@ async function setVideo(vid?: number) {
       }
 
       video.value = res.data
+
+      if (video.value.collection) {
+        video.value.collection.videos.forEach(v => {
+          cmjs.util.getVideoDurationPromise(v.url)
+            .then((d) => {
+              v.duration = d
+            })
+            .catch(() => {
+              v.duration = 0
+            })
+        })
+      }
+
       isUp.value = cmjs.biz.verifyLoginUid(video.value.author.uid)
       calcNextVid()
       document.title = video.value.title + " - 浅时"
@@ -486,7 +472,9 @@ async function setVideo(vid?: number) {
     setTimeout(() => {
       setIntroArea()
       collectionActiveItemEle = document.getElementById("collectionActiveItem") as HTMLLIElement
-      cmjs.util.scrollIntoViewInContainer(collectionActiveItemEle, collectionItemContainerEle, -5)
+      if (collectionActiveItemEle) {
+        cmjs.util.scrollIntoViewInContainer(collectionActiveItemEle, collectionItemContainerEle, -5)
+      }
     }, 0)
   }
 }
@@ -579,8 +567,10 @@ function starVideo() {
   video.value.isStar = !video.value.isStar
   if (video.value.isStar) {
     video.value.starNum++
+    cmjs.prompt.success('已收藏')
   } else {
     video.value.starNum--
+    cmjs.prompt.success('已取消收藏')
   }
 }
 
@@ -610,8 +600,8 @@ function reportVideo() {
   })
 }
 
-function setVipPri(vid: number) {
-  ElMessageBox.confirm('你确认要设置该视频为会员专享视频吗？', '确认提示', {
+function setVipPri(vid: number, set: boolean) {
+  ElMessageBox.confirm(`你确认要${set ? '设置' : '取消'}该视频为会员专享视频吗？`, '确认提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     closeOnClickModal: false,
@@ -621,44 +611,28 @@ function setVipPri(vid: number) {
     autofocus: false,
   })
     .then(() => {
-      //TODO api
-      video.value.vip = true
-      const vc = video.value.collection
-      if (vc) {
-        for (let i = 0; i < vc.videos.length; i++) {
-          if (vc.videos[i].vid === video.value.vid) {
-            vc.videos[i].vip = true
-            break
+      VideoAPI.setVipVideo(vid, set)
+        .then((res) => {
+          if (res.code !== 0) {
+            cmjs.prompt.error(res.msg)
+            return
           }
-        }
-      }
-      cmjs.prompt.success('操作成功')
-    })
-}
 
-function cancelVipPri(vid: number) {
-  ElMessageBox.confirm('你确认要取消该视频为会员专享视频吗？', '确认提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    showClose: false,
-    type: 'warning',
-    autofocus: false,
-  })
-    .then(() => {
-      //TODO api
-      video.value.vip = false
-      const vc = video.value.collection
-      if (vc) {
-        for (let i = 0; i < vc.videos.length; i++) {
-          if (vc.videos[i].vid === video.value.vid) {
-            vc.videos[i].vip = false
-            break
+          video.value.vip = true
+          const vc = video.value.collection
+          if (vc) {
+            for (let i = 0; i < vc.videos.length; i++) {
+              if (vc.videos[i].vid === video.value.vid) {
+                vc.videos[i].vip = true
+                break
+              }
+            }
           }
-        }
-      }
-      cmjs.prompt.success('操作成功')
+          cmjs.prompt.success('操作成功')
+        })
+        .catch((err) => {
+          cmjs.prompt.error(err)
+        })
     })
 }
 
@@ -1126,12 +1100,6 @@ async function getPower() {
       background-color: white;
       color: #409EFF;
       pointer-events: none;
-    }
-
-    .advertisement {
-      width: 270px;
-      height: 151.88px;
-      margin-bottom: 20px;
     }
 
     .autoStreaming-row {

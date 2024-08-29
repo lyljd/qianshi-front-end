@@ -2,147 +2,23 @@
   "carousel": [
     {
       "title": "轮播图1",
-      "imgUrl": "/resource/壁纸/锁屏1.jpg",
+      "imgUrl": "https://cdn.qianshi.fun/temp/壁纸/锁屏1.jpg",
       "linkUrl": ""
     },
     {
       "title": "轮播图2",
-      "imgUrl": "/resource/壁纸/锁屏2.jpg",
+      "imgUrl": "https://cdn.qianshi.fun/temp/壁纸/锁屏2.jpg",
       "linkUrl": ""
     },
     {
       "title": "轮播图3",
-      "imgUrl": "/resource/壁纸/Destiny 2.jpg",
+      "imgUrl": "https://cdn.qianshi.fun/temp/壁纸/Destiny 2.jpg",
       "linkUrl": ""
     },
     {
       "title": "轮播图4",
-      "imgUrl": "/resource/壁纸/Everlasting Summer Room.jpg",
+      "imgUrl": "https://cdn.qianshi.fun/temp/壁纸/Everlasting Summer Room.jpg",
       "linkUrl": ""
-    }
-  ],
-  "recommendation": [
-    {
-      "vid": 1,
-      "videoUrl": "/resource/video/1.mp4",
-      "coverUrl": "/resource/cover/1.jpeg",
-      "playNum": 0,
-      "danmuNum": 0,
-      "duration": 317,
-      "title": "晴天",
-      "uid": 1,
-      "nickname": "Bonnenult",
-      "date": 1696780800000,
-      "vip": false
-    },
-    {
-      "vid": 2,
-      "videoUrl": "/resource/video/2.mp4",
-      "coverUrl": "/resource/cover/2.jpeg",
-      "playNum": 0,
-      "danmuNum": 0,
-      "duration": 209,
-      "title": "Borrow Your Time",
-      "uid": 1,
-      "nickname": "Bonnenult",
-      "date": 1696780800000,
-      "vip": true
-    },
-    {
-      "vid": 3,
-      "videoUrl": "/resource/video/3.mp4",
-      "coverUrl": "/resource/cover/3.jpeg",
-      "playNum": 0,
-      "danmuNum": 0,
-      "duration": 256,
-      "title": "曼陀山庄",
-      "uid": 1,
-      "nickname": "Bonnenult",
-      "date": 1696780800000,
-      "vip": false
-    },
-    {
-      "vid": 4,
-      "videoUrl": "/resource/video/4.mp4",
-      "coverUrl": "/resource/cover/4.jpeg",
-      "playNum": 0,
-      "danmuNum": 0,
-      "duration": 222,
-      "title": "Paris",
-      "uid": 1,
-      "nickname": "Bonnenult",
-      "date": 1696780800000,
-      "vip": false
-    }
-  ],
-  "advertisement": {
-    "type": "text",
-    "content": {
-      "text": "仅供学习使用",
-      "fontSize": 18,
-      "fontColor": "white",
-      "bgColor": "#909399"
-    },
-    "linkUrl": ""
-  },
-  "regions": [
-    {
-      "title": "音乐",
-      "name": "music",
-      "videos": [
-        {
-          "vid": 5,
-          "videoUrl": "/resource/video/5.mp4",
-          "coverUrl": "/resource/cover/5.jpeg",
-          "playNum": 0,
-          "danmuNum": 0,
-          "duration": 103,
-          "title": "Running In The Dark",
-          "uid": 1,
-          "nickname": "Bonnenult",
-          "date": 1696780800000,
-          "vip": true
-        },
-        {
-          "vid": 6,
-          "videoUrl": "/resource/video/6.mp4",
-          "coverUrl": "/resource/cover/6.jpeg",
-          "playNum": 0,
-          "danmuNum": 0,
-          "duration": 318,
-          "title": "戒烟",
-          "uid": 1,
-          "nickname": "Bonnenult",
-          "date": 1696780800000,
-          "vip": false
-        },
-        {
-          "vid": 7,
-          "videoUrl": "/resource/video/7.mp4",
-          "coverUrl": "/resource/cover/7.jpeg",
-          "playNum": 0,
-          "danmuNum": 0,
-          "duration": 247,
-          "title": "Closer",
-          "uid": 1,
-          "nickname": "Bonnenult",
-          "date": 1696780800000,
-          "vip": false
-        },
-        {
-          "vid": 8,
-          "videoUrl": "/resource/video/8.mp4",
-          "coverUrl": "/resource/cover/8.jpeg",
-          "playNum": 0,
-          "danmuNum": 0,
-          "duration": 256,
-          "title": "雅俗共赏",
-          "uid": 1,
-          "nickname": "Bonnenult",
-          "date": 1696780800000,
-          "vip": false
-        }
-      ]
     }
   ]
 }

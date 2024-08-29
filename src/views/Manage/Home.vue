@@ -57,25 +57,6 @@
       </el-card>
     </div>
 
-    <el-card v-if="store.power >= 5">
-      <template #header>
-        <div class="card-header">
-          <div class="title">
-            <span class="iconfont el-icon-statistic icon"></span>
-            今日统计
-          </div>
-          <el-button v-blur @click="pushToNewPage('/manage/statistic')">查看更多</el-button>
-        </div>
-      </template>
-      <div class="row">总访问量：<span class="highlight">{{ hi.statistic!.total }}</span></div>
-      <div class="row">独立访问量：<span class="highlight">{{ hi.statistic!.unique }}</span>（用户：<span
-          class="highlight">49</span>，游客：<span class="highlight">8</span>）</div>
-      <div class="row"><span class="normallight">视频</span>投稿量：<span class="highlight">{{ hi.statistic!.video }}</span>
-      </div>
-      <div class="row"><span class="normallight">专栏</span>投稿量：<span class="highlight">{{ hi.statistic!.read }}</span>
-      </div>
-    </el-card>
-
     <el-card v-if="store.power >= 4">
       <template #header>
         <div class="card-header">
@@ -85,49 +66,44 @@
           </div>
         </div>
       </template>
-      <el-button v-blur @click="store.openSMSWindow()">
-        <span class="iconfont el-icon-message"></span>
-        <span>发送系统消息</span>
-      </el-button>
+      <div>
+        <el-button v-blur v-if="store.power >= 4" @click="store.openSMSWindow()">
+          <span class="iconfont el-icon-message"></span>
+          <span>发送系统消息</span>
+        </el-button>
 
-      <el-button v-blur @click="openSCWindow">
-        <span class="iconfont el-icon-carousel"></span>
-        <span>设置轮播图</span>
-      </el-button>
+        <el-button v-blur v-if="store.power >= 4" @click="openSCWindow">
+          <span class="iconfont el-icon-carousel"></span>
+          <span>设置轮播图</span>
+        </el-button>
 
-      <el-button v-blur @click="openSAWindow">
-        <span class="iconfont el-icon-guanggao"></span>
-        <span>设置广告</span>
-      </el-button>
+        <el-button v-blur v-if="store.power >= 4" @click="openSVRWindow">
+          <span class="iconfont el-icon-region"></span>
+          <span>设置视频分区</span>
+        </el-button>
 
-      <el-button v-blur @click="openSRWindow">
-        <span class="iconfont el-icon-region"></span>
-        <span>设置分区</span>
-      </el-button>
+        <el-button v-blur v-if="store.power >= 4" @click="openSRRWindow">
+          <span class="iconfont el-icon-region"></span>
+          <span>设置专栏分区</span>
+        </el-button>
 
-      <el-button v-blur @click="setVipPri">
-        <span class="iconfont el-icon-vip-pri-fill"></span>
-        <span>设置会员专享</span>
-      </el-button>
+        <el-button v-blur v-if="store.power >= 4" @click="setVipPri">
+          <span class="iconfont el-icon-vip-pri-fill"></span>
+          <span>设置会员专享</span>
+        </el-button>
 
-      <el-button v-blur @click="openIPBanWindow">
-        <span class="iconfont el-icon-ip"></span>
-        <span>IP封禁</span>
-      </el-button>
-
-      <el-button v-blur v-if="store.power >= 5" @click="cmjs.prompt.info('敬请期待')">
-        <span class="iconfont el-icon-log"></span>
-        <span>查看日志</span>
-      </el-button>
+        <el-button v-blur v-if="store.power >= 5" @click="cmjs.prompt.info('敬请期待')">
+          <span class="iconfont el-icon-log"></span>
+          <span>查看日志</span>
+        </el-button>
+      </div>
     </el-card>
 
     <SetCarouselWindow @open="getOpenSCWindow"></SetCarouselWindow>
 
-    <SetAdvertisementWindow @open="getOpenSAWindow"></SetAdvertisementWindow>
+    <VideoRegionWindow @open="getOpenSVRWindow"></VideoRegionWindow>
 
-    <RegionWindow @open="getOpenSRWindow"></RegionWindow>
-
-    <IPBanlWindow @open="getIPBanWindow"></IPBanlWindow>
+    <ReadRegionWindow @open="getOpenSRRWindow"></ReadRegionWindow>
   </div>
 </template>
 
@@ -136,9 +112,8 @@ import { useStore } from "@/store"
 import cmjs from '@/cmjs'
 import Avatar from '@/components/common/Avatar.vue'
 import SetCarouselWindow from "@/components/window/SetCarouselWindow.vue"
-import SetAdvertisementWindow from "@/components/window/SetAdvertisementWindow.vue"
-import RegionWindow from "@/components/window/SetRegionWindow.vue"
-import IPBanlWindow from "@/components/window/IPBanWindow.vue"
+import VideoRegionWindow from "@/components/window/SetVideoRegionWindow.vue"
+import ReadRegionWindow from "@/components/window/SetReadRegionWindow.vue"
 
 type HomeInfo = {
   nickname: string,
@@ -152,37 +127,26 @@ type HomeInfo = {
     msg?: number,
     report?: number,
   },
-  statistic?: {
-    total: number,
-    unique: number,
-    video: number,
-    read: number,
-  }
 }
 
 const store = useStore()
 
 let hi: HomeInfo = reactive(getHomeInfo())
 let openSCWindow = ref<Function>()
-let openSAWindow = ref<Function>()
-let openSRWindow = ref<Function>()
-let openIPBanWindow = ref<Function>()
+let openSVRWindow = ref<Function>()
+let openSRRWindow = ref<Function>()
 let avatarUrl = ref(cmjs.cache.getCookie('avatar'))
 
 function getOpenSCWindow(f: Function) {
   openSCWindow.value = f
 }
 
-function getOpenSAWindow(f: Function) {
-  openSAWindow.value = f
+function getOpenSVRWindow(f: Function) {
+  openSVRWindow.value = f
 }
 
-function getOpenSRWindow(f: Function) {
-  openSRWindow.value = f
-}
-
-function getIPBanWindow(f: Function) {
-  openIPBanWindow.value = f
+function getOpenSRRWindow(f: Function) {
+  openSRRWindow.value = f
 }
 
 function getCurTimePeriod() {
@@ -203,7 +167,7 @@ function getHomeInfo(): HomeInfo {
   return {
     nickname: "Bonnenult",
     review: {
-      video: 2,
+      video: 1,
       read: 0,
       title: 2,
     },
@@ -212,12 +176,6 @@ function getHomeInfo(): HomeInfo {
       msg: 0,
       report: 0,
     },
-    statistic: {
-      total: 103,
-      unique: 57,
-      video: 3,
-      read: 0,
-    }
   }
 }
 
@@ -246,7 +204,7 @@ function processFeedback() {
 }
 
 function setVipPri() {
-  cmjs.prompt.info('请前往需要设置的视频页，在“四连”右边的“三点悬浮菜单”中点击【设置会员专享】')
+  cmjs.prompt.info('请前往需要设置的视频页，在“三连”右边的“三点悬浮菜单”中点击【设置会员专享】')
 }
 </script>
 

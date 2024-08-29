@@ -7,6 +7,14 @@ export default {
     window.open(url, "_blank")
   },
 
+  push(url: string) {
+    router.push(url)
+  },
+
+  replace(url: string) {
+    router.replace(url)
+  },
+
   video(vid: number, t?: number) {
     this.new(`/v/${vid}${t !== undefined ? `?t=${t}` : ''}`)
   },
@@ -19,13 +27,17 @@ export default {
     this.new(`/r/${rid}`)
   },
 
+  readList(region: string) {
+    this.replace(`/read/${region}`)
+  },
+
   user(uid: number) {
     if (uid > 0) {
       this.new(`/u/${uid}`)
     }
   },
 
-  follow(uid: number, noJump?:boolean) {
+  follow(uid: number, noJump?: boolean) {
     if (noJump) {
       this.push(`/u/${uid}/follow`)
       return
@@ -33,7 +45,7 @@ export default {
     this.new(`/u/${uid}/follow`)
   },
 
-  fan(uid: number, noJump?:boolean) {
+  fan(uid: number, noJump?: boolean) {
     if (noJump) {
       this.push(`/u/${uid}/fan`)
       return
@@ -42,15 +54,11 @@ export default {
   },
 
   coinVideos(uid: number) {
-    this.new(`/u/${uid}/coinVideos`)
+    this.push(`/u/${uid}/coinVideos`)
   },
 
   likeVideos(uid: number) {
-    this.new(`/u/${uid}/likeVideos`)
-  },
-
-  dynamic(uid: number) {
-    this.new(`/u/${uid}/dynamic`)
+    this.push(`/u/${uid}/likeVideos`)
   },
 
   collection(uid: number, cid: number) {
@@ -63,10 +71,6 @@ export default {
 
   developer() {
     this.new("https://github.com/lyljd")
-  },
-
-  push(url: string) {
-    router.push(url)
   },
 
   pushVideo(vid: number, t?: number) {
@@ -83,6 +87,10 @@ export default {
       this.push(`/error?from=${location.pathname}`)
     }
   },
+
+  search(keyword: string) {
+    this.new(`/search?keyword=${keyword}`)
+  }
 }
 
 function getErrorMsg(code: number): string {

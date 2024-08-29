@@ -1,31 +1,34 @@
 <template>
-  <div class="pf-tip">每日凌晨3～5点每半个小时更新一次数据（昨日凌晨3点到今日凌晨3点）</div>
+  <div class="pf-tip">每日凌晨4点更新数据（昨日凌晨4点到今日凌晨4点）</div>
   <el-tabs class="pf-container">
     <el-tab-pane label="视频数据">
       <el-row>
         <el-col :span="8">
-          <StatisticCard title="播放量" icon="bofangshu" :total="data.video.total.playNum" :yesterday="data.video.yesterday.playNum"></StatisticCard>
+          <StatisticCard title="播放量" icon="bofangshu" :total="data.video.total.playNum"
+            :yesterday="data.video.yesterday.playNum"></StatisticCard>
         </el-col>
         <el-col :span="8">
-          <StatisticCard title="评论数" icon="pinglun" :total="data.video.total.commentNum" :yesterday="data.video.yesterday.commentNum"></StatisticCard>
+          <StatisticCard title="评论数" icon="pinglun" :total="data.video.total.commentNum"
+            :yesterday="data.video.yesterday.commentNum"></StatisticCard>
         </el-col>
         <el-col :span="8">
-          <StatisticCard title="弹幕数" icon="danmushu" :total="data.video.total.danmuNum" :yesterday="data.video.yesterday.danmuNum"></StatisticCard>
+          <StatisticCard title="弹幕数" icon="danmushu" :total="data.video.total.danmuNum"
+            :yesterday="data.video.yesterday.danmuNum"></StatisticCard>
         </el-col>
       </el-row>
 
       <el-row>
-        <el-col :span="6">
-          <StatisticCard title="点赞数" icon="good" :total="data.video.total.likeNum" :yesterday="data.video.yesterday.likeNum"></StatisticCard>
+        <el-col :span="8">
+          <StatisticCard title="点赞数" icon="good" :total="data.video.total.likeNum"
+            :yesterday="data.video.yesterday.likeNum"></StatisticCard>
         </el-col>
-        <el-col :span="6">
-          <StatisticCard title="投币数" icon="Bbi" :total="data.video.total.coinNum" :yesterday="data.video.yesterday.coinNum"></StatisticCard>
+        <el-col :span="8">
+          <StatisticCard title="投币数" icon="Bbi" :total="data.video.total.coinNum"
+            :yesterday="data.video.yesterday.coinNum"></StatisticCard>
         </el-col>
-        <el-col :span="6">
-          <StatisticCard title="收藏数" icon="collection" :total="data.video.total.starNum" :yesterday="data.video.yesterday.starNum"></StatisticCard>
-        </el-col>
-        <el-col :span="6">
-          <StatisticCard title="分享数" icon="fenxiang" :total="data.video.total.shareNum" :yesterday="data.video.yesterday.shareNum"></StatisticCard>
+        <el-col :span="8">
+          <StatisticCard title="收藏数" icon="collection" :total="data.video.total.starNum"
+            :yesterday="data.video.yesterday.starNum"></StatisticCard>
         </el-col>
       </el-row>
     </el-tab-pane>
@@ -34,22 +37,23 @@
     <el-tab-pane label="专栏数据">
       <el-row>
         <el-col :span="12">
-          <StatisticCard title="阅读量" icon="read" :total="data.read.total.readNum" :yesterday="data.read.yesterday.readNum"></StatisticCard>
+          <StatisticCard title="阅读量" icon="read" :total="data.read.total.readNum"
+            :yesterday="data.read.yesterday.readNum"></StatisticCard>
         </el-col>
         <el-col :span="12">
-          <StatisticCard title="评论数" icon="pinglun" :total="data.read.total.commentNum" :yesterday="data.read.yesterday.commentNum"></StatisticCard>
+          <StatisticCard title="评论数" icon="pinglun" :total="data.read.total.commentNum"
+            :yesterday="data.read.yesterday.commentNum"></StatisticCard>
         </el-col>
       </el-row>
 
       <el-row>
-        <el-col :span="8">
-          <StatisticCard title="点赞数" icon="good" :total="data.read.total.likeNum" :yesterday="data.read.yesterday.likeNum"></StatisticCard>
+        <el-col :span="12">
+          <StatisticCard title="点赞数" icon="good" :total="data.read.total.likeNum"
+            :yesterday="data.read.yesterday.likeNum"></StatisticCard>
         </el-col>
-        <el-col :span="8">
-          <StatisticCard title="收藏数" icon="collection" :total="data.read.total.starNum" :yesterday="data.read.yesterday.starNum"></StatisticCard>
-        </el-col>
-        <el-col :span="8">
-          <StatisticCard title="分享数" icon="fenxiang" :total="data.read.total.shareNum" :yesterday="data.read.yesterday.shareNum"></StatisticCard>
+        <el-col :span="12">
+          <StatisticCard title="收藏数" icon="collection" :total="data.read.total.starNum"
+            :yesterday="data.read.yesterday.starNum"></StatisticCard>
         </el-col>
       </el-row>
     </el-tab-pane>
@@ -79,7 +83,6 @@ type Video = {
   likeNum: number,
   coinNum: number,
   starNum: number,
-  shareNum: number
 }
 
 type Read = {
@@ -87,7 +90,6 @@ type Read = {
   commentNum: number,
   likeNum: number,
   starNum: number,
-  shareNum: number
 }
 
 const store = useStore()

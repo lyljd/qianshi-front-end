@@ -4,7 +4,7 @@
       <template #header>
         <div class="header">
           <span class="flex-center">用户：<span @click="cmjs.jump.user(r.uid)" class="nickname">{{ r.nickname
-          }}</span></span>
+              }}</span></span>
           <span>举报时间：{{ cmjs.fmt.tsStandard(r.reportTime) }}</span>
           <div>
             <el-button v-blur @click="process(idx)" type="success">调整视频至未通过</el-button>
@@ -40,7 +40,8 @@ type Video = {
   videoUrl: string,
   coverUrl: string,
   title: string,
-  region: string,
+  regionName: string,
+  regionSlug: string,
   tags: string[],
   intro: string,
   empower: boolean

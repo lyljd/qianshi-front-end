@@ -26,7 +26,7 @@
           <template #empty>
             <div v-loading="loading">暂无分区</div>
           </template>
-          <el-option v-for="r in store.regions" :label="r.name" :value="r.slug" />
+          <el-option v-for="r in store.videoRegions" :label="r.name" :value="r.slug" />
         </el-select>
       </div>
 
@@ -199,6 +199,7 @@ async function coverUploadHandler(file: File, percent: Ref<number>, succ: Functi
     .then((res) => {
       if (res.code !== 0) {
         fail(res.msg)
+        return
       }
 
       video.coverName = up.filename
@@ -250,6 +251,7 @@ async function videoUploadHandler(file: File, percent: Ref<number>, succ: Functi
     .then((res) => {
       if (res.code !== 0) {
         fail(res.msg)
+        return
       }
 
       video.videoName = up.filename
@@ -301,9 +303,9 @@ function submit() {
 }
 
 async function selectShow() {
-  if (store.regions.length === 0) {
+  if (store.videoRegions.length === 0) {
     loading.value = true
-    await store.getRegions()
+    await store.getVideoRegions()
     loading.value = false
   }
 }

@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import cmjs from "@/cmjs";
+import cmjs from "@/cmjs"
 import { useStore } from "@/store"
 import { useRoute } from "vue-router"
 import { storeToRefs } from "pinia"
@@ -64,6 +64,7 @@ watch(() => store.isLogin, (newVal: boolean) => {
   myId.value = cmjs.biz.getUid()
   timestamp.value = cmjs.util.getCurBETimestamp()
   curPage.value = 1
+  getFans()
 })
 
 let timestamp = ref(cmjs.util.getCurBETimestamp())

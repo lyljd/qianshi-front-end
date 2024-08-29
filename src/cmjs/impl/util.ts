@@ -321,4 +321,40 @@ export default {
     let idx = fileName.lastIndexOf(".")
     return fileName.substring(idx + 1)
   },
+
+  // 传入一个引用变量，将视频时长秒数赋值给它
+  // 原理：通过插入video元素，然后赋值src来获取元素的duration，最后再移除元素
+  getVideoDuration(src: string, d: globalThis.Ref<number>) {
+    const video = document.createElement('video')
+    video.src = src
+    video.onloadedmetadata = function () {
+      const duration = Math.floor(video.duration)
+      video.remove()
+      d.value = duration
+    }
+  },
+
+  // promise版，适用于不便传引用变量的情况
+  getVideoDurationPromise(src: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video')
+      video.src = src
+      video.onloadedmetadata = function () {
+        const duration = Math.floor(video.duration)
+        video.remove()
+        resolve(duration)
+      }
+      video.onerror = function (err) {
+        video.remove()
+        reject(err)
+      }
+    })
+  },
+
+  // 随机生成n位的整数
+  generateRandomNumber(n: number) {
+    let min = Math.pow(10, n - 1)
+    let max = Math.pow(10, n) - 1
+    return Math.floor(min + Math.random() * (max - min + 1))
+  },
 }

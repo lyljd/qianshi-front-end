@@ -27,9 +27,13 @@ defineProps<{
 </script>
 
 <style lang="less" scoped>
-.fd-container .img-row {
-  display: flex;
-  gap: 8px;
+.fd-container {
+  overflow-y: scroll;
+
+  .img-row {
+    display: flex;
+    gap: 8px;
+  }
 }
 </style>
 

@@ -1,5 +1,5 @@
 <template>
-  <el-empty description="敬请期待" />
+  <el-empty description="暂无专栏" />
 </template>
 
 <script setup lang="ts">

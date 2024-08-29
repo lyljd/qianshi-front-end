@@ -193,10 +193,10 @@ function send() {
   const cid = Date.now()
   const c: Comment = {
     "cid": cid,
-    "avatarUrl": "/resource/avatar.jpeg",
+    "avatarUrl": cmjs.cache.getCookie('avatar'),
     "uid": 1,
     "nickname": "Bonnenult",
-    "level": 6,
+    "level": 5,
     "isVip": true,
     "isUp": true,
     "isTop": false,
@@ -275,10 +275,10 @@ function childSend() {
   //TODO api
   const newComment: Comment = {
     "cid": Date.now(),
-    "avatarUrl": "/resource/avatar.jpeg",
+    "avatarUrl": cmjs.cache.getCookie('avatar'),
     "uid": 1,
     "nickname": "Bonnenult",
-    "level": 6,
+    "level": 5,
     "isVip": true,
     "isTop": false,
     "isUp": true,

@@ -66,10 +66,6 @@
           </template>
           <div class="extra-menu">
             <ul>
-              <li v-if="!user.isBlock || !isLogin" @click="blockUser"><span
-                  class="iconfont el-icon-lahei em-icon"></span>拉黑
-              </li>
-              <li v-else @click="cancelBlockUser"><span class="iconfont el-icon-lahei em-icon"></span>取消拉黑</li>
               <li @click="reportUser"><span class="iconfont el-icon-jubao2 em-icon"></span>举报</li>
             </ul>
           </div>
@@ -81,7 +77,6 @@
     <el-card class="nav">
       <el-menu class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
         <el-menu-item :index="`/u/${$route.params.uid}`">主页</el-menu-item>
-        <el-menu-item :index="`/u/${$route.params.uid}/dynamic`">动态</el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/post`">投稿<span class="item-num">{{ user.postNum
             }}</span></el-menu-item>
         <el-menu-item :index="`/u/${$route.params.uid}/collection`">合集<span class="item-num">{{ user.collectionNum
@@ -89,15 +84,6 @@
         <el-menu-item :index="`/u/${$route.params.uid}/favlist`">收藏<span class="item-num">{{ user.favlistNum
             }}</span></el-menu-item>
         <el-menu-item v-if="isMe" :index="`/u/${$route.params.uid}/setting`">设置</el-menu-item>
-
-        <div class="search-container">
-          <el-input v-model="searchKey" @keyup.enter.native="toSearch" class="search" placeholder="搜索视频、动态" clearable>
-
-            <template #prefix><el-icon style="cursor: pointer;">
-                <search />
-              </el-icon></template>
-          </el-input>
-        </div>
 
         <div class="flex-grow" />
 
@@ -145,8 +131,8 @@ import Avatar from '@/components/common/Avatar.vue'
 import cmjs from '@/cmjs'
 import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
-import { useRoute } from "vue-router"
-import { ElMessageBox, UploadUserFile } from "element-plus"
+import { onBeforeRouteUpdate, useRoute } from "vue-router"
+import { UploadUserFile } from "element-plus"
 import * as API from '@/api/user'
 import { useRouter } from "vue-router"
 
@@ -163,7 +149,6 @@ type User = {
   isBan?: boolean
   topImgNo: number
   isFocu: boolean
-  isBlock: boolean
   postNum: number
   collectionNum: number
   favlistNum: number
@@ -182,7 +167,7 @@ const extraPop = ref()
 let pageLoading = ref(false)
 
 const uid = parseInt(route.params.uid as string)
-let user = ref<User>({ uid: uid, nickname: "", signature: "", avatarUrl: "", gender: "保密", level: 1, isVip: false, ipLocation: "", topImgNo: 0, isFocu: false, isBlock: false, postNum: 0, collectionNum: 0, favlistNum: 0, followNum: 0, fanNum: 0, likeNum: 0, playNum: 0, readNum: 0 })
+let user = ref<User>({ uid: uid, nickname: "", signature: "", avatarUrl: "", gender: "保密", level: 1, isVip: false, ipLocation: "", topImgNo: 0, isFocu: false, postNum: 0, collectionNum: 0, favlistNum: 0, followNum: 0, fanNum: 0, likeNum: 0, playNum: 0, readNum: 0 })
 getUser()
 
 const store = useStore()
@@ -207,22 +192,15 @@ store.setUserMenuFavlistNum = setMenuFavlistNum
 
 const signatureInput = ref<HTMLInputElement>()
 const topImgs: string[] = [
-  "https://cdn.qianshi.fun/userhome-top-img/1.png?auth_key=1741881992-0-0-61f5f9a229eddc2f174fd03e783095e0",
-  "https://cdn.qianshi.fun/userhome-top-img/2.png?auth_key=1741882016-0-0-cc38f3c0b110f4c8c7856f18bdb862c0",
-  "https://cdn.qianshi.fun/userhome-top-img/3.png?auth_key=1741882023-0-0-7a52eb4a460952a53e07d95c9a60d8da",
-  "https://cdn.qianshi.fun/userhome-top-img/4.png?auth_key=1741882030-0-0-35c8b166af0e6d5629dc8de877403b30",
-]
-const aks: string[] = [
-  "?auth_key=1741881992-0-0-61f5f9a229eddc2f174fd03e783095e0",
-  "?auth_key=1741882016-0-0-cc38f3c0b110f4c8c7856f18bdb862c0",
-  "?auth_key=1741882023-0-0-7a52eb4a460952a53e07d95c9a60d8da",
-  "?auth_key=1741882030-0-0-35c8b166af0e6d5629dc8de877403b30",
+  "https://cdn.qianshi.fun/userhome-top-img/1.png",
+  "https://cdn.qianshi.fun/userhome-top-img/2.png",
+  "https://cdn.qianshi.fun/userhome-top-img/3.png",
+  "https://cdn.qianshi.fun/userhome-top-img/4.png",
 ]
 
 let isMe = ref(cmjs.biz.verifyLoginUid(uid))
 let topImgUrl = ref("")
 let signature = ref(user.value.signature)
-let searchKey = ref("")
 let oldTopImgUrl = ref("")
 let oldTopImgNo = ref(-1)
 let replaceTopImgDrawerShow = ref(false)
@@ -231,6 +209,11 @@ let lastPath = ref("")
 let replaceing = ref(false) // 是否正在更换头图的api请求过程中
 
 setLastPath(route.path)
+
+onBeforeRouteUpdate((to, from, next) => {
+  document.title = user.value.nickname + "的个人空间 - 浅时"
+  next()
+})
 
 function getUser() {
   pageLoading.value = true
@@ -241,7 +224,7 @@ function getUser() {
         return
       }
       user.value = res.data
-      topImgUrl.value = `https://cdn.qianshi.fun/userhome-top-img/${user.value.topImgNo}.png${aks[user.value.topImgNo - 1]}`
+      topImgUrl.value = `https://cdn.qianshi.fun/userhome-top-img/${user.value.topImgNo}.png`
       signature.value = user.value.signature
       document.title = user.value.nickname + "的个人空间 - 浅时"
     })
@@ -386,58 +369,6 @@ function sendMessage() {
   cmjs.prompt.info("敬请期待")
 }
 
-function blockUser() {
-  extraPop.value.hide()
-
-  if (!isLogin.value) {
-    store.openLoginWindow()
-    return
-  }
-
-  ElMessageBox.prompt('请输入备注（比如拉黑的原因；可为空）', '拉黑用户', {
-    confirmButtonText: '提交',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    showClose: false,
-  })
-    .then(({ value }) => {
-      //TODO api
-      console.log(uid)
-      console.log("备注：" + value)
-
-      user.value.isBlock = true
-      cmjs.prompt.success("拉黑成功")
-    })
-    .catch(() => { })
-}
-
-function cancelBlockUser() {
-  extraPop.value.hide()
-
-  if (!isLogin.value) {
-    store.openLoginWindow()
-    return
-  }
-
-  ElMessageBox.confirm('你确认要取消拉黑该用户吗？', '确认提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    showClose: false,
-    type: 'warning',
-    autofocus: false,
-  })
-    .then(() => {
-      //TODO api
-      console.log(uid)
-
-      user.value.isBlock = false
-      cmjs.prompt.success('取消拉黑成功')
-    })
-}
-
 function reportUser() {
   extraPop.value.hide()
 
@@ -474,10 +405,6 @@ function setMenuCollectionNum(newNum: number) {
 
 function setMenuFavlistNum(newNum: number) {
   user.value.favlistNum = newNum
-}
-
-function toSearch() {
-  cmjs.prompt.info(`searchKey: ${searchKey.value}`)
 }
 
 function setLastPath(path: string) {
@@ -644,17 +571,6 @@ function setLastPath(path: string) {
         color: #909399;
         font-size: 12px;
         margin-left: 3px;
-      }
-
-      .search-container {
-        display: flex;
-        align-items: center;
-        margin-left: 20px;
-
-        .search {
-          height: 30px;
-          width: 225px;
-        }
       }
 
       .num-container {

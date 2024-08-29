@@ -20,7 +20,7 @@
     </div>
 
     <div v-show="title !== '' && msg !== ''" class="row-title">预览消息实际显示效果</div>
-    <SysMsgCard v-show="title !== '' && msg !== ''" :data="{ title: title, content: msg, time: Date.now() }"></SysMsgCard>
+    <SysMsgCard v-show="title !== '' && msg !== ''" :data="{ title: title, content: msg, time: Date.now()/1000 }"></SysMsgCard>
 
     <div class="row-title">收件人</div>
     <div class="rec-row">

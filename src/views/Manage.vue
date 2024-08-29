@@ -5,7 +5,8 @@
         <el-menu :default-active=$route.path router="true">
           <div class="page-title">
             <div>
-              <Image url="https://cdn.qianshi.fun/favicon.png?auth_key=1741881534-0-0-b53b6ef7f0d3c2756aa3f777d5ed8a8e" :w="40" :h="40"></Image>
+              <Image url="https://cdn.qianshi.fun/favicon.png"
+                :w="40" :h="40"></Image>
             </div>
             <div>后台管理</div>
             <div @click="cmjs.jump.new('/')" class="open-main-web">打开主站</div>
@@ -43,7 +44,6 @@ let item = reactive([
   { index: "/manage/feedback/appeal/video", content: "反馈", icon: "feedback", power: 1 },
   { index: "/manage/user", content: "用户", icon: "people", power: 4 },
   { index: "/manage/power", content: "权限", icon: "key", power: 3 },
-  { index: "/manage/statistic", content: "统计", icon: "statistic", power: 5 }
 ])
 
 function setItemIndex(idx: number, index: string) {

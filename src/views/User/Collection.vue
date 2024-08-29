@@ -83,7 +83,6 @@ type Video = {
   coverUrl: string
   playNum: number
   danmuNum: number
-  duration: number
   title: string
   uid: number
   nickname: string

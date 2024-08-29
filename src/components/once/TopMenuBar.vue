@@ -4,7 +4,7 @@
   <el-menu id="menu" class="menu" @open="menuUnfold" mode="horizontal" :default-active=$route.path :ellipsis="false"
     router="true">
     <div class="logo">
-      <Image url="https://cdn.qianshi.fun/favicon.png?auth_key=1741881534-0-0-b53b6ef7f0d3c2756aa3f777d5ed8a8e" :w="40"
+      <Image url="https://cdn.qianshi.fun/favicon.png" :w="40"
         :h="40"></Image>
     </div>
 
@@ -12,17 +12,17 @@
     <el-menu-item v-blur index="/hot">热门</el-menu-item>
     <el-sub-menu index="/region" :popper-offset="-10">
       <template #title>分区</template>
-      <span v-loading="regionLoading" v-show="store.regions.length === 0" class="no-region">暂无分区</span>
-      <el-menu-item v-show="store.regions.length !== 0" v-for="r in store.regions" :index="`/region/${r.slug}`">{{
+      <span v-loading="regionLoading" v-show="store.videoRegions.length === 0" class="no-region">暂无分区</span>
+      <el-menu-item v-show="store.videoRegions.length !== 0" v-for="r in store.videoRegions" :index="`/region/${r.slug}`">{{
     r.name
   }}</el-menu-item>
     </el-sub-menu>
-    <el-menu-item v-blur index="/read">专栏</el-menu-item>
-    <el-menu-item v-blur index="/live">直播</el-menu-item>
+    <el-menu-item v-blur :index="readSlug">专栏</el-menu-item>
+    <!-- <el-menu-item v-blur index="/live">直播</el-menu-item> -->
 
     <div class="flex-grow" />
 
-    <div class="search-bar">
+    <div class="search-bar" v-show="store.topPath !== 'search'">
       <el-input @keyup.enter.native="toSearch" id="search" v-model="searchKey" class="search" placeholder="搜索"
         clearable>
 
@@ -84,10 +84,6 @@
                 <div class="number" @click="cmjs.jump.fan(ahi.id)">{{ cmjs.fmt.numWE(ahi.fanNum) }}</div>
                 <div class="text">粉丝</div>
               </div>
-              <div class="num">
-                <div class="number" @click="cmjs.jump.dynamic(ahi.id)">{{ cmjs.fmt.numWE(ahi.dynamicNum) }}</div>
-                <div class="text">动态</div>
-              </div>
             </div>
             <li @click="cmjs.jump.new('/manage')" v-if="ahi.power > 0">后台管理</li>
             <li @click="cmjs.jump.new('/me')">个人中心</li>
@@ -111,19 +107,11 @@
           </div>
         </template>
         <ul class="almul"> <!--after login menu ul-->
-          <li>回复我的</li>
-          <li>@我的</li>
-          <li>收到的赞</li>
-          <li>系统消息</li>
-          <li>我的消息</li>
+          <li @click="cmjs.jump.new('/message/reply')">回复我的</li>
+          <li @click="cmjs.jump.new('/message/system')">系统消息</li>
+          <li @click="cmjs.jump.new('/message/chat')">私信</li>
         </ul>
       </el-popover>
-
-      <div @click="cmjs.jump.new('/dynamic')" class="ico-btn" style="margin-top: 1px;">
-        <el-button v-blur circle><el-badge :value="newDynamicNum" :max="99" :show-zero="false"><el-icon
-              class="iconfont el-icon-fengche ico"></el-icon></el-badge></el-button>
-        <div class="notice">动态</div>
-      </div>
 
       <div @click="cmjs.jump.favlist(cmjs.biz.getUid())" class="ico-btn">
         <el-button v-blur circle><el-icon class="ico">
@@ -166,6 +154,7 @@ import { useStore } from "@/store"
 import { storeToRefs } from "pinia"
 import * as UserAPI from '@/api/user'
 import * as VideoAPI from '@/api/video'
+import * as ReadAPI from '@/api/read'
 
 type AvatarHoverInfo = {
   id: number,
@@ -176,7 +165,6 @@ type AvatarHoverInfo = {
   coin: number,
   followNum: number,
   fanNum: number,
-  dynamicNum: number,
   signinStatus: boolean,
 }
 
@@ -195,7 +183,6 @@ watch(() => store.isLogin, (newVal: boolean) => {
       "coin": 0,
       "followNum": 0,
       "fanNum": 0,
-      "dynamicNum": 0,
       "signinStatus": true,
     }
   }
@@ -218,15 +205,14 @@ let ahi = ref<AvatarHoverInfo>({
   "coin": 0,
   "followNum": 0,
   "fanNum": 0,
-  "dynamicNum": 0,
   "signinStatus": true,
 })
 let avatar = ref(cmjs.cache.getCookie('avatar'))
 let tpp = ref("不能为空") // topPath
 let newMessageNum = ref(0)
-let newDynamicNum = ref(0)
 let regionLoading = ref(false)
 let ahiLoading = ref(false)
+let readSlug = ref("/read/recommended")
 
 watch(() => route.path, (newPath) => {
   if (newPath === "/") {
@@ -338,7 +324,7 @@ function signin() {
 }
 
 function toSearch() {
-  cmjs.prompt.info(`searchKey: ${searchKey.value}`)
+  cmjs.jump.search(searchKey.value)
 }
 
 store.setTopMenuBarAvatar = (avatarUrl: string) => {
@@ -350,13 +336,8 @@ function setNewMessageNum(num: number) {
   newMessageNum.value = num
 }
 
-store.setNewDynamicNum = setNewDynamicNum
-function setNewDynamicNum(num: number) {
-  newDynamicNum.value = num
-}
-
-store.getRegions = getRegions
-async function getRegions() {
+store.getVideoRegions = getVideoRegions
+async function getVideoRegions() {
   await VideoAPI.getRegions()
     .then((res) => {
       if (res.code !== 0) {
@@ -364,7 +345,23 @@ async function getRegions() {
         return
       }
 
-      store.regions = res.data
+      store.videoRegions = res.data
+    })
+    .catch((err) => {
+      cmjs.prompt.error(err)
+    })
+}
+
+store.getReadRegions = getReadRegions
+async function getReadRegions() {
+  await ReadAPI.getRegions()
+    .then((res) => {
+      if (res.code !== 0) {
+        cmjs.prompt.error(res.msg)
+        return
+      }
+
+      store.readRegions = res.data
     })
     .catch((err) => {
       cmjs.prompt.error(err)
@@ -373,12 +370,17 @@ async function getRegions() {
 
 function menuUnfold(index: string) {
   if (index === "/region") {
-    if (store.regions.length === 0) {
+    if (store.videoRegions.length === 0) {
       regionLoading.value = true
-      getRegions()
+      getVideoRegions()
     }
   }
 }
+
+function setReadSlug(slug: string) {
+  readSlug.value = slug
+}
+store.setReadSlug = setReadSlug
 </script>
 
 <style scoped>

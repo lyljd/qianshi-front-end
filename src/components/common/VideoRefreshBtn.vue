@@ -1,5 +1,5 @@
 <template>
-  <el-button @click="refresh" v-blur class="refresh">
+  <el-button v-blur class="refresh">
     <span class="info"><el-icon class="icon">
         <Refresh />
       </el-icon>换一换</span>
@@ -7,13 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import cmjs from '@/cmjs';
-
-// TODO 通过函数传入需要刷新的视频变量
-
-function refresh() {
-  cmjs.prompt.info("敬请期待")
-}
 </script>
 
 <style lang="less" scoped>

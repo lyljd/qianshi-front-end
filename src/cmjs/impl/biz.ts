@@ -88,8 +88,11 @@ export default {
     1：已添加；0：已取消；-1：操作失败
     */
 
-    prompt.error("操作失败")
-    return -1
+    // prompt.error("操作失败")
+    // return -1
+
+    prompt.success("已添加")
+    return 1
   },
 
   // clearLoginInfo 清除登录信息

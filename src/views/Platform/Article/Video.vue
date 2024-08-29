@@ -174,7 +174,7 @@
             <template #empty>
               <div>暂无分区</div>
             </template>
-            <el-option v-for="r in store.regions" :label="r.name" :value="r.slug" />
+            <el-option v-for="r in store.videoRegions" :label="r.name" :value="r.slug" />
           </el-select>
         </div>
 
@@ -805,7 +805,7 @@ function publish(idx: number) {
 function cancelPublish(idx: number) {
   const id = pubed.value.list[idx].id
 
-  ElMessageBox.confirm('你确认要下架该视频吗？下架后其他人将无法观看该视频，且正在观看的人将立刻被终止观看！注意：视频的相关数据<span style="color: red;">不会受到影响</span>。', '确认提示', {
+  ElMessageBox.confirm('你确认要下架该视频吗？下架后其他人将无法观看该视频，且正在观看的人将在数秒后被终止观看（视频页不会被关闭，但相关功能会被禁止）！注意：视频的相关数据<span style="color: red;">不会受到影响</span>。', '确认提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     closeOnClickModal: false,
@@ -840,8 +840,8 @@ function cancelPublish(idx: number) {
 async function edit(idx: number) {
   getting.value.push(idx)
 
-  if (store.regions.length === 0) {
-    await store.getRegions()
+  if (store.videoRegions.length === 0) {
+    await store.getVideoRegions()
   }
 
   switch (viewItem.value) {

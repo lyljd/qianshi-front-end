@@ -21,16 +21,11 @@
       :resizable="false" />
     <el-table-column prop="setCarousel" label="设置轮播图" :width="100" :formatter="tfFormatter" align="center"
       :resizable="false" />
-    <el-table-column prop="setAdvertisement" label="设置广告" :width="90" :formatter="tfFormatter" align="center"
-      :resizable="false" />
-    <el-table-column prop="setRegion" label="设置分区" :width="90" :formatter="tfFormatter" align="center"
+    <el-table-column prop="setRegion" label="设置视频/专栏分区" :width="150" :formatter="tfFormatter" align="center"
       :resizable="false" />
     <el-table-column prop="setVipPri" label="设置会员专享" :width="110" :formatter="tfFormatter" align="center"
       :resizable="false" />
-    <el-table-column prop="ipBan" label="IP封禁" :width="70" :formatter="tfFormatter" align="center" :resizable="false" />
     <el-table-column prop="log" label="查看日志" :width="90" :formatter="tfFormatter" align="center" :resizable="false" />
-    <el-table-column prop="statistic" label="查看统计" :width="90" :formatter="tfFormatter" align="center"
-      :resizable="false" />
   </el-table>
 </template>
 
@@ -52,21 +47,18 @@ type power = {
   user: boolean,
   sendSysMsg: boolean,
   setCarousel: boolean,
-  setAdvertisement: boolean,
   setRegion: boolean,
   setVipPri: boolean,
-  ipBan: boolean,
   log: boolean,
-  statistic: boolean,
 }
 
 const data: power[] = [
-  { level: 1, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: false, msg: false, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, setRegion: false, setVipPri: false, ipBan: false, log: false, statistic: false },
-  { level: 2, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, setRegion: false, setVipPri: false, ipBan: false, log: false, statistic: false },
-  { level: 3, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: false, sendSysMsg: false, setCarousel: false, setAdvertisement: false, setRegion: false, setVipPri: false, ipBan: false, log: false, statistic: false },
-  { level: 4, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, setRegion: true, setVipPri: true, ipBan: true, log: false, statistic: false },
-  { level: 5, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, setRegion: true, setVipPri: true, ipBan: true, log: true, statistic: true },
-  { level: 6, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setAdvertisement: true, setRegion: true, setVipPri: true, ipBan: true, log: true, statistic: true },
+  { level: 1, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: false, msg: false, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setRegion: false, setVipPri: false, log: false },
+  { level: 2, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: false, power: false, user: false, sendSysMsg: false, setCarousel: false, setRegion: false, setVipPri: false, log: false },
+  { level: 3, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: false, sendSysMsg: false, setCarousel: false, setRegion: false, setVipPri: false, log: false },
+  { level: 4, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setRegion: true, setVipPri: true, log: false },
+  { level: 5, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setRegion: true, setVipPri: true, log: true },
+  { level: 6, reviewVR: true, reviewAvatar: true, appeal: true, reviewTitle: true, msg: true, report: true, power: true, user: true, sendSysMsg: true, setCarousel: true, setRegion: true, setVipPri: true, log: true },
 ]
 
 function tfFormatter(_: any, __: any, v: boolean): string {
